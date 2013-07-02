@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+#
+#--------------------------------------------------------------------------------
+#  Run Hartree-Fock bound calculation and get MOs & VEC & bound energy
+#
+#  Hao Feng (XHU)
+#  Jun 21, 2013
+#
+# ---
+#  Usage:
+#    enmv -t N2 -basis ACCQ -R 2.02 -ref HF
+#
+#--------------------------------------------------------------------------------
+#--- options
+function handle_opt {
+    while test "x$1" != "x"; do
+	case $1 in
+	    -t)     shift; tgt=$1      ;;
+	    -basis) shift; basis=$1    ;;
+	    -R)     shift; CRD=$1      ;;
+	    -ref)   shift; ref=$1      ;;
+	    *)                         ;;
+	esac
+	shift
+    done
+
+    if [ "$tgt" == ""    ]; then tgt=H2;     fi
+    if [ "$basis" == ""  ]; then basis=CCD;  fi
+    if [ "$CRD" == ""    ]; then CRD=1.400;  fi
+    if [ "$ref" == ""    ]; then ref=HF;     fi
+
+# - echo OPTIONS
+    echo " The command is: "
+    echo "     $0 -t $tgt -basis $basis -R $CRD -ref $ref"
+    echo
+}
+
+#--------------------------------------------------------------------------------
+#--- locations
+function set_location {
+    work="/Users/fenghao/home1/feng/scatt/bfsca/work"
+    storeT="/Users/fenghao/home1/feng/scatt/bfsca/store"
+    store="$storeT/alam/$tgt/DATA_IN/$basis"
+    datain="$storeT/vpol/$tgt/DATA_IN"
+    storev="$storeT/vpol/$tgt/DATA_IN/VEC/$ref/$basis"
+    storen="$storeT/spfd/$tgt/DATA_IN/$ref/$basis"
+}
+
+#--------------------------------------------------------------------------------
+#--- cd work directory
+#
+function cd_work {
+    curr=`pwd`
+    if [ -d $work ]; then
+	rm -f   $work/*
+	cd      $work
+    else
+	echo "$work does NOT exit!"
+	exit
+    fi
+}
+
+#--------------------------------------------------------------------------------
+#--- make input file
+#
+function make_inp {
+    cp    $datain/${ref}_bnd.inp        $tgt.inp
+
+    if [[ $basis == "M2" || $basis == "M2H" ]]; then
+	extfil=".TRUE."; ISPHER=-1
+    else
+	extfil=".FALSE."; ISPHER=1
+    fi
+
+    sed -e "s/CRD=[^[:space:]]*/CRD=$CRD/g"  \
+        -e "s/GBASIS=[^[:space:]]*/GBASIS=$basis/g" \
+	-e "s/EXTFIL=[^[:space:]]*/EXTFIL=$extfil/g" \
+        -e "s/ISPHER=[^[:space:]]*/ISPHER=$ISPHER/g" \
+        $tgt.inp > $tgt.inp.tt
+
+    mv  $tgt.inp.tt  $tgt.inp
+}
+
+#--------------------------------------------------------------------------------
+function run_gamess {
+    if [[ -e $1.F05 ]]; then rm $1.F05; fi
+    if [[ -e $1.dat ]]; then rm $1.dat; fi
+
+    /opt/gamess/VERSION/20130501_NAP/rungms $1 nap >& $1.log
+}
+
+#--------------------------------------------------------------------------------
+function pick_vec {
+    begin=`grep -n '$VEC' $1.dat | awk  '{print $1}' | sed 's/://g' | tail -n 1`
+    end=`  grep -n '$END' $1.dat | awk  '{print $1}' | sed 's/://g' | tail -n 1`
+
+    sed -n -e "$begin, ${end}p" $1.dat  >> out.R$CRD
+}
+
+#--------------------------------------------------------------------------------
+function pick_en {
+    ener=`grep "TOTAL ENERGY =" $1.log | tail -n 1 | awk '{print $4}'`
+
+    echo "$CRD   $ener" > ener.dat
+}
+
+#--------------------------------------------------------------------------------
+#--- MAIN FUNCTION
+#
+handle_opt $@
+
+set_location
+cd_work
+
+make_inp
+run_gamess   $tgt
+
+pick_vec     $tgt
+pick_en      $tgt
+
+cp out.R$CRD $storev/.
+cat ener.dat >> $storen/ener.dat
+
+cp GTObasis.dat $store/.
+cp MO.dat       $store/MOcoeR${CRD}

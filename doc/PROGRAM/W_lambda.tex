@@ -1,0 +1,148 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[aps,pra,groupedaddress,
+%               showpacs,%      display the PACS code(s)
+                amsfonts,amssymb,
+%               twocolumn,
+                preprint
+    ]{revtex4}
+% ---------------------- load CTAN & macro packages ---------------------------
+\usepackage{amsmath}
+\usepackage{revsymb}
+\usepackage{natbib}
+%\usepackage{SE}
+\usepackage{dcolumn}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\molnwv}{\psi}
+\newcommand{\vibqu}{\upsilon}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+%
+%\preprint{Version 1.0: Oct 03, 2005}
+\date{\today}
+%
+\title[WLAM: Calculation of the coupled potential]
+{WLAM: Calculation of the Coupled Potential}
+
+\author{Hao \surname{Feng}}
+\email[Electronic address: ]{ddsteed@163.com}
+\affiliation{College of Physics, Sichuan University, Chengdu, Sichuan,
+610065, P.R.China}
+
+\maketitle
+
+\section{Coupled Vibrational Potentials}
+Both coulped vibrational potentials and multi-moments, including
+spherical and non-spherical polarizabilited and qudrupole, etc., can be
+expressed as
+\begin{equation}  \label{equ:cci}
+I = \int_0^\infty \molnwv_\vibqu^*(R)f(R)\molnwv_{\vibqu'}(R)\,dR
+\end{equation}
+where~$f(R)$~denotes the potentials or multi-moments, which is varied as
+the internuclear distance $R$. $\molnwv$~are the molecular vibrational
+wavefunctions. Since $R > 0$, both $\molnwv$ and $f(R)$ do not exist as
+$R < 0$, and we can take them as zero. So, Eq.~(\ref{equ:cci}) can be
+written as
+\begin{equation}  \label{equ:ccii}
+I = \int_{-\infty}^\infty \molnwv_\vibqu^*(R)f(R)\molnwv_{\vibqu'}(R)\,dR
+\end{equation}
+
+Eq.~(\ref{equ:ccii}) can be solved by using Gauss-Hermite quadratures.
+However, Gauss-Hermite quadratures are for the whole ($-\infty \sim
+\infty$) range, while we can get limited $f(R)$. In order to use
+Gauss-Hermite quadratures, we have to suppose that $f(R)$ is smooth
+within the whole range.
+
+Suppose we have $N$ Gauss-Hermite quadratures: $\xi_1$, $\xi_2$, \dots,
+$\xi_{N}$,Eq.~(\ref{equ:ccii})~should be
+\begin{equation}  \label{equ:gauss-hermite}
+I = \sum_{k=1}^{N}\lambda_k g(\xi_k)\exp\left({\xi_k}^2\right)
+\end{equation}
+where $\lambda_k$ is the weighted factor\footnote{Both $\xi_k$ and
+  $\lambda_k$ can be got through mathematical manual. Notice that
+  $\lambda_k$ are different for different $N$ and $\xi_k$.}. $g(R)$ is
+the integrand.
+\begin{equation}
+g(R)=\molnwv_\vibqu^*(R)f(R)\molnwv_{\vibqu'}(R)
+\end{equation}
+
+If $g(R)$ are got only within $[R_1, R_M]$, we have to map Gauss-Hermite
+quadratures into this range. Suppose
+\begin{equation}
+R = R_\alpha\times\left(\frac{X}{\alpha}+R_x\right)\times R_e
+\end{equation}
+where $\alpha$ and $R_e$ are constants, while $R_\alpha$ and $R_x$ are
+transforming coefficients to ensure $R$ on every quadrature $X$ is within
+$[R_1, R_M]$. So
+\begin{equation}
+\begin{split}
+I &=
+\int_{-\infty}^{\infty}g\left[R_\alpha\times\left(\frac{X}{\alpha}+R_x\right)\times
+  R_e\right]\,d\left[R_\alpha\times\left(\frac{X}{\alpha}+R_x\right)\times R_e\right] \\
+&= \frac{R_\alpha\times
+  R_e}{\alpha}\int_{-\infty}^{\infty}g\left[R_\alpha\times\left(\frac{X}{\alpha}+R_x\right)\times R_e\right]\,dX 
+\end{split}
+\end{equation}
+
+Notice that the integral varialbe of $R$ is turned to $X$. By using
+Eq.(\ref{equ:gauss-hermite}), we get,
+\begin{equation}
+I = \frac{R_\alpha\times R_e}{\alpha}\sum_{k=1}^{N}\lambda_k g\left[R_\alpha\times\left(\frac{\xi_k}{\alpha}+R_x\right)\times R_e\right]\exp\left({\xi_k}^2\right)
+\end{equation}
+
+For simplicity, we let,
+\begin{gather}
+f_a = \frac{R_\alpha\times R_e}{\alpha} \\
+\zeta_k = R_\alpha\times\left(\frac{\xi_k}{\alpha}+R_x\right)\times R_e
+\end{gather}
+the integral is then written as,
+\begin{equation}  \label{equ:cciii}
+\begin{split}
+I &=
+f_a\times\sum_{k=1}^{N}\lambda_kg(\zeta_k)\exp\left({\xi_k}^2\right)
+\\
+&=
+f_a\times\sum_{k=1}^{N}\lambda_k\molnwv_{\vibqu}(\zeta_k)f(\zeta_k)\molnwv_{\vibqu'}(\zeta_k) \\
+&\quad\times\exp\left[\left(\alpha\times\frac{\zeta_k-R_\alpha\times
+    R_e\times R_x}{R_\alpha\times R_e}\right)^2\right]
+\end{split}
+\end{equation}
+
+So, if we choose suitalbe transforming coefficients $R_\alpha$ and $R_x$
+to ensure every $\zeta_k$ in Eq.(\ref{equ:cciii}) is within $[R_1,R_M]$,
+we can interpolate every $\molnwv_{\vibqu}(\zeta_k)$,
+$\molnwv_{\vibqu'}(\zeta_k)$ and $f(\zeta_k)$.
+
+If we choose another transforming formula, i.e.,
+\begin{gather}
+\alpha = R_\alpha\times \sqrt{\omega_e\times m_u}\times R_e \\
+R = \left(\frac{X}{\alpha}+R_x\right)\times R_e
+\end{gather}
+where $R_\alpha$, $\omega_e$, $m_u$, $R_e$ and $R_x$ are all constants.
+The integral is turned
+\begin{equation}
+\begin{split}
+I &=\int_{-\infty}^{\infty}g\left[\left(\frac{X}{\alpha}+R_x\right)\times
+  R_e\right]\,d\left[\left(\frac{X}{\alpha}+R_x\right)\times R_e\right] \\
+&=\frac{R_e}{\alpha}\int_{-\infty}^{\infty}g\left[\left(\frac{X}{\alpha}+R_x\right)\times
+  R_e\right]\,dX
+\end{split}
+\end{equation}
+letting
+\begin{gather}
+f_a = \frac{R_e}{\alpha} \\
+\zeta_k = \left(\frac{\xi_k}{\alpha}+R_x\right)\times R_e
+\end{gather}
+then the integral is
+\begin{equation}
+\begin{split}
+I &=
+f_a\times\sum_{k=1}^{N}\lambda_kg(\zeta_k)\exp\left({\xi_k}^2\right)
+\\
+&=
+f_a\times\sum_{k=1}^{N}\lambda_k\molnwv_{\vibqu}(\zeta_k)f(\zeta_k)\molnwv_{\vibqu'}(\zeta_k) \\
+&\quad\times\exp\left[\left(\frac{\zeta_k}{R_e}-R_x\right)\times \alpha\right]^2
+\end{split}
+\end{equation}
+
+\end{document}

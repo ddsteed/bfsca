@@ -1,0 +1,178 @@
+#!/usr/bin/env bash
+#
+#--------------------------------------------------------------------------------
+#  Calculate e-molecule polarization potential 
+#
+#  RDS (Hao Feng)
+#  Jun 17, 2013
+#
+# ---
+#  Usage:
+#    vpola -t N2 -p DSG -basis ACCQ -R 2.02 -ref HF -method vxz
+#
+#--------------------------------------------------------------------------------
+#--- options
+function handle_opt {
+    while test "x$1" != "x"; do
+	case $1 in
+	    -t)     shift; tgt=$1      ;;
+	    -p)     shift; pot=$1      ;;
+	    -basis) shift; basis=$1    ;;
+	    -R)     shift; CRD=$1      ;;
+	    -ref)   shift; ref=$1      ;;
+	    -method)shift; method=$1   ;;
+	    *)                         ;;
+	esac
+	shift
+    done
+
+    if [ "$tgt" == ""    ]; then tgt=H2;     fi
+    if [ "$pot" == ""    ]; then pot=DSG;    fi
+    if [ "$basis" == ""  ]; then basis=CCD;  fi
+    if [ "$CRD" == ""    ]; then CRD=1.400;  fi
+    if [ "$ref" == ""    ]; then ref=HF;     fi
+    if [ "$method" == "" ]; then method=vxz; fi
+
+# - echo OPTIONS
+    echo " The command is: "
+    echo "     $0 -t $tgt -p $pot -basis $basis -R $CRD -ref $ref -method $method"
+    echo
+}
+
+#--------------------------------------------------------------------------------
+#--- locations
+function set_location {
+    work="/Users/fenghao/home1/feng/scatt/bfsca/work"
+    storeT="/Users/fenghao/home1/feng/scatt/bfsca/store"
+    store="$storeT/vpol/$tgt/POT_ORI/$ref/$pot/$basis"
+    datain="$storeT/vpol/$tgt/DATA_IN"
+}
+
+#--------------------------------------------------------------------------------
+#--- cd work directory
+#
+function cd_work {
+    curr=`pwd`
+    if [ -d $work ]; then
+	rm -f   $work/*
+	ln -s   $curr/../bin/vxz_to_v02.x  $work/.
+	cd      $work
+    else
+	echo "$work does NOT exit!"
+	exit
+    fi
+}
+
+#--------------------------------------------------------------------------------
+#--- make input file
+#
+function make_inp {
+    cp    $datain/${ref}_${method}.inp        $tgt.inp
+    cp    $datain/VEC/$ref/$basis/out.R$CRD   out.VEC
+
+    NORB=`tail -n 2 out.VEC | sed -n -e '2p' | awk '{print $1}'`
+
+    if [[ $basis == "M2" || $basis == "M2H" ]]; then
+	extfil=".TRUE."; ISPHER=-1
+    else
+	extfil=".FALSE."; ISPHER=1
+    fi
+
+    sed -e "s/CRD=[^[:space:]]*/CRD=$CRD/g"  \
+	-e "s/GBASIS=[^[:space:]]*/GBASIS=$basis/g" \
+	-e "s/EXTFIL=[^[:space:]]*/EXTFIL=$extfil/g" \
+	-e "s/ISPHER=[^[:space:]]*/ISPHER=$ISPHER/g" \
+	-e "s/XIE=[^[:space:]]*/XIE=$XIE/g" \
+	-e "s/YIE=[^[:space:]]*/YIE=$YIE/g" \
+	-e "s/ZIE=[^[:space:]]*/ZIE=$ZIE/g" \
+	-e "s/IEHF=[^[:space:]]*/IEHF=$IEHF/g" \
+	-e "s/IFIN=[^[:space:]]*/IFIN=$IFIN/g" \
+	-e "s/IDEL=[^[:space:]]*/IDEL=$IDEL/g" \
+	-e "s/LEMIN=[^[:space:]]*/LEMIN=$LEMIN/g" \
+	-e "s/LEMAX=[^[:space:]]*/LEMAX=$LEMAX/g" \
+	-e "s/NORB=[^[:space:]]*/NORB=$NORB/g" \
+	$tgt.inp > $tgt.inp.tt
+
+    mv  $tgt.inp.tt    $tgt.inp
+    cat out.VEC     >> $tgt.inp
+}
+
+#--------------------------------------------------------------------------------
+function make_pot_parameter {
+    if [[ $pot == "BTAD" ]]; then
+	IEHF=1; IFIN=100; IDEL=1; LEMIN=1; LEMAX=1;
+    elif [[ $pot == "DSG" ]]; then
+	IEHF=1; IFIN=100; IDEL=2; LEMIN=0; LEMAX=100;
+    fi
+}
+
+#--------------------------------------------------------------------------------
+function make_e_coord {
+    if [[ $2 == "X" ]]; then
+	XIE=$1;  YIE=0.0; ZIE=0.0;
+    elif [[ $2 == "Z" ]]; then 
+	XIE=0.0; YIE=0.0; ZIE=$1;
+    fi
+}
+
+#--------------------------------------------------------------------------------
+function run_gamess {
+    if [[ -e $1.F05 ]]; then rm $1.F05; fi
+    if [[ -e $1.dat ]]; then rm $1.dat; fi
+
+    /opt/gamess/VERSION/20130501_NAP/rungms $1 nap >& $1.log
+}
+
+#--------------------------------------------------------------------------------
+#--- MAIN FUNCTION
+#
+handle_opt $@
+make_pot_parameter
+
+set_location
+cd_work
+
+re=(0.01 0.05 0.10 0.15 0.20 0.28 0.38 0.48 0.58 0.68 0.78 0.88 0.98 1.08 1.18 1.28 1.38 \
+    1.48 1.58 1.68 1.78 1.88 2.00 2.20 2.40 2.60 2.80 3.00 3.50 4.00 4.50 5.00 5.50 6.00 \
+    6.50 7.00 7.50 8.00 8.50 9.00 9.50 10.0 11.0 12.0 13.0 14.0 15.0 16.0 18.0 20.0)
+
+if [[ $tgt == "H2" && $pot == "DSG" && $CRD == "0.500" ]]; then  # 3.0, 3.5 are fatal (I don't know why!)
+re=(0.01 0.05 0.10 0.15 0.20 0.28 0.38 0.48 0.58 0.68 0.78 0.88 0.98 1.08 1.18 1.28 1.38 \
+    1.48 1.58 1.68 1.78 1.88 2.00 2.20 2.40 2.60 2.80           4.00 4.50 5.00 5.50 6.00 \
+    6.50 7.00 7.50 8.00 8.50 9.00 9.50 10.0 11.0 12.0 13.0 14.0 15.0 16.0 18.0 20.0)
+fi
+
+# test
+#re=(2.80)
+
+#--- calculate V_x & V_z
+for r in "${re[@]}"; do
+    if [[ $method == "vxz" ]]; then
+	for rp in X Z; do
+	    echo "Now running r = $r, rp = $rp ..."
+	    make_e_coord $r $rp
+	    make_inp
+	    run_gamess $tgt
+	    
+	    cat HFVpol.dat  >> HFVP_${rp}.dat
+	    cat HFApol.dat  >> HFAP_${rp}.dat
+	done
+    fi
+done
+
+for rp in X Z; do
+    cp  HFVP_${rp}.dat   $store/V_${rp}.R${CRD}
+    cp  HFAP_${rp}.dat   $store/A_${rp}.R${CRD}
+done
+
+#--- calculate V_0 & V_2
+echo "${#re[@]}" > fort.5
+cp HFVP_X.dat      fort.7;      cp HFVP_Z.dat      fort.8
+cp HFAP_X.dat      fort.9;      cp HFAP_Z.dat      fort.10
+./vxz_to_v02.x < fort.5 > fort.11
+cp fort.11         HFVP_0.dat;  cp fort.12         HFVP_2.dat
+cp fort.13         HFAP_0.dat;  cp fort.14         HFAP_2.dat
+for rp in 0 2; do
+    cp  HFVP_${rp}.dat   $store/V_${rp}.R${CRD}
+    cp  HFAP_${rp}.dat   $store/A_${rp}.R${CRD}
+done

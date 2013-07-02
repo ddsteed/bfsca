@@ -1,0 +1,33 @@
+This file is about coding standards and conventions of BFsca package.
+
+             Hao Feng (RDS)     Aug. 07, 2005
+
+------------------------------------------------------------------------
+
+1. Shell Script
+
+   1.1. Functions, version, author, modified dates, etc., should be put
+   at the beginning.
+
+   1.2. All information communicated with outer files, such as name of
+   store and source directory, should be put at the beginning of body
+   script. 
+
+------------------------------------------------------------------------
+
+2. FORTRAN codes
+
+   2.1. Functions, version, author, modified dates, etc., should be put
+   at the beginning.
+
+   2.2. Indentation	3 spaces
+
+   2.3. All data input from shell script are free formatted except for
+        logic variable since blanks are easily occasionlly added in the
+        shell script
+
+   2.4. All data input from other data files are formatted read for
+	rigority
+
+
+

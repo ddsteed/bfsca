@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+#
+#--------------------------------------------------------------------------------
+# calculate the SIMONS-PARR-FINLAN-DUNHAM potential parameters for the
+# input potentials of nuclear motion Calculate e-molecule polarization
+# potential
+#
+#  RDS (Hao Feng)
+#  Jun 29, 2013
+#
+# ---
+#  Usage:
+#    spfd -t N2 -p DSG -basis ACCQ -R 2.02 -ref HF 
+#
+#--------------------------------------------------------------------------------
+#--- options
+function handle_opt {
+    while test "x$1" != "x"; do
+	case $1 in
+	    -t)     shift; tgt=$1      ;;
+	    -p)     shift; pot=$1      ;;
+	    -basis) shift; basis=$1    ;;
+	    -R)     shift; CRD=$1      ;;
+	    -ref)   shift; ref=$1      ;;
+	    *)                         ;;
+	esac
+	shift
+    done
+
+    if [ "$tgt" == ""    ]; then tgt=H2;     fi
+    if [ "$pot" == ""    ]; then pot=DSG;    fi
+    if [ "$basis" == ""  ]; then basis=CCD;  fi
+    if [ "$CRD" == ""    ]; then CRD=1.400;  fi
+    if [ "$ref" == ""    ]; then ref=HF;     fi
+
+# - echo OPTIONS
+    echo " The command is: "
+    echo "     $0 -t $tgt -p $pot -basis $basis -R $CRD -ref $ref"
+    echo
+}
+
+#--------------------------------------------------------------------------------
+#--- locations
+function set_location {
+    work="/Users/fenghao/home1/feng/scatt/bfsca/work"
+    storeT="/Users/fenghao/home1/feng/scatt/bfsca/store"
+    store="$storeT/spfd/$tgt/$ref/$pot/$basis"
+    datain="$storeT/spfd/$tgt/DATA_IN/$ref/$basis"
+}
+
+#--------------------------------------------------------------------------------
+#--- cd work directory
+#
+function cd_work {
+    curr=`pwd`
+    if [ -d $work ]; then
+	rm -f   $work/*
+	ln -s   $curr/../bin/spfdfit.x  $work/.
+	cd      $work
+    else
+	echo "$work does NOT exit!"
+	exit
+    fi
+}
+
+#--------------------------------------------------------------------------------
+#--- make input file
+#
+function make_inp {
+    input=$1
+    ln -s $datain/ener.dat  .
+
+    title="SPFD potential fit calculation for $tgt " > $input
+
+#---
+#   RMS  - Input value for R at the minimum of the potential.
+#  NOFR  - Number of potential values input
+#  NFIT  - Order of S-P-F-D fit [Maximum N of B(N)]; Always use NFIT=6.
+# PERCNT - Initial percentage change in RMS to make first parabola
+#   TOL  - Required accuracy in RM if OPT(4) is true
+
+    if [[ $tgt == "H2" && $ref == "HF" ]]; then
+	RMS=1.387
+    elif [[ $tgt == "N2" && $ref == "HF" ]]; then
+	RMS=2.020
+    fi
+    NOFR=`wc -l ener.dat`
+    NFIT=6; PERCNT=1.0;  TOL=1.000D-08
+
+#---
+#  OPT(1) = T, Prints the input potential 
+#  OPT(2) = T, Prints the input to the linear Eq. solver
+#  OPT(3) = T, Prints CHIsquare for solutions
+#  OPT(4) = T, Finds best RMS by minimizing CHIsquare;
+#     if OPT(4) = T, sets OPT(3) = T.
+#
+    OPT=" T F T F"     # (4L2)
+
+#---
+    echo $title  >$input
+    echo "$RMS   $NOFR  $NFIT  $PERCNT  $TOL" >> $input
+    echo $OPT    >> $input
+
+    cat ener.dat >> $input
+}
+
+#--------------------------------------------------------------------------------
+#--- MAIN FUNCTION
+#
+handle_opt $@
+set_location
+cd_work
+
+make_inp      $tgt.inp
+./spfdfit.x < $tgt.inp > $tgt.out
+
+cp fort.11    $store/spfd.dat

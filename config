@@ -1,0 +1,55 @@
+#!/bin/csh
+#-----------------------------------------------------------------------
+# This shell script is to set up the working scatch and the store 
+# directory and compile all the source codes.
+#-----------------------------------------------------------------------
+set currpath = `pwd`
+
+echo -n " Please specify the working scratch directory, [./work]: "
+set work = $<
+if ($work == "") then
+    set work = "$currpath/work"
+else
+    if (! -d $work) then
+	mkdir $work
+    endif
+    cd $work
+    set work = `pwd`
+    cd $currpath
+endif
+
+echo -n " Please specify the store dirctory, [./store]: "
+set store = $<
+if ($store == "") then
+    set store = "$currpath/store"
+else
+    if (! -d $store) mkdir -p $store
+    cd $store
+    set store = `pwd`
+    cd $currpath
+    cp -r $currpath/store/* $store/
+endif
+
+cd $currpath/run
+set files = (*)
+
+foreach file ($files)
+    sed -e 's:work=.*$:work="'"$work"'":' \
+        -e 's:storeT=.*$:storeT="'"$store"'":' \
+            $file >! $file.tt
+    mv $file.tt $file
+    chmod a+x $file
+end
+
+cd ..
+
+echo
+echo " NOTE: work = $work "
+echo "      store = $store "
+echo
+echo " Now we are compiling all of the source codes!"
+echo
+
+cd tools
+./compile.sh -r
+cd ..

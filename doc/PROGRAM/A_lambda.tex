@@ -1,0 +1,296 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[aps,pra,groupedaddress,
+%               showpacs,%      display the PACS code(s)
+                amsfonts,amssymb,
+%               twocolumn,
+                preprint
+    ]{revtex4}
+% ---------------------- load CTAN & macro packages ---------------------------
+\usepackage{amsmath}
+\usepackage{revsymb}
+\usepackage{natbib}
+\usepackage{SE}
+\usepackage{dcolumn}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+%
+%\preprint{Version 1.0: Aug 09, 2005}
+\date{\today}
+%
+\title[ALAMN: Correction to large-r fit of $a_\lambda$]
+{ALAMN: Correction to large-r fit of $a_\lambda$}
+
+\author{Hao \surname{Feng}}
+\email[Electronic address: ]{ddsteed@163.com}
+\affiliation{College of Physics, Sichuan University, Chengdu, Sichuan,
+610065, P.R.China}
+
+\maketitle
+% -----------------------------------------------------------------------------
+\section{Basic Concepts}
+Suppose the charge density of a closed-shell $N$-electron linear
+molecule be expanded in Legendre polynomials $P_\lambda(\cos\theta)$,
+viz.,
+\begin{equation}
+  \label{eq:ELP}
+  \rho(r,\theta) = \sum_{\lambda=0}^{\lambda_max}a_\lambda(r)
+                   P_\lambda(\cos\theta)
+\end{equation}
+From the orthogonality relation for the Legendre polynomials, we find
+that the $\lambda$th expansion coefficient in \Eq{ELP} is given as a
+function of $r$ by
+\begin{equation}
+  \label{eq:sal}
+  a_\lambda(r) = \dfrac{2\lambda+1}{2}\int_0^\pi\rho(r,\theta)
+                 P_\lambda(\cos\theta)\sin\theta\,\rd\theta
+\end{equation}
+The integral in \Eq{sal} is evaluated for values of $r$ in a
+user-prescribed $n$-point mesh \{$r_i$, $i$ = 1, 2, \ldots, $n$\} by a
+32-point Gauss-Legendre quadrature.
+
+As $r$ becomes large, the expansion coefficients $a_\lambda(r)$ of the
+molecular charge density $\rho(r,\theta)$ [\Eq{sal}] can be fitted very
+accurately to the analytic form
+\begin{equation}
+  \label{eq:lal}
+  a_\lambda(r) = A_\lambda r^{p_\lambda}\exp(-\alpha_\lambda r)
+\end{equation}
+where $A_\lambda$, $p_\lambda$ and $\alpha_\lambda$ are real numbers.
+
+In Ref.\cite{MAM1980}, these parameters are determined by using the
+last three values of $r$ at which $a_\lambda(r)$ is evaluated from
+\Eq{sal}, $r_n$, $r_{n-1}$ and $r_{n-2}$. Letting $a_n$, $a_{n-1}$ and
+$a_{n-2}$ denote the values of $a_\lambda$ at these values of $r$, we
+have
+\begin{equation}
+  \label{eq:plam}
+  p_\lambda = \dfrac{h\ln\left(\dfrac{a_{n-1}}{a_n}\right) +
+                      \ln\left(\dfrac{a_{n-1}}{a_{n-2}}\right)}
+                    {h\ln\left(\dfrac{r_{n-1}}{r_n}\right) +
+                      \ln\left(\dfrac{r_{n-1}}{r_{n-2}}\right)} 
+\end{equation}
+where
+\begin{equation}
+   h = \dfrac{r_{n-1} - r_{n-2}}{r_n - r_{n-1}}
+ \end{equation}
+And
+\begin{align}
+  \label{eq:alphlam}
+  \alpha_\lambda &= \dfrac{1}{r_{n-1} - r_n}
+                    \ln\left[\dfrac{a_n}{a_{n-1}}
+                       \left(\dfrac{r_{n-1}}{r_n}\right)^{p_\lambda}\right] \\
+  \label{eq:Alam}
+  A_\lambda & = a_nr_n^{-p_\lambda}\exp(\alpha_\lambda r_n)
+\end{align}
+NOTICE: There is a print error in Eq.~(16) in Ref.\cite{MAM1980},
+the source code of ALAMN is consistent with \Eq{Alam}.
+
+Thus the expansion coefficients and hence the charge density need not be
+calculated for $r > r_n$ even if $a_\lambda(r)$ is required for larger
+values of $r$.
+
+
+\section{Saha's correction to $e$-N$_2$}
+We can get well-behaved large-r $a_\lambda$ and static potential
+$V_{st}$ for $e$-H$_2$ by using \Eq{lal}, \Eq{plam}, \Eq{alphlam} and
+\Eq{Alam}. But for $e$-N$_2$, if we choose the $r$-mesh as
+\begin{center}
+\newcolumntype{.}{D{.}{.}{-1}}
+\begin{tabular}{...}
+  0.00 &  0.01  &   1.20  \\
+  1.20 &  0.02  &   2.00  \\
+  2.00 &  0.04  &   4.40  \\
+  4.40 &  0.08  &   6.00  
+\end{tabular}
+\end{center}
+and choose LAMMAX = 14, we get $A_{14} = 3.093\times 10^{18}$, $p_{14} =
+-65.58$ and $\alpha_{14} = -8.408$ for $R = 2.020 a_0$. Meanwhile, the
+static potential ($v_\lambda$) for $\lambda = 14$ are
+\begin{center}
+% \newcolumntype{.}{D{.}{.}{-1}}
+\begin{tabular}{ccc}
+     $r$   &    $v_\lambda$ \\
+   \ldots  &  \ldots                 \\
+   5.04000 &  \quad  -0.1131232954588831E+93 \\
+   5.12000 &  \quad  -0.1410275599185811E+93 \\
+   5.20000 &  \quad  -0.1752150266189247E+93 \\
+   5.28000 &  \quad  -0.2169698823790784E+93 \\
+   5.36000 &  \quad  -0.2678129626035787E+93 \\
+   5.44000 &  \quad  -0.3295407561285985E+93 \\
+   5.52000 &  \quad  -0.4042701040798804E+93 \\
+   5.60000 &  \quad  -0.4944893200460516E+93 \\
+   5.68000 &  \quad  -0.6031165389052729E+93 \\
+   5.76000 &  \quad  -0.7335661891117883E+93 \\
+   5.84000 &  \quad  -0.8898245787188291E+93 \\
+   5.92000 &  \quad  -0.1076535689486381E+94 \\
+   6.00000 &  \quad -0.1299098386733144E+94
+\end{tabular}
+\end{center}
+They are overflow! (They are too LARGE for other high $\lambda's$ and
+other internuclear distances!)
+
+I searched our store directory and found that B.~C.~Saha wrote the
+following codes in the subroutine ALAM
+\begin{center}
+\begin{verbatim}
+... ... ...
+C     PSM=(DLOG(ABY2/ABY1)+RAT*DLOG(ABY2/ABY3))/(DLOG(R2/R1)+RAT*DLOG(R2
+C    #/R3))
+c---
+      PSM=0.D+00
+C     IF(IFIX.EQ.1.AND.PSM.GT.1.D+00) PSM=1.D+00
+      QSM = -DLOG((ABY3/ABY2)*(R2/R3)**PSM)/(R3-R2)
+C See the note for this modification 8/23/85
+      ASM = Y3*R3**(-PSM)*DEXP(QSM*R3)
+\end{verbatim}
+\end{center}
+We don't have his note, but from his codes I can guess his formula for
+large-r $a_\lambda$ is
+\begin{equation}
+  \label{eq:sahalal}
+  a_\lambda(r) = A_\lambda\exp(-\alpha_\lambda r)
+\end{equation}
+
+By using Saha's formula we get $A_{14} = 1.351\times 10^{-3}$, $p_{14} =
+0.0$ and $\alpha_{14} = 2.595$. The static potential ($v_\lambda$)for
+$\lambda = 14$ are
+\begin{center}
+% \newcolumntype{.}{D{.}{.}{-1}}
+\begin{tabular}{ccc}
+     $r$   &    $v_\lambda$ \\
+   \ldots  &  \ldots               \\
+   5.04000 &  \quad  .2155357141168185E-08 \\
+   5.12000 &  \quad  .1772666466746914E-08 \\
+   5.20000 &  \quad  .1458346809604667E-08 \\
+   5.28000 &  \quad  .1200442725400119E-08 \\
+   5.36000 &  \quad  .9890022814558143E-09 \\
+   5.44000 &  \quad  .8157512135613536E-09 \\
+   5.52000 &  \quad  .6738244745961844E-09 \\
+   5.60000 &  \quad  .5575415032036261E-09 \\
+   5.68000 &  \quad  .4622160475180030E-09 \\
+   5.76000 &  \quad  .3839942571407144E-09 \\
+   5.84000 &  \quad  .3197165625943484E-09 \\
+   5.92000 &  \quad  .2667999764303344E-09 \\
+   6.00000 &  \quad  .2231387506188567E-09
+\end{tabular}
+\end{center}
+
+
+\section{New correction to large-r fit}
+Although Saha's codes corrected the large-r fit overflow, we can't
+reproduce $e$-H$_2$ static potential because \Eq{sahalal} is different
+from \Eq{lal}. I guess that for some $e$-targets, the parameters of
+$A_\lambda$, $p_\lambda$ and $\alpha_\lambda$ cannot be chosen ONLY by
+the last three $a_\lambda$. So I will fit them by using more
+$a_\lambda's$.
+
+\Eq{lal} can be rewritten as
+\begin{equation}
+  \label{eq:lalog}
+  \ln a_\lambda = \ln A_\lambda + p_\lambda\ln r - \alpha_\lambda r
+\end{equation}
+Letting 
+\begin{subequations}
+  \begin{align}
+    \label{eq:lalp}
+    b_\lambda & = \ln a_\lambda \\
+    g_{0\lambda} & = \ln A_\lambda \\
+    g_{1\lambda} & = -\alpha_\lambda \\
+    g_{2\lambda} & = p_\lambda
+  \end{align}
+\end{subequations}
+Then
+\begin{equation}
+  \label{eq:lallog2}
+  b_\lambda = g_{0\lambda} + g_{1\lambda}r + g_{2\lambda}\ln r
+\end{equation}
+So $b_\lambda$ is linearlly dependent on the fitting coefficients. We
+adopt ``General Linear Least Squares'' routine --- SVDFIT (Signular
+Value Decomposition fit) \cite{PTV1992} to fit the coefficients.
+
+By using 10 $a_\lambda$ to fit \Eq{lallog2} we get $A_{14} = 2.597\times
+10^{-4}$, $p_{14} = 6.346$ and $\alpha_{14} = 4.627$. The static
+potential ($v_\lambda$) for $\lambda = 14$ are
+\begin{center}
+% \newcolumntype{.}{D{.}{.}{-1}}
+\begin{tabular}{ccc}
+     $r$   &    $v_\lambda$ \\
+   \ldots  &  \ldots               \\
+   5.04000 &   \quad 0.2154651146898829E-08 \\
+   5.12000 &   \quad 0.1771786323990111E-08 \\
+   5.20000 &   \quad 0.1457253305351663E-08 \\
+   5.28000 &   \quad 0.1199088632125510E-08 \\
+   5.36000 &   \quad 0.9873308802109118E-09 \\
+   5.44000 &   \quad 0.8136945736411463E-09 \\
+   5.52000 &   \quad 0.6713014542439685E-09 \\
+   5.60000 &   \quad 0.5544554312783496E-09 \\
+   5.68000 &   \quad 0.4584520410108206E-09 \\
+   5.76000 &   \quad 0.3794161238428322E-09 \\
+   5.84000 &   \quad 0.3141632320379888E-09 \\
+   5.92000 &   \quad 0.2600813953949083E-09 \\
+   6.00000 &   \quad 0.2150311719575100E-09
+\end{tabular}
+\end{center}
+
+By using 80 $a_\lambda$ to fit \Eq{lallog2} we get $A_{14} = 25.275$,
+$p_{14} = -10.067$ and $\alpha_{14} = 1.217$. The static potential for
+$\lambda = 14$ are
+\begin{center}
+% \newcolumntype{.}{D{.}{.}{-1}}
+\begin{tabular}{ccc}
+     $r$   &    $v_\lambda$ \\
+   \ldots  &  \ldots               \\
+   5.04000 &   \quad 0.2155529635889707E-08 \\
+   5.12000 &   \quad 0.1772881510956653E-08 \\
+   5.20000 &   \quad 0.1458613984169379E-08 \\
+   5.28000 &   \quad 0.1200773569363670E-08 \\
+   5.36000 &   \quad 0.9894106528899811E-09 \\
+   5.44000 &   \quad 0.8162537098927050E-09 \\
+   5.52000 &   \quad 0.6744409210914880E-09 \\
+   5.60000 &   \quad 0.5582955194052478E-09 \\
+   5.68000 &   \quad 0.4631357026518250E-09 \\
+   5.76000 &   \quad 0.3851128268835364E-09 \\
+   5.84000 &   \quad 0.3210734010977414E-09 \\
+   5.92000 &   \quad 0.2684415191666285E-09 \\
+   6.00000 &   \quad 0.2251196654564229E-09
+\end{tabular}
+\end{center}
+
+I still keep the linear equation method (LEM) to solve $A_\lambda$,
+$p_\lambda$ and $\alpha_\lambda$ by solving \Eq{plam}, \Eq{alphlam} and
+\Eq{Alam}. So for H$_2$, we have two methods to calculate large-r
+$a_\lambda$ and static potential ($v_\lambda$). For $\lambda=6$, we get
+\begin{center}
+%\newcolumntype{.}{D{.}{.}{-1}}
+\begin{tabular}{lcc}
+                 & LEM & SVDFIT \\
+     $A_\lambda$ & \quad 0.1601316757808016E-23  & \quad 0.1189776202324306E-04 \\
+     $p_\lambda$ & \quad 0.4523276259430859E+02  & \quad 0.6724227178999224E+01 \\
+$\alpha_\lambda$ & \quad 0.7923329439442724E+01  & \quad 0.3361975965910192E+01
+\end{tabular}
+\end{center}
+and static potential ($v_\lambda$)
+\begin{center}
+%\newcolumntype{.}{D{.}{.}{-1}}
+\begin{tabular}{rcc}
+                     & $v_\lambda$ (LEM) & $v_\lambda$ (SVDFIT) \\
+   \ldots  &  \ldots      & \ldots         \\
+   8.90000 &  \quad -0.3738601412980983E-07 &   \quad  -0.3738604465762323E-07  \\
+   9.00000 &  \quad -0.3457238352675295E-07 &   \quad  -0.3457241617130511E-07  \\
+   9.10000 &  \quad -0.3199833271303255E-07 &   \quad  -0.3199836759524417E-07  \\
+   9.20000 &  \quad -0.2964111789027305E-07 &   \quad  -0.2964115513652894E-07  \\
+   9.30000 &  \quad -0.2748037669302244E-07 &   \quad  -0.2748041643535470E-07  \\
+   9.40000 &  \quad -0.2549785533465599E-07 &   \quad  -0.2549789771093117E-07  \\
+   9.50000 &  \quad -0.2367716973439954E-07 &   \quad  -0.2367721488850992E-07  \\
+   9.60000 &  \quad -0.2200359606053337E-07 &   \quad  -0.2200364414259235E-07  \\
+   9.70000 &  \quad -0.2046388677921551E-07 &   \quad  -0.2046393794575718E-07  \\
+   9.80000 &  \quad -0.1904610885409454E-07 &   \quad  -0.1904616326827752E-07  \\
+   9.90000 &  \quad -0.1773950121435192E-07 &   \quad  -0.1773955904616741E-07  \\
+  10.00000 &  \quad -0.1653434900198538E-07 &   \quad  -0.1653441042846955E-07  
+
+\end{tabular}
+\end{center}
+
+\bibliography{SCIENCE_REFERENCES}
+
+\end{document}

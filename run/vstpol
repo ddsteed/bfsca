@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+#
+#--------------------------------------------------------------------------------
+#  Add static and polarization potential
+#
+#  RDS (Hao Feng)
+#  Jun 29, 2013
+#
+# ---
+#  Usage:
+#    vstpol -t N2 -p DSG -basis ACCQ -R 2.02 -ref HF
+#
+#--------------------------------------------------------------------------------
+#--- options
+function handle_opt {
+    while test "x$1" != "x"; do
+	case $1 in
+	    -t)     shift; tgt=$1      ;;
+	    -p)     shift; pot=$1      ;;
+	    -basis) shift; basis=$1    ;;
+	    -R)     shift; CRD=$1      ;;
+	    -ref)   shift; ref=$1      ;;
+	    *)                         ;;
+	esac
+	shift
+    done
+
+    if [ "$tgt" == ""    ]; then tgt=H2;     fi
+    if [ "$pot" == ""    ]; then pot=DSG;    fi
+    if [ "$basis" == ""  ]; then basis=CCD;  fi
+    if [ "$CRD" == ""    ]; then CRD=1.400;  fi
+    if [ "$ref" == ""    ]; then ref=HF;     fi
+
+# - echo OPTIONS
+    echo " The command is: "
+    echo "     $0 -t $tgt -p $pot -basis $basis -R $CRD -ref $ref"
+    echo
+}
+
+#--------------------------------------------------------------------------------
+#--- locations
+function set_location {
+    work="/Users/fenghao/home1/feng/scatt/bfsca/work"
+    storeT="/Users/fenghao/home1/feng/scatt/bfsca/store"
+    store="$storeT/vstpol/$tgt/$ref/$pot/$basis"
+    datapl="$storeT/vpol/$tgt/$ref/$pot/$basis"
+    datast="$storeT/vstat/$tgt/$ref/$pot/$basis"
+}
+
+#--------------------------------------------------------------------------------
+#--- cd work directory
+#
+function cd_work {
+    curr=`pwd`
+    if [ -d $work ]; then
+	rm -f   $work/*
+	ln -s   $curr/../bin/addpots.x   $work/.
+	cd      $work
+    else
+	echo "$work does NOT exit!"
+	exit
+    fi
+}
+
+#--------------------------------------------------------------------------------
+#--- make input file
+#
+function make_inp {
+    input=$1
+
+#  stlam : MAX Lambda of static potential
+# pollam : MAX Lambda of polarization potential
+# lamdeg : Delta Lambda (0 2 4 6 8 ... ---> 2; 0 1 2 3 ... ---> 1)
+
+    if [[ $tgt == "H2" ]]; then
+	stlam=4;    pollam=2;   lamdeg=2;
+    elif [[ $tgt == "N2" ]]; then
+	stlam=8;    pollam=2;   lamdeg=2;
+    fi
+
+    echo "$stlam   $pollam   $lamdeg" > $input
+
+    ln -s $datast/vstR${CRD}.dat  fort.10
+    ln -s $datapl/polR${CRD}.dat  fort.11
+}
+
+#--------------------------------------------------------------------------------
+#--- MAIN FUNCTION
+#
+handle_opt $@
+
+set_location
+cd_work
+
+make_inp   $tgt.inp
+
+$work/addpots.x < $tgt.inp > $tgt.out
+
+cp   fort.12    $store/vspR${CRD}.dat

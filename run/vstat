@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+#
+#--------------------------------------------------------------------------------
+#  Compute Legendre coefficients of static potential of e-mol
+#
+#  RDS (Hao Feng)
+#  Jun 24, 2013
+#
+# ---
+#  Usage:
+#    vstat -t N2 -p DSG -basis ACCQ -R 2.02 -ref HF
+#
+#--------------------------------------------------------------------------------
+#--- options
+function handle_opt {
+    while test "x$1" != "x"; do
+	case $1 in
+	    -t)     shift; tgt=$1      ;;
+	    -p)     shift; pot=$1      ;;
+	    -basis) shift; basis=$1    ;;
+	    -R)     shift; CRD=$1      ;;
+	    -ref)   shift; ref=$1      ;;
+	    *)                         ;;
+	esac
+	shift
+    done
+
+    if [ "$tgt" == ""    ]; then tgt=H2;     fi
+    if [ "$pot" == ""    ]; then pot=DSG;    fi
+    if [ "$basis" == ""  ]; then basis=CCD;  fi
+    if [ "$CRD" == ""    ]; then CRD=1.400;  fi
+    if [ "$ref" == ""    ]; then ref=HF;     fi
+
+# - echo OPTIONS
+    echo " The command is: "
+    echo "     $0 -t $tgt -p $pot -basis $basis -R $CRD -ref $ref"
+    echo
+}
+
+#--------------------------------------------------------------------------------
+#--- locations
+function set_location {
+    work="/Users/fenghao/home1/feng/scatt/bfsca/work"
+    storeT="/Users/fenghao/home1/feng/scatt/bfsca/store"
+    store="$storeT/vstat/$tgt/$ref/$pot/$basis"
+    datain="$storeT/alam/$tgt/$ref/$pot/$basis"
+}
+
+#--------------------------------------------------------------------------------
+#--- cd work directory
+#
+function cd_work {
+    curr=`pwd`
+    if [ -d $work ]; then
+	rm -f   $work/*
+	ln -s   $curr/../bin/vlam.x   $work/.
+	cd      $work
+    else
+	echo "$work does NOT exit!"
+	exit
+    fi
+}
+
+#--------------------------------------------------------------------------------
+#--- make input file
+#
+function make_inp {
+    input=$1
+    rind=R$CRD
+
+#---
+#   LMINI = initial value of LAMDA desired.   LMIN = LMINI + 1 .
+#             Alam file will be searched sequentially for this value
+#   LMAXI = final value of lamda desired.     LMAX = LMAXI + 1 .
+#             must be .ge. LMIN;  must be .le. last value of alam data.
+#   LSTEP = increment in LAMDA from LMIN to LMAX
+#    NREG = number of mesh regions for Vlam output; must be .le. MXRG.
+#   ICASE = 1 for electronic plus nuclear Vlam output
+#         = 2 for electronic Vlam output only
+#    IRW3 = 0 for creation of new output file
+#         > 0 for addition to previously created output file
+#   IPRNT = 0,1,2 or 3 for successively higher print level
+#    IFLG = print control, Vlam output printed in IFLG steps
+#         = 0 for no points of Vlam output printed
+#            ( default values : IPRNT = IFLG = 0 )
+#
+#  RMI(I) = initial value of r in the ith Vlam mesh block
+#             must be 0.0 for I=1
+#  RMA(I) = final value of r in Vlam mesh block I
+#             RMA(I) must equal RMI(I+1)
+#             RMA(NREG) must be .ge. to the last point
+#             provided for the Alam data
+#  RST(I) = increment of r in Vlam mesh block I
+#             total number of mesh points must be .le. MXVL
+
+    if [[ $tgt == "H2" ]]; then
+	LMINI=0;  LMAXI=6;  LSTEP=2
+	rmesh[0]="0.00    1.00    0.01"
+	rmesh[1]="1.00    2.00    0.02"
+	rmesh[2]="2.00    4.00    0.05"
+	rmesh[3]="4.00   10.00    0.10"
+    elif [[ $tgt == "N2" ]]; then
+	LMINI=0;  LMAXI=14; LSTEP=2
+	rmesh[0]="0.00    1.20    0.01"
+	rmesh[1]="1.20    2.00    0.02"
+	rmesh[2]="2.00    4.40    0.04"
+	rmesh[3]="4.40    6.00    0.08"
+	if [[ $pot == "DSG" ]]; then
+	    rmesh[4]="6.00    10.00    0.10"
+	    rmesh[5]="10.00   15.00    0.10"
+	fi
+    fi
+    NREG=${#rmesh[@]};  ICASE=1;  IRW3=0;  IPRNT=1; IFLG=1;
+
+#---
+    echo "$LMINI  $LMAXI  $LSTEP  $NREG  $ICASE  $IRW3  $IPRNT  $IFLG " > $input
+
+    for index in ${!rmesh[@]}; do
+	echo ${rmesh[index]}  >> $input
+    done
+
+    ln -s   $datain/alam_${rind}.dat    fort.2
+}
+
+#--------------------------------------------------------------------------------
+#--- MAIN FUNCTION
+#
+handle_opt $@
+
+set_location
+cd_work
+
+make_inp $tgt.inp
+
+$work/vlam.x < $tgt.inp > $tgt.out
+
+mv fort.3  $store/vstR${CRD}.dat

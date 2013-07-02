@@ -1,0 +1,282 @@
+#!/usr/bin/env bash
+#
+#--------------------------------------------------------------------------------
+#  Get the charge density, a_lambda coefficients, and MOs expansion coefficients
+#
+#  RDS (Hao Feng)
+#  Jun 21, 2013
+#
+# ---
+#  Usage:
+#    alamn -t N2 -p DSG -basis ACCQ -R 2.02 -ref HF
+#
+#--------------------------------------------------------------------------------
+#--- options
+function handle_opt {
+    while test "x$1" != "x"; do
+	case $1 in
+	    -t)     shift; tgt=$1      ;;
+	    -p)     shift; pot=$1      ;;
+	    -basis) shift; basis=$1    ;;
+	    -R)     shift; CRD=$1      ;;
+	    -ref)   shift; ref=$1      ;;
+	    *)                         ;;
+	esac
+	shift
+    done
+
+    if [ "$tgt" == ""    ]; then tgt=H2;     fi
+    if [ "$pot" == ""    ]; then pot=DSG;    fi
+    if [ "$basis" == ""  ]; then basis=CCD;  fi
+    if [ "$CRD" == ""    ]; then CRD=1.400;  fi
+    if [ "$ref" == ""    ]; then ref=HF;     fi
+
+# - echo OPTIONS
+    echo " The command is: "
+    echo "     $0 -t $tgt -p $pot -basis $basis -R $CRD -ref $ref"
+    echo
+}
+
+#--------------------------------------------------------------------------------
+#--- locations
+function set_location {
+    work="/Users/fenghao/home1/feng/scatt/bfsca/work"
+    storeT="/Users/fenghao/home1/feng/scatt/bfsca/store"
+    store="$storeT/alam/$tgt"
+    datain="$store/DATA_IN/$basis"
+    storea="$store/$ref/$pot/$basis"
+}
+
+#--------------------------------------------------------------------------------
+#--- cd work directory
+#
+function cd_work {
+    curr=`pwd`
+    if [ -d $work ]; then
+	rm -f   $work/*
+	ln -s   $curr/../bin/alamn.x   $work/.
+	cd      $work
+    else
+	echo "$work does NOT exit!"
+	exit
+    fi
+}
+
+#--------------------------------------------------------------------------------
+#--- make input file
+#
+function make_inp {
+    input=$1
+    rval=`echo "scale=3; $CRD/2" | bc -l`
+    rind=R$CRD
+
+    title="$basis basis R = $CRD a_0"
+#---
+#  IHETRO = 1 for heteronuclear symmetry; = 0 else
+#   IFDSK = 1 if function f is on disk on fort.4
+#   IWRTF = 1 if code is to write f to fort.2
+#  IPNCHA = 1 print data to fort.7  before cal. alambda 
+#  ISTORA = 1 if code is to write a coeffs to fort.3
+
+#    For STO FCNS INDCON denotes the MO and basis function conventions :
+#  INDCON = 1 for MCLEAN and YOSHIMINE conventions;
+#         = 2 for CADE et al conventions;
+#         = 3 for FRAGA and RANSIL conventions.     if IHETRO = 0, do
+#                 not input coefficients for rightmost center
+#   NEWRS = 1 if we are to calculate f at any new r values
+#   IADSK = 1 if there are some alamda on fort.8
+#             note if IADSK = 1 then LAMDA = 0 must be the first 
+#             lamda file on fort.8
+#   IPROJ = 0 do not do MOEXP
+#         = 1 do only MOEXP (no charge density or alam; don't use it !)
+#         = 2 do MOEXP and any other calculations
+#         = same as above but Negative, output in linear-algebraic form
+#    IBSS = 0 STO basis
+#         = 1 CARTESIAN GTO basis
+#   IPLOT = 1 this produces the charge density on a cartesian mesh
+#             of points (x,z) suitable for surface plots.  (if this
+#             option is chosen, no other quantities will be calculated.)
+#             the charge density is written to fort.2 .
+#   NPRNT = 0 this option is only used with gtos.  it causes a minimum of
+#             output to be written to unit 6 involving gto:mo overlaps.
+#         = 1 more information is printed.
+#         = 2 this prints all the available information including the 
+#               overlap matrix of "atomic fcns".
+#   ITEST = 1 the quadrature angles and legendre fcns. are calculated.
+#               (this invokes the original coding.) for any other value
+#               of itest, the quadrature angles and all functions of 
+#               theta are looked up in the block data table.  the
+#               associated legendre fcns. needed for the moexp option
+#               will be calculated if necessary.
+
+    IHETRO=0; IFDSK=0; IWRTF=1; IPNCHA=0; ISTORA=1; INDCON=3; NEWRS=1; IADSK=0;
+    IPROJ=-2; IBSS=1;  IPLOT=0; NPRNT=2;  ITEST=1;
+
+#---
+#   for |IPROJ| =\= 1  &  IPLOT =\= 1  ONLY !
+#   LAMMIN  LAMMAX  -- Minimum & maximum value of Lambda
+    LAMMIN=0;
+    if [[ $tgt == "H2" ]]; then LAMMAX=6;  fi
+    if [[ $tgt == "N2" ]]; then LAMMAX=14; fi
+
+#---
+    if [[ $tgt == "H2" ]]; then
+	rmesh[0]="0.00    1.00    0.01"
+	rmesh[1]="1.00    2.00    0.02"
+	rmesh[2]="2.00    4.00    0.05"
+	rmesh[3]="4.00   10.00    0.10"
+    elif [[ $tgt == "N2" ]]; then
+	rmesh[0]="0.00    1.20    0.01"
+	rmesh[1]="1.20    2.00    0.02"
+	rmesh[2]="2.00    4.40    0.04"
+	rmesh[3]="4.40    6.00    0.08"
+	if [[ $pot == "DSG" ]]; then
+	    rmesh[4]="6.00    10.00    0.10"
+	    rmesh[5]="10.00   15.00    0.10"
+	fi
+    fi
+#---
+#   subtitle ILBL & ICON (for subroutine  RDINPT) :
+    title1="$basis NEUTRAL BASIS FOR $tgt"
+
+#---
+#     ICON(1) = 0, calc. 1-e & 2-elec. integrals;
+#     ICON(2) = 0, data in tape;
+#     ICON(3) = 0, Normalize, = 1, NO;
+#     ICON(4) = 0, Check symmetry, = 1, NO.
+#       ...
+#    ICON(10) = 0.
+    ICON="0 0 0 0 0 0 0 0 0 0"
+
+#---
+#   NON = Number of centers;   NAC = Number of additional centers.
+    NON=2;  NAC=0;
+
+# ---
+#    ICNTR(I)   = The Ith center of the molecule.
+#    VLIST(I,J) = The nuclear coordinates of the Ith center (J=1,2,3).
+#    VLIST(I,4) = The nuclear charge.
+    if [[ $tgt == "H2" ]]; then
+	atom[0]="1   0.0   0.0  -$rval  1.0"
+	atom[1]="2   0.0   0.0   $rval  1.0"
+    elif [[ $tgt == "N2" ]]; then
+	atom[0]="1   0.0   0.0  -$rval  7.0"
+	atom[1]="2   0.0   0.0   $rval  7.0"
+    fi
+
+# ---
+# BASIS
+#     NGAUS = Number of GTOs.  
+#     NCBFN = Number of basis functions.
+#      NOCC = Number of OCCUPIED CLOSED-shell orbitals.
+    cp $datain/GTObasis.dat   GTO.dat
+    cp $datain/MOcoeR${CRD}   MO.dat
+
+    begin=`wc -l GTO.dat | awk '{print $1}'`
+    end=`grep -n "[SXYZ]" GTO.dat | awk '{print $1}' | head -n 1| sed 's/://g' | tail -n 1`
+    NGAUS=`expr $begin - $end + 1`
+    let "end--"
+    bfn=(`sed -n -e "1, ${end}p" GTO.dat`)
+    NCBFN=${#bfn[@]}
+    NOCC=`grep "ORBITAL" MO.dat | tail -n 1 | awk '{print $2}'`
+
+#---
+#        ( MORB classifies MOs )
+#      MORB = 0, for a Sigma orbital;       
+#           = 1, for a Pi(X) orbital;
+#           = 2, for a Pi(Y) orbital (IN XZ-plane, Pi_y orbitals make
+#                no contribution, so we can skip Pi_y MOs when MORB=2).
+#
+#     LSTART(I) = Minimum value of L (angular momentum) for the 
+#  Ith orbital.  For STO orbitals we use NMO as the # of occupied 
+#  orbitals,  but for GTO orbitals we use NOCC (NMO = NOCC).
+#    L = 0, for Sigma_g MO;      L = 1, for Sigma_u MO;
+#    L = 1, for    Pi_u MO;      L = 2, for    Pi_g MO;
+#    L = 2, for Delta_g MO;      L = 3, for Delta_u MO.
+
+    if [[ $tgt == "H2" ]]; then
+	MORB="0"; LSTART="0";
+    elif [[ $tgt == "N2" ]]; then
+	case $CRD in
+	    1.600) 
+		MORB="0 0 0 1 1 0 0"; LSTART="0 1 0 1 1 1 0" ;;
+	    1.700) 
+		MORB="0 0 0 1 1 0 0"; LSTART="0 1 0 1 1 1 0" ;;
+	    1.800 | 1.950) 
+		MORB="0 0 0 0 1 1 0"; LSTART="0 1 0 1 1 1 0" ;;
+	    1.850 | 1.900) 
+		MORB="0 0 0 0 1 1 0"; LSTART="0 1 0 1 1 1 0" ;;
+	    2.000 | 2.020 | 2.068 | 2.100 | 2.200 | 2.300 | 2.400 | 2.500 | 2.600 | 2.700)
+		MORB="0 0 0 0 0 1 1"; LSTART="0 1 0 1 0 1 1" ;;
+	esac
+    fi
+
+#---
+# NFIT = 1  linearly solve the three coefficients for large-r fit by 
+#           using the last three A_lambda
+#      = 2  fit the three coefficients for large-r fit by using SVDFIT
+#      = 3  use B.C.Saha's method to fit the three coefficients 
+# NDAT: if NFIT = 2, the # of last A_lambda to fit large-r ( NDAT > 3 )
+#       if NFIT != 2, NDAT could be set ANY VALUE! (It doesn't work.)
+    if [[ $tgt == "H2" ]]; then
+#	NFIT=1;  NDAT=3;
+	NFIT=3;  NDAT=80;
+    elif [[ $tgt == "N2" ]]; then
+	NFIT=3;  NDAT=80;
+    fi
+
+#---
+# data  for subroutine  SPHPRJ  :
+# Diffrent LMAX values produce different MO expansion PHILM !!
+#     LMAX = Maximum value of Lambda for the orbital expansion
+#     LMAX = 30 for Sgg MO (0,2,4,6,8,...,28,30; 16 values.) ; 
+#          = 29 for Sgu & Piu MOs (1,3,5,7,...,27,29; 15 values).
+    if [[ $tgt == "H2" ]]; then	LMAX=8;  fi
+    if [[ $tgt == "N2" ]]; then	LMAX=16; fi
+
+#---
+    echo "$title" > $input
+    echo "$IHETRO $IFDSK $IWRTF $IPNCHA $ISTORA $INDCON $NEWRS $IADSK" >> $input
+    echo "$IPROJ $IBSS $IPLOT $NPRNT $ITEST" >> $input
+    echo "$LAMMIN $LAMMAX" >> $input
+
+    echo "${#rmesh[@]}" >> $input
+    for index in ${!rmesh[@]}; do
+	echo ${rmesh[index]}  >> $input
+    done
+
+    echo $title1 >> $input
+    echo "$ICON" >> $input
+    echo "$NON $NAC" >> $input
+
+    for index in ${!atom[@]}; do
+	echo ${atom[index]} >> $input
+    done
+
+    echo "$NGAUS $NCBFN $NOCC" >> $input
+    cat  GTO.dat               >> $input
+
+    echo "$MORB" >> $input
+    cat  MO.dat  >> $input
+
+    echo "$NFIT   $NDAT" >> $input
+
+    echo "$LMAX"         >> $input
+    echo "$LSTART"       >> $input
+}
+
+#--------------------------------------------------------------------------------
+#--- MAIN FUNCTION
+#
+handle_opt $@
+
+set_location
+cd_work
+
+make_inp $tgt.inp
+
+$work/alamn.x < $tgt.inp > $tgt.out
+
+mv fort.10  $storea/sphrjR${CRD}.dat    # MO projections
+mv fort.2   $storea/dalam_R${CRD}.dat   # charge density
+mv fort.3   $storea/alam_R${CRD}.dat    # alams

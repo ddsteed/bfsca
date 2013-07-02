@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+#
+#--------------------------------------------------------------------------------
+#  Calculates the multipole moments using
+#          D_dipole(r;R) = - (r**2)*V_static(Lambda=1;r,R)
+#      Q_quatrupole(r;R) = - (r**3)*V_static(Lambda=2;r,R)
+#          A_alpha2(r;R) = - (2*r**4)*V_pola(Lambda=2;r,R)
+#          A_alpha0(r;R) = - (2*r**4)*V_pola(Lambda=0;r,R)
+#
+#  RDS (Hao Feng)
+#  Jun 29, 2013
+#
+# ---
+#  Usage:
+#    mpmom -t N2 -p DSG -basis ACCQ -R 2.02 -ref HF
+#
+#--------------------------------------------------------------------------------
+#--- options
+function handle_opt {
+    while test "x$1" != "x"; do
+	case $1 in
+	    -t)     shift; tgt=$1      ;;
+	    -p)     shift; pot=$1      ;;
+	    -basis) shift; basis=$1    ;;
+	    -R)     shift; CRD=$1      ;;
+	    -ref)   shift; ref=$1      ;;
+	    *)                         ;;
+	esac
+	shift
+    done
+
+    if [ "$tgt" == ""    ]; then tgt=H2;     fi
+    if [ "$pot" == ""    ]; then pot=DSG;    fi
+    if [ "$basis" == ""  ]; then basis=CCD;  fi
+    if [ "$CRD" == ""    ]; then CRD=1.400;  fi
+    if [ "$ref" == ""    ]; then ref=HF;     fi
+
+# - echo OPTIONS
+    echo " The command is: "
+    echo "     $0 -t $tgt -p $pot -basis $basis -R $CRD -ref $ref"
+    echo
+}
+
+#--------------------------------------------------------------------------------
+#--- locations
+function set_location {
+    work="/Users/fenghao/home1/feng/scatt/bfsca/work"
+    storeT="/Users/fenghao/home1/feng/scatt/bfsca/store"
+    store="$storeT/mpmom/$tgt/$ref/$pot/$basis"
+    datap="$storeT/vpol/$tgt/$ref/$pot/$basis"
+    datas="$storeT/vstat/$tgt/$ref/$pot/$basis"
+}
+
+#--------------------------------------------------------------------------------
+#--- cd work directory
+#
+function cd_work {
+    curr=`pwd`
+    if [ -d $work ]; then
+	rm -f   $work/*
+	ln -s   $curr/../bin/mpmom.x   $work/.
+	cd      $work
+    else
+	echo "$work does NOT exit!"
+	exit
+    fi
+}
+
+#--------------------------------------------------------------------------------
+#--- MAIN FUNCTION
+#
+handle_opt $@
+
+set_location
+cd_work
+
+#--- vstat and polarization potential
+ln -s $datap/polR${CRD}.dat   fort.3
+ln -s $datas/vstR${CRD}.dat   fort.2
+
+mp=(A0 A2 D Q)
+for index in ${!mp[@]}; do
+    echo `expr $index + 1`   > $tgt.inp
+
+    $work/mpmom.x < $tgt.inp > ${mp[index]}.dat
+
+    cp  ${mp[index]}.dat     $store/${mp[index]}.dat.R${CRD}
+    cat ${mp[index]}.dat  >> $store/${mp[index]}.dat
+done

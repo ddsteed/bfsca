@@ -1228,7 +1228,7 @@ C * end iri loop
               end do
             end do
           WRITE (6,475) iv-1,ivp-1,cfm,e
-  475 format(' xsec',2i4,2x,e13.7,f10.6)
+  475 format(' xsec',2i4,2x,e14.7,f10.6)
           end do
         end do
       go to 10

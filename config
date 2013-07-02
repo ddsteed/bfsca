@@ -1,55 +1,454 @@
-#!/bin/csh
+#!/usr/bin/env  bash
 #-----------------------------------------------------------------------
 # This shell script is to set up the working scatch and the store 
 # directory and compile all the source codes.
 #-----------------------------------------------------------------------
-set currpath = `pwd`
+function make_work {
+    echo -n " Please specify the working scratch directory, [./work]: "
+    read work
 
-echo -n " Please specify the working scratch directory, [./work]: "
-set work = $<
-if ($work == "") then
-    set work = "$currpath/work"
-else
-    if (! -d $work) then
-	mkdir $work
-    endif
+    if [[ $work == "" ]]; then	work="$currpath/work"; fi
+    if [ ! -d $work ]; then mkdir $work; fi
     cd $work
-    set work = `pwd`
+    work=`pwd`
     cd $currpath
-endif
+}
 
-echo -n " Please specify the store dirctory, [./store]: "
-set store = $<
-if ($store == "") then
-    set store = "$currpath/store"
-else
-    if (! -d $store) mkdir -p $store
+#-----------------------------------------------------------------------
+function store_name {
+    st=(
+	./alam/H2/CCSD/ACCD
+	./alam/H2/CCSD/ACCQ
+	./alam/H2/CCSD/ACCT
+	./alam/H2/CCSD/CCD
+	./alam/H2/CCSD/CCQ
+	./alam/H2/CCSD/CCT
+	./alam/H2/CCSD/M2
+	./alam/H2/CCSD/M2H
+	./alam/H2/CCSD
+	./alam/H2/DATA_IN/ACCD
+	./alam/H2/DATA_IN/ACCQ
+	./alam/H2/DATA_IN/ACCT
+	./alam/H2/DATA_IN/CCD
+	./alam/H2/DATA_IN/CCQ
+	./alam/H2/DATA_IN/CCT
+	./alam/H2/DATA_IN/M2
+	./alam/H2/DATA_IN/M2H
+	./alam/H2/DATA_IN
+	./alam/H2/HF/BTAD/ACCD
+	./alam/H2/HF/BTAD/ACCQ
+	./alam/H2/HF/BTAD/ACCT
+	./alam/H2/HF/BTAD/CCD
+	./alam/H2/HF/BTAD/CCQ
+	./alam/H2/HF/BTAD/CCT
+	./alam/H2/HF/BTAD/M2
+	./alam/H2/HF/BTAD/M2H
+	./alam/H2/HF/BTAD
+	./alam/H2/HF/DSG/ACCD
+	./alam/H2/HF/DSG/ACCQ
+	./alam/H2/HF/DSG/ACCT
+	./alam/H2/HF/DSG/CCD
+	./alam/H2/HF/DSG/CCQ
+	./alam/H2/HF/DSG/CCT
+	./alam/H2/HF/DSG/M2
+	./alam/H2/HF/DSG/M2H
+	./alam/H2/HF/DSG
+	./alam/H2/HF
+	./alam/H2
+	./alam/N2/CCSD/ACCD
+	./alam/N2/CCSD/ACCQ
+	./alam/N2/CCSD/ACCT
+	./alam/N2/CCSD/CCD
+	./alam/N2/CCSD/CCQ
+	./alam/N2/CCSD/CCT
+	./alam/N2/CCSD/M2H
+	./alam/N2/CCSD
+	./alam/N2/DATA_IN/ACCD
+	./alam/N2/DATA_IN/ACCQ
+	./alam/N2/DATA_IN/ACCT
+	./alam/N2/DATA_IN/CCD
+	./alam/N2/DATA_IN/CCQ
+	./alam/N2/DATA_IN/CCT
+	./alam/N2/DATA_IN/M2H
+	./alam/N2/DATA_IN
+	./alam/N2/HF/BTAD/ACCD
+	./alam/N2/HF/BTAD/ACCQ
+	./alam/N2/HF/BTAD/ACCT
+	./alam/N2/HF/BTAD/CCD
+	./alam/N2/HF/BTAD/CCQ
+	./alam/N2/HF/BTAD/CCT
+	./alam/N2/HF/BTAD/M2H
+	./alam/N2/HF/BTAD
+	./alam/N2/HF/DSG/ACCD
+	./alam/N2/HF/DSG/ACCQ
+	./alam/N2/HF/DSG/ACCT
+	./alam/N2/HF/DSG/CCD
+	./alam/N2/HF/DSG/CCQ
+	./alam/N2/HF/DSG/CCT
+	./alam/N2/HF/DSG/M2H
+	./alam/N2/HF/DSG
+	./alam/N2/HF
+	./alam/N2
+	./alam
+	./mpmom/H2/HF/BTAD/ACCD
+	./mpmom/H2/HF/BTAD/ACCQ
+	./mpmom/H2/HF/BTAD/ACCT
+	./mpmom/H2/HF/BTAD/CCD
+	./mpmom/H2/HF/BTAD/CCQ
+	./mpmom/H2/HF/BTAD/CCT
+	./mpmom/H2/HF/BTAD/M2
+	./mpmom/H2/HF/BTAD/M2H
+	./mpmom/H2/HF/BTAD
+	./mpmom/H2/HF/DSG/ACCD
+	./mpmom/H2/HF/DSG/ACCQ
+	./mpmom/H2/HF/DSG/ACCT
+	./mpmom/H2/HF/DSG/CCD
+	./mpmom/H2/HF/DSG/CCQ
+	./mpmom/H2/HF/DSG/CCT
+	./mpmom/H2/HF/DSG/M2
+	./mpmom/H2/HF/DSG/M2H
+	./mpmom/H2/HF/DSG
+	./mpmom/H2/HF
+	./mpmom/H2
+	./mpmom/N2/HF/BTAD/ACCD
+	./mpmom/N2/HF/BTAD/ACCQ
+	./mpmom/N2/HF/BTAD/ACCT
+	./mpmom/N2/HF/BTAD/CCD
+	./mpmom/N2/HF/BTAD/CCQ
+	./mpmom/N2/HF/BTAD/CCT
+	./mpmom/N2/HF/BTAD/M2H
+	./mpmom/N2/HF/BTAD
+	./mpmom/N2/HF/DSG/ACCD
+	./mpmom/N2/HF/DSG/ACCQ
+	./mpmom/N2/HF/DSG/ACCT
+	./mpmom/N2/HF/DSG/CCD
+	./mpmom/N2/HF/DSG/CCQ
+	./mpmom/N2/HF/DSG/CCT
+	./mpmom/N2/HF/DSG/M2H
+	./mpmom/N2/HF/DSG
+	./mpmom/N2/HF
+	./mpmom/N2
+	./mpmom
+	./spfd/H2/DATA_IN/HF/ACCD
+	./spfd/H2/DATA_IN/HF/ACCQ
+	./spfd/H2/DATA_IN/HF/ACCT
+	./spfd/H2/DATA_IN/HF/CCD
+	./spfd/H2/DATA_IN/HF/CCQ
+	./spfd/H2/DATA_IN/HF/CCT
+	./spfd/H2/DATA_IN/HF/M2
+	./spfd/H2/DATA_IN/HF/M2H
+	./spfd/H2/DATA_IN/HF
+	./spfd/H2/DATA_IN
+	./spfd/H2
+	./spfd/N2/DATA_IN/HF/ACCD
+	./spfd/N2/DATA_IN/HF/ACCQ
+	./spfd/N2/DATA_IN/HF/ACCT
+	./spfd/N2/DATA_IN/HF/CCD
+	./spfd/N2/DATA_IN/HF/CCQ
+	./spfd/N2/DATA_IN/HF/CCT
+	./spfd/N2/DATA_IN/HF/M2H
+	./spfd/N2/DATA_IN/HF
+	./spfd/N2/DATA_IN
+	./spfd/N2/HF/ACCD
+	./spfd/N2/HF/ACCQ
+	./spfd/N2/HF/ACCT
+	./spfd/N2/HF/CCD
+	./spfd/N2/HF/CCQ
+	./spfd/N2/HF/CCT
+	./spfd/N2/HF/M2H
+	./spfd/N2/HF
+	./spfd/N2
+	./spfd
+	./vpol/H2/CCSD/ACCD
+	./vpol/H2/CCSD/ACCQ
+	./vpol/H2/CCSD/ACCT
+	./vpol/H2/CCSD/CCD
+	./vpol/H2/CCSD/CCQ
+	./vpol/H2/CCSD/CCT
+	./vpol/H2/CCSD/M2
+	./vpol/H2/CCSD/M2H
+	./vpol/H2/CCSD
+	./vpol/H2/DATA_IN/.svn/prop-base
+	./vpol/H2/DATA_IN/.svn/props
+	./vpol/H2/DATA_IN/.svn/text-base
+	./vpol/H2/DATA_IN/.svn/tmp/prop-base
+	./vpol/H2/DATA_IN/.svn/tmp/props
+	./vpol/H2/DATA_IN/.svn/tmp/text-base
+	./vpol/H2/DATA_IN/.svn/tmp
+	./vpol/H2/DATA_IN/.svn
+	./vpol/H2/DATA_IN/VEC/HF/ACCD
+	./vpol/H2/DATA_IN/VEC/HF/ACCQ
+	./vpol/H2/DATA_IN/VEC/HF/ACCT
+	./vpol/H2/DATA_IN/VEC/HF/CCD
+	./vpol/H2/DATA_IN/VEC/HF/CCQ
+	./vpol/H2/DATA_IN/VEC/HF/CCT
+	./vpol/H2/DATA_IN/VEC/HF/M2
+	./vpol/H2/DATA_IN/VEC/HF/M2H
+	./vpol/H2/DATA_IN/VEC/HF
+	./vpol/H2/DATA_IN/VEC
+	./vpol/H2/DATA_IN
+	./vpol/H2/HF/BTAD/ACCD
+	./vpol/H2/HF/BTAD/ACCQ
+	./vpol/H2/HF/BTAD/ACCT
+	./vpol/H2/HF/BTAD/CCD
+	./vpol/H2/HF/BTAD/CCQ
+	./vpol/H2/HF/BTAD/CCT
+	./vpol/H2/HF/BTAD/M2
+	./vpol/H2/HF/BTAD/M2H
+	./vpol/H2/HF/BTAD
+	./vpol/H2/HF/DSG/ACCD
+	./vpol/H2/HF/DSG/ACCQ
+	./vpol/H2/HF/DSG/ACCT
+	./vpol/H2/HF/DSG/CCD
+	./vpol/H2/HF/DSG/CCQ
+	./vpol/H2/HF/DSG/CCT
+	./vpol/H2/HF/DSG/M2
+	./vpol/H2/HF/DSG/M2H
+	./vpol/H2/HF/DSG
+	./vpol/H2/HF
+	./vpol/H2/POT_ORI/CCSD
+	./vpol/H2/POT_ORI/HF/BTAD/ACCD
+	./vpol/H2/POT_ORI/HF/BTAD/ACCQ
+	./vpol/H2/POT_ORI/HF/BTAD/ACCT
+	./vpol/H2/POT_ORI/HF/BTAD/CCD
+	./vpol/H2/POT_ORI/HF/BTAD/CCQ
+	./vpol/H2/POT_ORI/HF/BTAD/CCT
+	./vpol/H2/POT_ORI/HF/BTAD/M2
+	./vpol/H2/POT_ORI/HF/BTAD/M2H
+	./vpol/H2/POT_ORI/HF/BTAD
+	./vpol/H2/POT_ORI/HF/DSG/ACCD
+	./vpol/H2/POT_ORI/HF/DSG/ACCQ
+	./vpol/H2/POT_ORI/HF/DSG/ACCT
+	./vpol/H2/POT_ORI/HF/DSG/CCD
+	./vpol/H2/POT_ORI/HF/DSG/CCQ
+	./vpol/H2/POT_ORI/HF/DSG/CCT
+	./vpol/H2/POT_ORI/HF/DSG/M2
+	./vpol/H2/POT_ORI/HF/DSG/M2H
+	./vpol/H2/POT_ORI/HF/DSG
+	./vpol/H2/POT_ORI/HF
+	./vpol/H2/POT_ORI
+	./vpol/H2
+	./vpol/N2/CCSD/ACCD
+	./vpol/N2/CCSD/ACCQ
+	./vpol/N2/CCSD/ACCT
+	./vpol/N2/CCSD/CCD
+	./vpol/N2/CCSD/CCQ
+	./vpol/N2/CCSD/CCT
+	./vpol/N2/CCSD/M2H
+	./vpol/N2/CCSD
+	./vpol/N2/DATA_IN/VEC/HF/ACCD
+	./vpol/N2/DATA_IN/VEC/HF/ACCQ
+	./vpol/N2/DATA_IN/VEC/HF/ACCT
+	./vpol/N2/DATA_IN/VEC/HF/CCD
+	./vpol/N2/DATA_IN/VEC/HF/CCQ
+	./vpol/N2/DATA_IN/VEC/HF/CCT
+	./vpol/N2/DATA_IN/VEC/HF/M2H
+	./vpol/N2/DATA_IN/VEC/HF
+	./vpol/N2/DATA_IN/VEC
+	./vpol/N2/DATA_IN
+	./vpol/N2/HF/BTAD/ACCD
+	./vpol/N2/HF/BTAD/ACCQ
+	./vpol/N2/HF/BTAD/ACCT
+	./vpol/N2/HF/BTAD/CCD
+	./vpol/N2/HF/BTAD/CCQ
+	./vpol/N2/HF/BTAD/CCT
+	./vpol/N2/HF/BTAD/M2H
+	./vpol/N2/HF/BTAD
+	./vpol/N2/HF/DSG/ACCD
+	./vpol/N2/HF/DSG/ACCQ
+	./vpol/N2/HF/DSG/ACCT
+	./vpol/N2/HF/DSG/CCD
+	./vpol/N2/HF/DSG/CCQ
+	./vpol/N2/HF/DSG/CCT
+	./vpol/N2/HF/DSG/M2H
+	./vpol/N2/HF/DSG
+	./vpol/N2/HF
+	./vpol/N2/POT_ORI/CCSD
+	./vpol/N2/POT_ORI/HF/BTAD/ACCD
+	./vpol/N2/POT_ORI/HF/BTAD/ACCQ
+	./vpol/N2/POT_ORI/HF/BTAD/ACCT
+	./vpol/N2/POT_ORI/HF/BTAD/CCD
+	./vpol/N2/POT_ORI/HF/BTAD/CCQ
+	./vpol/N2/POT_ORI/HF/BTAD/CCT
+	./vpol/N2/POT_ORI/HF/BTAD/M2H
+	./vpol/N2/POT_ORI/HF/BTAD
+	./vpol/N2/POT_ORI/HF/DSG/ACCD
+	./vpol/N2/POT_ORI/HF/DSG/ACCQ
+	./vpol/N2/POT_ORI/HF/DSG/ACCT
+	./vpol/N2/POT_ORI/HF/DSG/CCD
+	./vpol/N2/POT_ORI/HF/DSG/CCQ
+	./vpol/N2/POT_ORI/HF/DSG/CCT
+	./vpol/N2/POT_ORI/HF/DSG/M2H
+	./vpol/N2/POT_ORI/HF/DSG
+	./vpol/N2/POT_ORI/HF
+	./vpol/N2/POT_ORI
+	./vpol/N2
+	./vpol
+	./vstat/H2/CCSD/ACCD
+	./vstat/H2/CCSD/ACCQ
+	./vstat/H2/CCSD/ACCT
+	./vstat/H2/CCSD/CCD
+	./vstat/H2/CCSD/CCQ
+	./vstat/H2/CCSD/CCT
+	./vstat/H2/CCSD/M2
+	./vstat/H2/CCSD/M2H
+	./vstat/H2/CCSD
+	./vstat/H2/HF/BTAD/ACCD
+	./vstat/H2/HF/BTAD/ACCQ
+	./vstat/H2/HF/BTAD/ACCT
+	./vstat/H2/HF/BTAD/CCD
+	./vstat/H2/HF/BTAD/CCQ
+	./vstat/H2/HF/BTAD/CCT
+	./vstat/H2/HF/BTAD/M2
+	./vstat/H2/HF/BTAD/M2H
+	./vstat/H2/HF/BTAD
+	./vstat/H2/HF/DSG/ACCD
+	./vstat/H2/HF/DSG/ACCQ
+	./vstat/H2/HF/DSG/ACCT
+	./vstat/H2/HF/DSG/CCD
+	./vstat/H2/HF/DSG/CCQ
+	./vstat/H2/HF/DSG/CCT
+	./vstat/H2/HF/DSG/M2
+	./vstat/H2/HF/DSG/M2H
+	./vstat/H2/HF/DSG
+	./vstat/H2/HF
+	./vstat/H2
+	./vstat/N2/CCSD/ACCD
+	./vstat/N2/CCSD/ACCQ
+	./vstat/N2/CCSD/ACCT
+	./vstat/N2/CCSD/CCD
+	./vstat/N2/CCSD/CCQ
+	./vstat/N2/CCSD/CCT
+	./vstat/N2/CCSD/M2H
+	./vstat/N2/CCSD
+	./vstat/N2/HF/BTAD/ACCD
+	./vstat/N2/HF/BTAD/ACCQ
+	./vstat/N2/HF/BTAD/ACCT
+	./vstat/N2/HF/BTAD/CCD
+	./vstat/N2/HF/BTAD/CCQ
+	./vstat/N2/HF/BTAD/CCT
+	./vstat/N2/HF/BTAD/M2H
+	./vstat/N2/HF/BTAD
+	./vstat/N2/HF/DSG/ACCD
+	./vstat/N2/HF/DSG/ACCQ
+	./vstat/N2/HF/DSG/ACCT
+	./vstat/N2/HF/DSG/CCD
+	./vstat/N2/HF/DSG/CCQ
+	./vstat/N2/HF/DSG/CCT
+	./vstat/N2/HF/DSG/M2H
+	./vstat/N2/HF/DSG
+	./vstat/N2/HF
+	./vstat/N2
+	./vstat
+	./vstpol/H2/CCSD/ACCD
+	./vstpol/H2/CCSD/ACCQ
+	./vstpol/H2/CCSD/ACCT
+	./vstpol/H2/CCSD/CCD
+	./vstpol/H2/CCSD/CCQ
+	./vstpol/H2/CCSD/CCT
+	./vstpol/H2/CCSD/M2
+	./vstpol/H2/CCSD/M2H
+	./vstpol/H2/CCSD
+	./vstpol/H2/HF/BTAD/ACCD
+	./vstpol/H2/HF/BTAD/ACCQ
+	./vstpol/H2/HF/BTAD/ACCT
+	./vstpol/H2/HF/BTAD/CCD
+	./vstpol/H2/HF/BTAD/CCQ
+	./vstpol/H2/HF/BTAD/CCT
+	./vstpol/H2/HF/BTAD/M2
+	./vstpol/H2/HF/BTAD/M2H
+	./vstpol/H2/HF/BTAD
+	./vstpol/H2/HF/DSG/ACCD
+	./vstpol/H2/HF/DSG/ACCQ
+	./vstpol/H2/HF/DSG/ACCT
+	./vstpol/H2/HF/DSG/CCD
+	./vstpol/H2/HF/DSG/CCQ
+	./vstpol/H2/HF/DSG/CCT
+	./vstpol/H2/HF/DSG/M2
+	./vstpol/H2/HF/DSG/M2H
+	./vstpol/H2/HF/DSG
+	./vstpol/H2/HF
+	./vstpol/H2
+	./vstpol/N2/CCSD/ACCD
+	./vstpol/N2/CCSD/ACCQ
+	./vstpol/N2/CCSD/ACCT
+	./vstpol/N2/CCSD/CCD
+	./vstpol/N2/CCSD/CCQ
+	./vstpol/N2/CCSD/CCT
+	./vstpol/N2/CCSD/M2H
+	./vstpol/N2/CCSD
+	./vstpol/N2/HF/BTAD/ACCD
+	./vstpol/N2/HF/BTAD/ACCQ
+	./vstpol/N2/HF/BTAD/ACCT
+	./vstpol/N2/HF/BTAD/CCD
+	./vstpol/N2/HF/BTAD/CCQ
+	./vstpol/N2/HF/BTAD/CCT
+	./vstpol/N2/HF/BTAD/M2H
+	./vstpol/N2/HF/BTAD
+	./vstpol/N2/HF/DSG/ACCD
+	./vstpol/N2/HF/DSG/ACCQ
+	./vstpol/N2/HF/DSG/ACCT
+	./vstpol/N2/HF/DSG/CCD
+	./vstpol/N2/HF/DSG/CCQ
+	./vstpol/N2/HF/DSG/CCT
+	./vstpol/N2/HF/DSG/M2H
+	./vstpol/N2/HF/DSG
+	./vstpol/N2/HF
+	./vstpol/N2
+	./vstpol
+    )
+}
+
+#-----------------------------------------------------------------------
+function make_store {
+    echo -n " Please specify the store dirctory, [./store]: "
+    read store
+
+    if [[ $store == "" ]]; then	store="$currpath/store"; fi
+    if [ ! -d $store ]; then mkdir -p $store; fi
     cd $store
-    set store = `pwd`
+    store=`pwd`
+    store_name
+    for dir in ${st[@]}; do
+	if [ ! -d $dir ]; then mkdir -p $dir; fi
+    done
     cd $currpath
-    cp -r $currpath/store/* $store/
-endif
+}
 
-cd $currpath/run
-set files = (*)
+#-----------------------------------------------------------------------
+function ch_script {
+    cd $currpath/run
 
-foreach file ($files)
-    sed -e 's:work=.*$:work="'"$work"'":' \
-        -e 's:storeT=.*$:storeT="'"$store"'":' \
-            $file >! $file.tt
-    mv $file.tt $file
-    chmod a+x $file
-end
+    for file in *; do
+	sed -e 's:work=.*$:work="'"$work"'":' \
+            -e 's:storeT=.*$:storeT="'"$store"'":' \
+            $file > $file.tt
+	mv $file.tt $file
+	chmod a+x $file
+    done
 
-cd ..
+    cd ..
+}
 
-echo
-echo " NOTE: work = $work "
-echo "      store = $store "
-echo
-echo " Now we are compiling all of the source codes!"
-echo
+#-----------------------------------------------------------------------
+function compile {
+    echo
+    echo " NOTE: work = $work "
+    echo "      store = $store "
+    echo
+    echo " Now we are compiling all of the source codes!"
+    echo
+    
+    cd tools
+    ./compile.sh -r
+    cd ..
+}
 
-cd tools
-./compile.sh -r
-cd ..
+#-----------------------------------------------------------------------
+#--- main function
+
+currpath=`pwd`
+make_work
+make_store
+ch_script
+compile

@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+tar zcvf bfsca.tgz  \
+    CMakeLists.txt \
+    ChangeLog \
+    README \
+    bak \
+    config \
+    package \
+    doc \
+    run \
+    src \
+    tools

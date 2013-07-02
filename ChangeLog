@@ -1,3 +1,6 @@
+2013-07-02 Hao Feng (RDS) <fenghao#mail.xhu.edu.cn>
+	* rewrite config file to setup bfsca package
+	
 2013-07-01 Hao Feng (RDS) <fenghao@mail.xhu.edu.cn>
     * change autoconf/automake to cmake
 
@@ -5,6 +8,9 @@
     * rename lavib to bfsca
     * rewrite all run scripts
 
+2013-06-01 Hao Feng (RDS) <fenghao@mail.xhu.edu.cn>
+    * modify GAMESS 2013 to calculate BTAD/DSG potential (rewrite)
+	
 2008-06-23 Hao Feng (RDS) <fenghao@scu.edu.cn>
 	* modify all scripts to deal with DSGH/BTADH polarization
 	potentials

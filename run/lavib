@@ -1,0 +1,429 @@
+#!/usr/bin/env bash
+#
+#--------------------------------------------------------------------------------
+#  Calculates the scattering matirices/cross sections
+#
+#  RDS (Hao Feng)
+#  Jul 06, 2013
+#
+# ---
+#  Usage:
+#    lavib -t N2 -p DSG -basis ACCQ -ref HF -sym pg -method vib
+#
+#--------------------------------------------------------------------------------
+#--- options
+function handle_opt {
+    while test "x$1" != "x"; do
+	case $1 in
+	    -t)     shift; tgt=$1      ;;
+	    -p)     shift; pot=$1      ;;
+	    -R)     shift; CRD=$1      ;;
+	    -basis) shift; basis=$1    ;;
+	    -ref)   shift; ref=$1      ;;
+	    -sym)   shift; sym=$1      ;;
+	    -method)shift; method=$1   ;;
+	    *)                         ;;
+	esac
+	shift
+    done
+
+    if [ "$tgt" == ""    ]; then tgt=H2;     fi
+    if [ "$pot" == ""    ]; then pot=DSG;    fi
+    if [ "$basis" == ""  ]; then basis=CCD;  fi
+    if [ "$CRD" == ""    ]; then CRD=1.400;  fi
+    if [ "$ref" == ""    ]; then ref=HF;     fi
+    if [ "$sym" == ""    ]; then sym=sg;     fi
+    if [ "$method" == "" ]; then method=vib; fi
+
+# - echo OPTIONS
+    echo " The command is: "
+    if [[ $method == vib ]]; then
+	echo "     $0 -t $tgt -p $pot -basis $basis -ref $ref -sym $sym -method $method"
+    else
+	echo "     $0 -t $tgt -p $pot -basis $basis -ref $ref -sym $sym -method $method -R $CRD"
+    fi
+    echo
+}
+
+#--------------------------------------------------------------------------------
+#--- locations
+function set_location {
+    work="/Users/fenghao/home1/feng/scatt/bfsca/work"
+    storeT="/Users/fenghao/home1/feng/scatt/bfsca/store"
+    store="$storeT/lavib/$tgt/$ref/$pot/$basis"
+    datain="$storeT/wlam/$tgt/$ref/$pot/$basis"
+    datast="$storeT/vstpol/$tgt/$ref/$pot/$basis"
+    dataex="$storeT/exker/$tgt/$ref/$pot/$basis"
+    datamp="$storeT/mpmom/$tgt/$ref/$pot/$basis"
+    dataal="$storeT/alam/$tgt/$ref/$pot/$basis"
+}
+
+#--------------------------------------------------------------------------------
+#--- cd work directory
+#
+function cd_work {
+    curr=`pwd`
+    if [ -d $work ]; then
+	rm -f   $work/*
+	ln -s   $curr/../bin/lavib.x   $work/.
+	cd      $work
+    else
+	echo "$work does NOT exit!"
+	exit
+    fi
+}
+
+#--------------------------------------------------------------------------------
+#--- make input file
+#
+function make_inp {
+    inf=$1
+
+# NUMENER: the number of energies read in
+#  EUNITS: Units for the input energies
+#          = 0 ==> Hartree
+#          = 1 ==> eV
+# ENERGY(): the list of energies to be used; <= 60 energies are allowed
+#           in the source code
+#
+    energy=(1.50 2.75)
+    numener=${#energy[@]};   eunits=1
+
+#---
+# choice: the initial guess
+#   ipot: the potential choice
+    choice=0;  ipot=0
+
+#---
+#    NBSET: the number of different iteration numbers with which to run
+#           the program
+#    iRmat: if using the R-Matrix Propagator
+#           = 1; using the R-Matrix Propagator
+# rclosure: if doing Born r-closure
+#           = 1; doing Born r-closure
+    nbset=1;  irmat=1;  rclosure=1
+
+#---
+# rmatstep: the step size to be used in the R-Matrix propagator 
+#           (if it is being used)
+#    rasym: R at which we quit integrating
+#    nlams: number of lambdas in the long range region
+#
+#  nvibin: the number of vibrational channels for the particular symmetry
+#          of interest. (That is, in the short range region.)
+#    nofr: not currently used (set it to 1)
+# NvTrunc: the requested number of vibrational channels to keep in the 
+#          outer region.
+# NlTrunc: the number of partial waves to keep in the asymptotic region
+#
+# numiter: number of Iterations
+#
+# NBOUND: the number of bound target orbitals
+# NPWAVXIN: the number of partial wave channels in the input exchange 
+#           kernel FILE
+# According to subroutine movemat(...)
+#   NPWAVXIN = (lmax-l0)/2 + 1  for homonuclear molecule
+#   NPWAVXIN = (lmax-l0) + 1  for heteronuclear molecule
+#
+# Please refer to nlexo in wlam
+#
+# NVIBXIN: the number of vibrational levels in the input potential
+#          AND in the long range moments
+#
+# NPWAVX: the number of partial wave channels in the exchange kernel
+#         that are retained in the calculation
+#
+# NVIBX: the number of vib levels in the exchange kernel that are 
+#        retained in this calculation
+#
+#   we: harmonic vibrational constant
+# wexe: non-harmonic vibrational constant
+# swit: = 1: cm-1
+#       = 0: Hartree
+
+    if [[ $tgt == H2 ]]; then
+	rmatstep=0.1;    rasym=200;   nlams=6
+	nvibin=4;        nvibxin=4;   nvibx=4;  nofr=1
+	nvtrunc=$nvibin; nltrunc=3
+	numiter=6
+	nbound=1
+	npwavxin=5;      npwavx=5
+	swit=1;          we=4395.2;  wexe=117.9
+    elif [[ $tgt == N2 ]]; then
+	rmatstep=0.1;    rasym=85;    nlams=2
+	nvibin=15;       nvibxin=15;  nvibx=15; nofr=1
+	nvtrunc=$nvibin; nltrunc=11
+	numiter=10
+	nbound=6
+	npwavxin=11;     npwavx=11
+	swit=0;          we=1.07367848E-02;  wexe=6.43295472E-05
+    fi
+
+#---
+# infil: the name of the vibrational close-coupling local potential file
+#
+#  Set symbolic links to the potential/multi-moments
+#                        and exchange matrix elements
+#
+# KERNLFIL: an array of the names of the files containing the kernel
+#           (the '.ker' will be appended internally here) for all 
+#           symmetries
+    if [[ $method == vib ]]; then
+	irr=0;  infil="pots.avg";  kernfil="exvib.$sym"
+
+	ln -s $datain/vex.$sym             exvib.$sym
+	ln -s $datain/pots.avg             .
+	ln -s $datain/moms.avg             .
+	cp    moms.avg                     mpmom
+    else
+	irr=1;  infil="vsp.rr";  kernfil="exrr.$sym"
+
+	ln -s $datast/vspR${CRD}.dat       vsp.rr
+	ln -s $dataex/ker.$sym.$pot.R$CRD  exrr.$sym
+
+	cat   $datamp/A0.dat.R$CRD      >  mpmom
+	cat   $datamp/A2.dat.R$CRD     >>  mpmom
+	cat   $datamp/Q.dat.R$CRD      >>  mpmom
+    fi
+
+
+#---
+# ity: 0 - Trapezoidal pts and wts
+#      1 - Gauss-Legendre pts and wts (nodes are copied from Saha)
+#      2 - Gauss-Legendre pts and wts (nodes are calculated by gauleg)
+#
+# nps = No. of pts. in a region
+#  rs = starting radius of region
+# rfn = ending radius of region
+    if [[ $tgt == H2 ]]; then
+	ity=2
+	rmesh[0]="$ity  100  0.00  1.00"
+	rmesh[1]="$ity   50  1.00  2.00"
+	rmesh[2]="$ity   40  2.00  4.00"
+	rmesh[3]="$ity   59  4.00 10.00"
+    elif [[ $tgt == N2 ]]; then
+	ity=2; g1=7; g2=7; g3=20; g4=20
+ 	rmesh[0]="  $ity    $g1   0.00    0.50  " 
+ 	rmesh[1]="  $ity    $g1   0.50    0.55  " 
+ 	rmesh[2]="  $ity    $g1   0.55    0.60  "  
+ 	rmesh[3]="  $ity    $g1   0.60    0.65  "  
+ 	rmesh[4]="  $ity    $g1   0.65    0.70  "  
+ 	rmesh[5]="  $ity    $g1   0.70    0.75  "  
+ 	rmesh[6]="  $ity    $g1   0.75    0.80  "  
+ 	rmesh[7]="  $ity    $g1   0.80    0.85  "  
+ 	rmesh[8]="  $ity    $g1   0.85    0.90  "  
+ 	rmesh[9]="  $ity    $g1   0.90    0.95  "  
+ 	rmesh[10]=" $ity    $g1   0.95    1.00  "  
+ 	rmesh[11]=" $ity    $g2   1.00    1.05  "  
+ 	rmesh[12]=" $ity    $g2   1.05    1.10  "  
+ 	rmesh[13]=" $ity    $g2   1.10    1.15  "  
+ 	rmesh[14]=" $ity    $g2   1.15    1.20  "  
+ 	rmesh[15]=" $ity    $g2   1.20    1.25  "  
+ 	rmesh[16]=" $ity    $g2   1.25    1.30  "  
+ 	rmesh[17]=" $ity    $g2   1.30    1.35  "  
+ 	rmesh[18]=" $ity    $g2   1.35    1.40  "  
+ 	rmesh[19]=" $ity    $g2   1.40    1.45  "  
+ 	rmesh[20]=" $ity    $g2   1.45    1.50  "  
+ 	rmesh[21]=" $ity    $g2   1.50    1.55  "  
+ 	rmesh[22]=" $ity    $g2   1.55    1.60  "  
+	rmesh[23]=" $ity    $g3   1.60    2.50  "  
+	rmesh[24]=" $ity    $g4   2.50    6.00  "  
+	if [[ $pot == DSG ]]; then
+	    rmesh[25]=" $ity    5   6.00    10.00  "  
+	    rmesh[26]=" $ity    5  10.00    15.00  "  
+	fi
+    fi
+	
+#---
+#  NREGEX: the number of regions used in calculation of the exchange
+#          potential and exchange integrals
+# NREGPOT: the number of integration regions in the input potential
+#    NREG: the number of r-meshes
+#
+# For Trapezoidal integral, NREG = NREGPOT >= NREGEX
+# For Gauss-Legendre integral, the region makes no sense, however, 
+# for both trapezoidal and G-L integral, the rmax of input potential
+#     should be >= rmax of exchange
+    nreg=${#rmesh[@]};  nregex=${#rmesh[@]}; 
+
+    if [[ $tgt == H2 ]]; then
+	potmesh[0]="100  0.01"
+	potmesh[1]=" 50  0.02"
+	potmesh[2]=" 40  0.05"
+	potmesh[3]=" 60  0.10"
+    elif [[ $tgt == N2 ]]; then
+	potmesh[0]="120  0.01"
+	potmesh[1]=" 40  0.02"
+	potmesh[2]=" 60  0.04"
+	potmesh[3]=" 20  0.08"
+	if [[ $pot == DSG ]]; then
+	    potmesh[4]=" 40  0.1"
+	    potmesh[5]=" 50  0.1"
+	fi
+    fi
+    nregpot=${#potmesh[@]}
+
+#---
+# nsym: number of symmetries considered
+#
+# symlam: = 0: Sigma;  
+#         = 1: Pi
+#
+# l0,lmax: the lowest and highest legendre expansion included in the
+#          scattering equation
+    nsym=1
+    case $sym in
+	sg)
+	    symlam=0; l0=0   ;;
+	su)
+	    symlam=0; l0=1   ;;
+	pu)
+	    symlam=1; l0=1   ;;
+	pg)
+	    symlam=1; l0=2   ;;
+    esac
+    if [[ $tgt == H2 ]]; then nl=8;  fi
+    if [[ $tgt == N2 ]]; then nl=20; fi
+
+    lmax=`expr $l0 + $nl`
+
+#---
+# NLAMDAIN: the number of lamdas read in for the local potential
+#  NLAMLOC: the total number of legendre (electronic+nuclear) to be 
+#           included in the local part of the input potential
+# Currently these two numbers have to be the same for Vibrational 
+# excitation calculations, but for RR calcs NLAMLOC can be larger
+# and the code will pad out using the analytic nuclear terms
+#
+# Please refer to lammax in wlam.s, 
+#      nlamdain = lammax/lamstp + 1
+#        lamstp = 2 for   homonuclear molecule
+#               = 1 for heteronuclear molecule
+#
+    if [[ $tgt == H2 ]]; then
+	if [[ $method == rr ]]; then
+	    nlamdin=4;  nlamloc=11
+	elif [[ $method == vib ]]; then
+	    nlamdin=11; nlamloc=11
+	fi
+    elif [[ $tgt == N2 ]]; then
+	if [[ $method == rr ]]; then
+	    nlamdin=8;  nlamloc=16
+	elif [[ $method == vib ]]; then
+	    nlamdin=16; nlamloc=16
+	fi
+    fi
+
+#---
+# iex: exchange switch
+#      = 0: without exchange potential
+#      = 1: first to calculate the exchange kernel
+#      = 2: we already have the exchange kernel and just need to read
+#           it out from FORT.55
+#
+    iex=2
+    if [[ $iex == 1 ]]; then
+	ln -s $dataal/sphrjR${CRD}.dat   fort.3
+    fi
+
+#---
+# nlproj: the maximum number of projections for the orbital; see LSTART, LMAX in alamn.s
+#         H2:  5: L = 0, 2, 4, 6, 8   
+#         N2:  9: L = 0, 2, ..., 16  for sigma_g
+#              8: L = 1, 3, ..., 15  for sigma_u & pi_u
+#
+# BE CAREFUL: INCREASE nlproj while NOT increasing nexdim will NOT get 
+# ** *******  converged kernel and cross sections!
+#
+# mlproj: the M_l for that orbital
+#         = 0: for sigma
+#         = 1: for pi
+# l0proj: the L0 for the orbital; minimum value of angular momentum
+#
+# nml:  nlporj  mlporj   l0proj
+    if [[ $tgt == H2 ]]; then
+	nml[0]="5   0    0"     # sigma_g
+    elif [[ $tgt == N2 ]]; then
+	nml[0]="9   0    0"     # sigma_g
+	nml[1]="8   0    1"     # sigma_u
+	nml[2]="9   0    0"     # sigma_g
+	case $CRD in
+	    1.600 | 1.700)
+		nml[3]="8   1   1"  # pi_u
+		nml[4]="8   0   1"  # sigma_u
+		nml[5]="9   0   0"  # sigma_g
+		;;
+	    1.800 | 1.850 | 1.900 | 1.950)
+		nml[3]="8   0   1"  # sigma_u
+		nml[4]="8   1   1"  # pi_u
+		nml[5]="9   0   0"  # sigma_g
+		;;
+	    2.00 | 2.020 | 2.068 | 2.100 | 2.200 | 2.300 | 2.400 | 2.500 | 2.600 | 2.700)
+		nml[3]="8   0   1"  # sigma_u
+		nml[4]="9   0   0"  # sigma_g
+		nml[5]="8   1   1"  # pi_u
+		;;
+	esac
+    fi
+
+#---
+    echo "$nbset    $irmat   $rclosure"   > $inf
+    echo "$rmatstep $rasym   $nlams"     >> $inf
+    echo "$nvibin   $nofr    $irr"       >> $inf
+    echo "$nvtrunc  $nltrunc"            >> $inf
+    echo "$infil"                        >> $inf
+    cat  mpmom                           >> $inf
+    echo "$numiter"                      >> $inf
+    echo "$nsym"                         >> $inf
+    echo "$l0  $lmax  $symlam  $nvibin"  >> $inf
+    echo "$nlamdin  $nlamloc"            >> $inf
+
+    echo "$numener  $eunits"             >> $inf
+    echo ${energy[@]}                    >> $inf
+
+    echo "$iex"                          >> $inf
+    echo "$nbound"                       >> $inf
+    echo "$npwavxin"                     >> $inf
+    echo "$nvibxin"                      >> $inf
+    echo "$npwavx"                       >> $inf
+    echo "$nvibx"                        >> $inf
+
+    for (( i=0; i<${#nml[@]}; i++ )); do
+	echo ${nml[$i]}  >> $inf
+    done
+
+    echo "$kernfil"                     >> $inf
+    echo "$choice"                      >> $inf
+    echo "$ipot"                        >> $inf
+    echo "$nreg  $nregpot  $nregex"     >> $inf
+
+    for (( i=0; i<${#potmesh[@]}; i++ )); do
+	echo ${potmesh[$i]}  >> $inf
+    done
+
+    for (( i=0; i<${#rmesh[@]}; i++ )); do
+	echo ${rmesh[$i]}  >> $inf
+    done
+
+    echo "$swit  $we  $wexe"          >> $inf
+}
+
+#--------------------------------------------------------------------------------
+#--- MAIN FUNCTION
+#
+handle_opt $@
+
+set_location
+cd_work
+
+make_inp $tgt.inp
+
+$work/lavib.x < $tgt.inp > $tgt.out
+
+cp fort.51  $store/xsc.$sym
+cp fort.70  $store/kmat.$sym
+
+if [[ $method == rr ]]; then
+    cp fort.51  $store/xsc.$sym.R$CRD
+    cp fort.70  $store/kmat.$sym.R$CRD
+fi

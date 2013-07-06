@@ -282,7 +282,7 @@ function make_inp_mom {
 #--------------------------------------------------------------------------------
 function make_inp_sp {
     inf=$1
-    input=vsp;  output=vsp.vib
+    input=vsp;  output=pots.avg
 
     for ir in ${lir[@]}; do
 	ln -s $datasp/sp.R${ir}   $input$ir
@@ -392,7 +392,7 @@ function make_inp_sp {
 #--------------------------------------------------------------------------------
 function make_inp_ex {
     inf=$1
-    input=ex;  output=vex.vib
+    input=ex;  output=vex.$sym
 
 #---
 # iflnm - names of the input and output files (.le. 8 char.).

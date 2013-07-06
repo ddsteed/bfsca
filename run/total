@@ -17,16 +17,16 @@ pot=$2; if [[ $pot == "" ]]; then pot=BTAD; fi
 
 for basis in ${BS[@]}; do
     for R in ${RE[@]}; do
-	./enmv   -t $1 -basis $basis -R $R 
- 	./alamn  -t $1 -basis $basis -R $R -p $pot
- 	./vstat  -t $1 -basis $basis -R $R -p $pot
-	./vpola  -t $1 -basis $basis -R $R -p $pot -method vxz
+    	./enmv   -t $1 -basis $basis -R $R 
+    	./alamn  -t $1 -basis $basis -R $R -p $pot
+    	./vstat  -t $1 -basis $basis -R $R -p $pot
+#    	./vpola  -t $1 -basis $basis -R $R -p $pot -method vxz
 
- 	./fitpol -t $1 -basis $basis -R $R -p $pot
-	./vstpol -t $1 -basis $basis -R $R -p $pot
-	./wlut   -t $1 -basis $basis -R $R -p $pot
-	./spfd   -t $1 -basis $basis -R $R -p $pot
- 	./mpmom  -t $1 -basis $basis -R $R -p $pot
+    	./fitpol -t $1 -basis $basis -R $R -p $pot
+    	./vstpol -t $1 -basis $basis -R $R -p $pot
+    	./wlut   -t $1 -basis $basis -R $R -p $pot
+    	./spfd   -t $1 -basis $basis -R $R -p $pot
+    	./mpmom  -t $1 -basis $basis -R $R -p $pot
     done
     ./wlam  -t $1 -basis $basis -R ${RE[@]} -p $pot -cp mpmom
     ./wlam  -t $1 -basis $basis -R ${RE[@]} -p $pot -cp pot
@@ -37,6 +37,11 @@ for basis in ${BS[@]}; do
 	for R in ${RE[@]}; do
 	    ./exker  -t $1 -basis $basis -R $R -p $pot -sym $sym
 	done
+
 	./wlam  -t $1 -basis $basis -R ${RE[@]} -p $pot -cp exk -sym $sym
     done
+done
+
+for sym in ${SYMM[@]}; do
+    ./lavib  -t $1 -basis $basis -R ${RE[@]} -p $pot -cp exk -sym $sym
 done

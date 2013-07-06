@@ -1,31 +1,14 @@
+C * JUL 06 2013 - RDS - AUGMENT COUPLING NUMBER
+C * MAY 29 2006 - RDS - DO E-E AND E-N COUPLING POTENTIALS SEPERATELY
+C * DEC 31 2005 - RDS - AUGMENT THE ORDER OF GAUSS-HERMITE QUADRATURE FROM 20 -> 50
+C *                     GENERALIZE NUMFUNCEX TO COPE WITH E-N2
+C * JUN 18 1982 - AF  - VIB WFN CALCULATION SCAVANGED FROM PARKER'S VIVAS CODE
 C *-
-C * PROGRAM WLAM
-C *
 C * Code to calculate vibrational matrix elementts of:
 C *   1)  the vlams (i.e. produce the wlams)
 C *   2)  any numerical function
 C *   3)  body frame t-matrices
 C *   4)  any analytic function
-C *
-C * V1.0: A. Feldt (OU) 
-C *       1) vib wfn calculation scavanged from parker's vivas code
-C *
-C * V1.1: A. Feldt (OU), Jun. 18, 1982
-C *       1) updated for documentation only
-C *
-C * V2.0: Hao Feng (SCU), Dec. 31, 2005
-C *       1) change iflnm to read/write files conveniently
-C *       2) augment the order of the Gauss-Hermite quadrature
-C *          from 20 -> 50
-C *       3) add the function to read formatted vibrational wavefunctions
-C *          from outer file, so ANY accurate vibrational wavefunctions 
-C *          could be used to calculate coupled potentials
-C *       4) generalize numfunex to cope with e-N2
-C *     
-C * V3.0: Hao Feng (SCU), May. 29, 2006
-C *       1) do elec-elec and elec-nucl coupling potentials seperately
-C *          so that lammax >= lelctr for outer reading vib.
-C *-/
 
       program nwlam
       implicit double precision (a-h,o-z)
@@ -392,7 +375,7 @@ C *-
       logical twice,second,test,tstchi,tstpot,tstint,tstpi
       logical outvib
 
-      character*8 iflnm(16)
+      character*8 iflnm(20)
       integer ivtemp
 
 C     dimension wlamd(10,6,6,60),rall(600),lam(4),rtst(20),ltst(4)
@@ -988,7 +971,7 @@ c  ***
       dimension fout(nlexo*ivm,nlexo*ivm,npts)
       dimension chis(nquad,ivm),fnum(1),rquad(1),vquad(1),wquad(1)
      $     ,nmunit(16),rss(15)
-      character*8 iflnm(16)
+      character*8 iflnm(20)
 
       logical outvib
 
@@ -1111,7 +1094,7 @@ c
      1  wquad)
       implicit double precision (a-h,o-z)
         logical kmats
-      character*8  iflnm(16)
+      character*8  iflnm(20)
       dimension chis(nquad,ivm),rs(1),fnum(1),flin(20,11),rquad(1),
      1  vquad(1),wquad(1)
       dimension tmat(20,20,3,3,2)
@@ -3969,7 +3952,7 @@ C *-
       parameter (maxqd=20,maxho=20)
 C * maxqd is max quadrature   maxho=max harmonic osc.
       dimension fin(35,21,11),fout(20,18,5,12)
-      character*8 iflnm(16)
+      character*8 iflnm(20)
       integer doexch
 
       logical outvib

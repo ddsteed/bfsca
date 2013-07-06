@@ -1,0 +1,499 @@
+#!/usr/bin/env bash
+#
+#--------------------------------------------------------------------------------
+#  This script runs wlam 
+#  1. to produce the matrix elements of the long range potentials.  
+#     It assumes that the files alphas.dat and qmom.dat exist and that they
+#     contain the values of alpha0, alpha2 and qmom as a function of R
+#     for the R values considered
+#
+#  2. to produce the matrix elements of the static(+pol.) potentials.
+#
+#  3. to calculate the vibrational matrix elements of the exchange kernel
+#
+#  RDS (Hao Feng)
+#  Jul 02, 2013
+#
+# ---
+#  Usage:
+#    wlam -t N2 -p DSG -basis ACCQ -ref HF -cp mpmom -R 2.000 2.020 -sym pg
+#
+#--------------------------------------------------------------------------------
+#--- options
+function handle_opt {
+    while test "x$1" != "x"; do
+	case $1 in
+	    -t)     shift; tgt=$1      ;;
+	    -p)     shift; pot=$1      ;;
+	    -basis) shift; basis=$1    ;;
+	    -cp)    shift; cp=$1       ;;
+	    -ref)   shift; ref=$1      ;;
+	    -sym)   shift; sym=$1      ;;
+	    -R)     shift; lir=($*)    ;;
+	    *)                         ;;
+	esac
+	shift
+    done
+
+    if [ "$tgt" == ""    ]; then tgt=H2;     fi
+    if [ "$pot" == ""    ]; then pot=DSG;    fi
+    if [ "$basis" == ""  ]; then basis=CCD;  fi
+    if [ "$cp" == ""     ]; then cp=mpmom; fi
+    if [ "$ref" == ""    ]; then ref=HF;     fi
+    if [ "$sym" == ""    ]; then sym=pg;     fi
+    if [ "$lir" == ""    ]; then lir=(0.500 1.400 2.600); fi
+
+#- handle lir
+    num=${#lir[@]}
+    for (( i=0; i<=num; i++ )); do
+	echo ${lir[$i]} | grep -q "-"
+	if [ $? -eq 0 ]; then num=$i; break; fi
+    done
+    ir=(${lir[@]:0:num})
+    unset lir
+    lir=(${ir[@]})
+
+# - echo OPTIONS
+    echo " The command is: "
+    if [[ $cp == exk ]]; then
+	echo "     $0 -t $tgt -p $pot -basis $basis -ref $ref -cp $cp -R ${lir[@]} -sym $sym"
+    else
+	echo "     $0 -t $tgt -p $pot -basis $basis -ref $ref -cp $cp -R ${lir[@]}"
+    fi
+    echo
+}
+
+#--------------------------------------------------------------------------------
+#--- locations
+function set_location {
+    work="/Users/fenghao/home1/feng/scatt/bfsca/work"
+    storeT="/Users/fenghao/home1/feng/scatt/bfsca/store"
+    store="$storeT/wlam/$tgt/$ref/$pot/$basis"
+    datavw="$storeT/wlam/$tgt/DATA_IN"
+    datapt="$storeT/spfd/$tgt/$ref/$pot/$basis"
+    datasp="$storeT/wlut/$tgt/$ref/$pot/$basis"
+    datamp="$storeT/mpmom/$tgt/$ref/$pot/$basis"
+    dataex="$storeT/exker/$tgt/$ref/$pot/$basis"
+}
+
+#--------------------------------------------------------------------------------
+#--- cd work directory
+#
+function cd_work {
+    curr=`pwd`
+    if [ -d $work ]; then
+	rm -f   $work/*
+	ln -s   $curr/../bin/wlam.x   $work/.
+	cd      $work
+    else
+	echo "$work does NOT exit!"
+	exit
+    fi
+
+}
+
+#--------------------------------------------------------------------------------
+function make_gen_para {
+    local inf=$1
+
+#---vib. wavefunctions
+    cp $datavw/Morse    vibfun
+
+#---
+#  lvib = m, the unit number for storing vib. matrix elements is m.
+#
+# idbug  = logical switch - if true print lots of intermediate stuff
+# ibasis =   '      '     - if true print the sho basis used
+# wrtvib =   '      '     - if true write the wfn to unit lvib
+# redvib =   '      '     - if true read the wfn from unit lvib; 
+#                           unformatted data
+# sho    =   '      '     - if true use simple harm. osc. wfn.
+# outvib =   '      '     - if true read vibrational wavefunction from 
+#                           outer file (unit lvib);
+#                           FORMATTED data; 
+
+    vwf=READ   # SHO SPFD READ
+    case $vwf in 
+	SHO)
+	    idegub="F"; ibasis="T"; wrtvib="F"; redvib="F"; sho="T"; outvib="F" ;;
+	SPFD)
+	    idegub="F"; ibasis="T"; wrtvib="F"; redvib="F"; sho="F"; outvib="F" ;;
+	READ)
+	    idegub="F"; ibasis="T"; wrtvib="F"; redvib="F"; sho="F"; outvib="T" ;;
+    esac
+
+#---
+# NOTE: the following are not read if redvib is true
+# bmass  - the mass in a.u. of the 'left' atom
+# cmass  - the mass in a.u. of the 'right' atom
+#    We  - the vibrational constant (a.u.)
+#    Re  - the equilibrium separation (a0)
+#
+# minvib - the minimum v + 1
+# maxvib - the maximum v + 1
+# nhermt - the order of the Gauss-Hermite quadrature
+#          used in evaluating integrals in the determ.
+#          of the vib wfn and in any matrix element
+#          determinations
+# ivibtr - number of vib. channels used for homogeneous terms.
+#          if zero ivibtr=maxvib-minvib+1. only needed when more
+#          inhomogeneous terms than homo terms
+# ihoex  - no. osc. states to expand exch kernel.
+#          use zero for normal vib state run
+#
+# ralfa  - a parameter near unity which must be adjusted
+#          upon the first calculations of the vib. wfns.
+#          to maximize the agreement with the experimental
+#          energy levels
+#    rx  - another parameter near unity which must
+#          similarly be adjusted
+# noscil - no. of harmonic oscillators in the basis set
+#          for calc. of the vib. wfn. 
+#          if(maxvib-minvib+1.gt.noscil) noscil=maxvib-minvib+1
+
+# for outvib = .true., these three parameters are nsignificant! 
+# You only have to ensure the rquad(i) are within the range of nvwf.
+#
+# WeXe,Be,Alfe,De - rovibrational experimental constants
+#                   (along with we) for calculating exp. energies
+#                   to compare with the theoretical values
+
+    case $tgt in
+	H2)
+	    bmass=0.10078250e+01; cmass=0.10078250e+01; We=0.20053400e-01; Re=0.14011000e+01
+	    minvib=1; maxvib=4; nhermt=12; ivibtr=`expr $maxvib - $minvib + 1`; ihoex=0 
+	    ralfa=0.90; rx=1.13; noscil=12
+	    WeXe=0.55282000e-03;  Be=0.27727000e-03;  Alfe=0.13950000e-04;  De=0.21460000e-06
+	    ;;
+	N2)
+	    bmass=0.14003074D+02; cmass=0.14003074D+02; We=0.10746436D-01; Re=0.20200000D+01 
+	    minvib=1; maxvib=15; nhermt=30; ivibtr=`expr $maxvib - $minvib + 1`; ihoex=0 
+	    ralfa=1.00; rx=1.00; noscil=10
+	    WeXe=0.65264950D-04;  Be=0.91046518D-05;  Alfe=0.78906618D-07;  De=0.26244493D-10
+	    ;;
+    esac
+
+#---
+# jmin(i),jmax(i) - are the minimum and maximum values of
+#                   rotor state for each vib manifold.  the code
+#                   currently only allows a single value for j so
+#                   that jmin must equal jmax.  this could be
+#                   fairly easily adapted.
+    for (( i=0; i<maxvib; i++ )); do
+	jmin[$i]=0; 
+	jmax[$i]=0
+    done
+
+    echo " $idegub $ibasis $wrtvib $redvib $sho $outvib" >> $inf
+    echo "$bmass  $cmass  $We  $Re " >> $inf
+    echo "$minvib $maxvib $nhermt  $ivibtr  $ihoex"  >> $inf
+    echo "$ralfa  $rx     $noscil"  >> $inf
+    echo ${jmin[@]} >> $inf
+    echo ${jmax[@]} >> $inf
+    echo "$WeXe  $Be  $Alfe  $De"   >> $inf
+
+#---
+# read in data for the bc diatom
+#  idbc - determines which potential is used see the corresponding
+#         format statement for the computed goto below
+# parbc - holds the parameters which determine these potentials
+
+#         IDBC
+if [[ $vwf == SPFD ]]; then
+    echo " 8 " >> $inf
+    cat $datapt/spfd.dat >> $inf
+fi
+
+}
+
+#--------------------------------------------------------------------------------
+function make_inp_mom {
+    inf=$1
+    input=moms.inp;  output=moms.avg
+
+    mp=(A0 A2 Q)
+    for mom in ${mp[@]}; do
+	for ir in ${lir[@]}; do
+	    cat $datamp/${mom}.dat.R${ir}  >> $input
+	done
+    done
+
+    title=" Vibrational matrix elements of e-$tgt long range moments."
+
+#---
+# iwlam = 0, do not calculate <v(r)|v_lambda(r;r)|v'(r)>; 
+#       = 1, calculate it.
+#  noff =+n, calculate <v(r)|f_n(r)|v'(r)> for n numerical functions f(r).
+#       < 0, calculate <v(r)|f_n(r)|v'(r)> for numerical t or k matrices.
+#  nanl = 0, do not calculate matrix elements of analytic funcs
+#       = 1, calculate matrix elements of function given by subr. fanl.
+# inucl = 0, homonuclear molecule;  
+#       = 1, heteronuclear molecule.
+#
+#  lvib = m, the unit number for storing vib. matrix elements is m.
+    iwlam=0; noff=${#mp[@]};  nanl=0; inucl=0;  lvib=10
+
+#---
+# doexch = 0: do vibrational matrix elements of multi-moments
+#        > 0: do vibrational matrix elements of the exchange potential
+    doexch=0
+
+#--
+# nsepar - number of internuclear seps at which the numerical
+#          double precision function exists.
+# rss,fnum:  the vectors holding the internuc. sep. values and
+#            the values of the numerical function (e.g. the
+#            polarizabilities given by poll and wolniewicz).
+#  nfile  = 1, file has values to be averaged which are read into fnum, 
+#         > 1, equals the number (nsepar) of files containing values 
+#              to averaged.
+#  iprint  != 0, results printed on unit 6.
+#  ivibopt != 0, do overlap of function and vib state
+#           = 0, do vib. avg. <v|f(R)|vp>
+    nsepar=${#lir[@]};  nfile=1;  iprint=1; ivibopt=0
+
+#---
+# norbi - no. of orbitals input.
+# norbo - no. of orbitals output.
+# nlexi - no. of l values input.
+# nlexo - no. of l values output.
+    norbi=0; norbo=1;  nlexi=0;  nlexo=1
+
+#---
+# iflnm - names of the input and output files (.le. 8 char.).
+#         there should be nfile + 1 names.
+    iflnm=($input  $output)
+
+#---
+    echo $title > $inf
+    echo "$iwlam  $noff  $nanl  $inucl  $lvib" >>$inf
+
+    make_gen_para $inf
+
+    echo $doexch >> $inf
+    echo "$nsepar  $nfile  $iprint  $ivibopt" >> $inf
+    echo "$norbi   $norbo  $nlexi   $nlexo  " >> $inf
+
+    for ir in ${lir[@]}; do echo $ir >> $inf; done
+
+    for if in ${iflnm[@]}; do echo $if >> $inf; done
+}
+
+#--------------------------------------------------------------------------------
+function make_inp_sp {
+    inf=$1
+    input=vsp;  output=vsp.vib
+
+    for ir in ${lir[@]}; do
+	ln -s $datasp/sp.R${ir}   $input$ir
+	iflnm=(${iflnm[@]} "$input$ir")
+    done
+    iflnm=(${iflnm[@]} "$output")
+
+    title=" Vibrational matrix elements of e-$tgt Static + pol. Potential."
+
+#---
+# iwlam = 0, do not calculate <v(r)|v_lambda(r;r)|v'(r)>; 
+#       = 1, calculate it.
+#  noff =+n, calculate <v(r)|f_n(r)|v'(r)> for n numerical functions f(r).
+#       < 0, calculate <v(r)|f_n(r)|v'(r)> for numerical t or k matrices.
+#  nanl = 0, do not calculate matrix elements of analytic funcs
+#       = 1, calculate matrix elements of function given by subr. fanl.
+# inucl = 0, homonuclear molecule;  
+#       = 1, heteronuclear molecule.
+#
+#  lvib = m, the unit number for storing vib. matrix elements is m.
+
+    iwlam=1; noff=0;  nanl=0; inucl=0;  lvib=10
+
+#---
+# test: if true, then only perform certain tests of this
+#       subroutine  - see tstchi,tstpot and tstint
+    test="    F"    # (L5)
+
+#---
+#   nofr:  first dimensioned size of wlamd.
+# lelctr:  maximum value of lamda for the electronic part of pot.
+# lammax:  maximum value of lambda for the vlams and wlams.
+#          if lammax > lelctr, only electron-nuclear is avaraged for lmda >lelctr
+# nsepar:  number of internuclear separations for which the
+#          vlams exist.
+# iprint:  = 1 to print wlamda on unit 6 for each lamda.
+#          = 0 not to print
+#   irad:  frequency of such printing w.r.t. radial distance.
+#          Now it is NOT used since all coupled potentials are printed.
+#   rerr:  relative error parameter for the imsl function dcadre
+#          must be small enough or a smooth wlam will not appear.
+    nofr=1;  
+    lelctr=`tail -n 1 $input${lir[0]} | awk '{print $1}'`
+    if [[ $tgt == H2 ]]; then
+	lammax=20  
+    elif [[ $tgt == N2 ]]; then
+	lammax=30
+    else
+	lammax=lelctr
+    fi
+    nsepar=${#lir[@]};  iprint=1;  irad=1;  rerr=0.00000001
+
+#---
+# rnl, rnr: left and right nuclear locations.
+    for (( i=0; i<${#lir[@]}; i++ )); do
+	rnl[i]=`echo "scale=5; ${lir[$i]}/2" | bc -l`
+	rnr[i]=`echo "scale=5; ${lir[$i]}/2" | bc -l`
+    done
+
+#---
+#  nreg: NO. of integration regions for the collision coord.
+# rstrt: beginning value of r in each region. (in bohr)
+# rstop: ending value of r in each region.
+#  delp: incremental value of r in each region.
+# zl,zr: left and right nuclear charges.
+
+    if [[ $tgt == H2 ]]; then
+	rmesh[0]="0.00    1.00    0.01"
+	rmesh[1]="1.00    2.00    0.02"
+	rmesh[2]="2.00    4.00    0.05"
+	rmesh[3]="4.00   10.00    0.10"
+	zl=1.0;  zr=1.0
+    elif [[ $tgt == N2 ]]; then
+	rmesh[0]="0.00    1.20    0.01"
+	rmesh[1]="1.20    2.00    0.02"
+	rmesh[2]="2.00    4.40    0.04"
+	rmesh[3]="4.40    6.00    0.08"
+	if [[ $pot == "DSG" ]]; then
+	    rmesh[4]="6.00    10.00    0.10"
+	    rmesh[5]="10.00   15.00    0.10"
+	fi
+	zl=7.0;  zr=7.0
+    fi
+
+#---
+    echo $title > $inf
+    echo "$iwlam  $noff  $nanl  $inucl  $lvib" >>$inf
+
+    make_gen_para $inf
+
+    echo $test >> $inf
+    echo "$nofr  $lelctr  $lammax  $nsepar  $iprint  $irad  $rerr" >> $inf
+    
+    for (( i=0; i<${#rnl[@]}; i++ )); do
+	echo "${rnl[$i]}  ${rnr[$i]}"  >> $inf
+    done
+
+    echo ${#rmesh[@]}  >> $inf
+    for index in ${!rmesh[@]}; do
+	echo ${rmesh[index]}  >> $inf
+    done
+    echo "$zl  $zr" >> $inf
+
+    for if in ${iflnm[@]}; do echo $if >> $inf; done
+}
+
+#--------------------------------------------------------------------------------
+function make_inp_ex {
+    inf=$1
+    input=ex;  output=vex.vib
+
+#---
+# iflnm - names of the input and output files (.le. 8 char.).
+#         there should be nfile + 1 names.
+    for ir in ${lir[@]}; do
+	ln -s $dataex/ker.$sym.R${ir}   $input$ir
+	iflnm=(${iflnm[@]} "$input$ir")
+    done
+    iflnm=(${iflnm[@]} "$output")
+
+
+    title=" Vibrational matrix elements of e-$tgt exchange kernel, symm=$sym."
+
+#---
+# iwlam = 0, do not calculate <v(r)|v_lambda(r;r)|v'(r)>; 
+#       = 1, calculate it.
+#  noff =+n, calculate <v(r)|f_n(r)|v'(r)> for n numerical functions f(r).
+#       < 0, calculate <v(r)|f_n(r)|v'(r)> for numerical t or k matrices.
+#  nanl = 0, do not calculate matrix elements of analytic funcs
+#       = 1, calculate matrix elements of function given by subr. fanl.
+# inucl = 0, homonuclear molecule;  
+#       = 1, heteronuclear molecule.
+#
+#  lvib = m, the unit number for storing vib. matrix elements is m.
+    iwlam=0; noff=250;  nanl=0; inucl=0;  lvib=10
+
+#---
+# doexch = 0: do vibrational matrix elements of multi-moments
+#        > 0: do vibrational matrix elements of the exchange potential
+    doexch=1
+
+#--
+# nsepar - number of internuclear seps at which the numerical
+#          double precision function exists.
+# rss,fnum:  the vectors holding the internuc. sep. values and
+#            the values of the numerical function (e.g. the
+#            polarizabilities given by poll and wolniewicz).
+#  nfile  = 1, file has values to be averaged which are read into fnum, 
+#         > 1, equals the number (nsepar) of files containing values 
+#              to averaged.
+#  iprint  != 0, results printed on unit 6.
+#  ivibopt != 0, do overlap of function and vib state
+#           = 0, do vib. avg. <v|f(R)|vp>
+    nsepar=${#lir[@]};  nfile=$nsepar;  iprint=0; ivibopt=0
+
+#---
+# norbi - no. of orbitals input.
+# norbo - no. of orbitals output.
+# nlexi - no. of l values input.  = nexdim of exker
+# nlexo - no. of l values output. = nexdim of exker
+#
+# npts - no. of the r
+    norbi=250; norbo=250;  
+    if [[ $tgt == H2 ]]; then
+	nlexi=5;  nlexo=5
+	npts=250
+    elif [[ $tgt == N2 ]]; then
+	nlexi=11; nlexo=11
+	if [[ $pot == BTAD ]]; then
+	    npts=202
+	elif [[ $pot == DSG ]]; then
+	    npts=212
+	fi
+    fi
+
+#---
+    echo $title > $inf
+    echo "$iwlam  $noff  $nanl  $inucl  $lvib" >>$inf
+
+    make_gen_para $inf
+
+    echo $doexch >> $inf
+    echo "$nsepar  $nfile  $iprint  $ivibopt" >> $inf
+    echo "$norbi   $norbo  $nlexi   $nlexo  " >> $inf
+    echo "$npts"                              >> $inf
+
+    for ir in ${lir[@]}; do echo $ir >> $inf; done
+
+    for if in ${iflnm[@]}; do echo $if >> $inf; done
+}
+
+#--------------------------------------------------------------------------------
+#--- MAIN FUNCTION
+#
+handle_opt $@
+
+set_location
+cd_work
+
+case $cp in
+    mpmom)
+	make_inp_mom  $tgt.inp
+	;;
+    pot)
+	make_inp_sp   $tgt.inp
+	;;
+    exk)
+	make_inp_ex   $tgt.inp
+	;;
+esac
+
+./wlam.x < $tgt.inp > $tgt.out
+
+mv  $output  $store/.

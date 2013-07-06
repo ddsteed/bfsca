@@ -84,7 +84,7 @@ function make_inp {
     elif [[ $tgt == "N2" && $ref == "HF" ]]; then
 	RMS=2.020
     fi
-    NOFR=`wc -l ener.dat`
+    NOFR=`wc -l ener.dat | awk '{print $1}'`
     NFIT=6; PERCNT=1.0;  TOL=1.000D-08
 
 #---

@@ -43,8 +43,8 @@ function handle_opt {
 function set_location {
     work="/Users/fenghao/home1/feng/scatt/bfsca/work"
     storeT="/Users/fenghao/home1/feng/scatt/bfsca/store"
-    store="$storeT/wlut/$tgt/$ref/$basis"
-    datain="$storeT/vstpol/$tgt/$ref/$basis"
+    store="$storeT/wlut/$tgt/$ref/$pot/$basis"
+    datain="$storeT/vstpol/$tgt/$ref/$pot/$basis"
 }
 
 #--------------------------------------------------------------------------------

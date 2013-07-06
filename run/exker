@@ -1,0 +1,230 @@
+#!/usr/bin/env bash
+#
+#--------------------------------------------------------------------------------
+#  Calculates the exchange kernels for all of our R values
+#
+#  RDS (Hao Feng)
+#  Jul 06, 2013
+#
+# ---
+#  Usage:
+#    exker -t N2 -p DSG -basis ACCQ -R 2.02 -ref HF -sym pg
+#
+#--------------------------------------------------------------------------------
+#--- options
+function handle_opt {
+    while test "x$1" != "x"; do
+	case $1 in
+	    -t)     shift; tgt=$1      ;;
+	    -p)     shift; pot=$1      ;;
+	    -basis) shift; basis=$1    ;;
+	    -R)     shift; CRD=$1      ;;
+	    -ref)   shift; ref=$1      ;;
+	    -sym)   shift; sym=$1      ;;
+	    *)                         ;;
+	esac
+	shift
+    done
+
+    if [ "$tgt" == ""    ]; then tgt=H2;     fi
+    if [ "$pot" == ""    ]; then pot=DSG;    fi
+    if [ "$basis" == ""  ]; then basis=CCD;  fi
+    if [ "$CRD" == ""    ]; then CRD=1.400;  fi
+    if [ "$ref" == ""    ]; then ref=HF;     fi
+    if [ "$sym" == ""    ]; then sym=sg;     fi
+
+# - echo OPTIONS
+    echo " The command is: "
+    echo "     $0 -t $tgt -p $pot -basis $basis -R $CRD -ref $ref -sym $sym"
+    echo
+}
+
+#--------------------------------------------------------------------------------
+#--- locations
+function set_location {
+    work="/Users/fenghao/home1/feng/scatt/bfsca/work"
+    storeT="/Users/fenghao/home1/feng/scatt/bfsca/store"
+    store="$storeT/exker/$tgt/$ref/$pot/$basis"
+    datain="$storeT/alam/$tgt/$ref/$pot/$basis"
+}
+
+#--------------------------------------------------------------------------------
+#--- cd work directory
+#
+function cd_work {
+    curr=`pwd`
+    if [ -d $work ]; then
+	rm -f   $work/*
+	ln -s   $curr/../bin/exker.x   $work/.
+	cd      $work
+    else
+	echo "$work does NOT exit!"
+	exit
+    fi
+}
+
+#--------------------------------------------------------------------------------
+#--- make input file
+#
+function make_inp {
+    input=$1
+
+    ln -s $datain/sphrjR${CRD}.dat    fort.10
+    ln -s $datain/dalam_R${CRD}.dat   dalam
+
+#---
+# nsym: the number of symmetries considered
+    nsym=1
+
+#---
+# nbound: the number of bound target orbitals
+# nexdim: the number of partial waves used in the CREATION of the 
+#         Exchange kernel.  It is important to get this number right
+#         so that the unformatted reads of the exchange kernel work out ok.
+# nexdim(i) i=1,nsym
+    if [[ $tgt == H2 ]]; then
+	nbound=1;  
+	nexdim=5
+    elif [[ $tgt == N2 ]]; then
+	nbound=6    # pi_x and pi_y are included in pi orbital
+	nexdim=11
+    fi
+
+#---
+# npts: the number of radial mesh points in the MO coefficients
+    npts=`head -n 2 dalam | sed -n -e '2p' | awk '{print $3}' `
+    let "npts--"
+
+#---
+# ity: 0 - Trapezoidal pts and wts
+#      1 - Gauss-Legendre pts and wts (nodes are copied from Saha)
+#      2 - Gauss-Legendre pts and wts (nodes are calculated by gauleg)
+#
+# nps = No. of pts. in a region
+#  rs = starting radius of region
+# rfn = ending radius of region
+    if [[ $tgt == H2 ]]; then
+	ity=2
+	rmesh[0]="$ity  100  0.00  1.00"
+	rmesh[1]="$ity   50  1.00  2.00"
+	rmesh[2]="$ity   40  2.00  4.00"
+	rmesh[3]="$ity   59  4.00 10.00"
+    elif [[ $tgt == N2 ]]; then
+	ity=2; g1=7; g2=7; g3=20; g4=20
+ 	rmesh[0]= "  $ity    $g1   0.00    0.50  " 
+ 	rmesh[1]= "  $ity    $g1   0.50    0.55  " 
+ 	rmesh[2]= "  $ity    $g1   0.55    0.60  "  
+ 	rmesh[3]= "  $ity    $g1   0.60    0.65  "  
+ 	rmesh[4]= "  $ity    $g1   0.65    0.70  "  
+ 	rmesh[5]= "  $ity    $g1   0.70    0.75  "  
+ 	rmesh[6]= "  $ity    $g1   0.75    0.80  "  
+ 	rmesh[7]= "  $ity    $g1   0.80    0.85  "  
+ 	rmesh[8]= "  $ity    $g1   0.85    0.90  "  
+ 	rmesh[9]= "  $ity    $g1   0.90    0.95  "  
+ 	rmesh[10]= " $ity    $g1   0.95    1.00  "  
+ 	rmesh[11]= " $ity    $g2   1.00    1.05  "  
+ 	rmesh[12]= " $ity    $g2   1.05    1.10  "  
+ 	rmesh[13]= " $ity    $g2   1.10    1.15  "  
+ 	rmesh[14]= " $ity    $g2   1.15    1.20  "  
+ 	rmesh[15]= " $ity    $g2   1.20    1.25  "  
+ 	rmesh[16]= " $ity    $g2   1.25    1.30  "  
+ 	rmesh[17]= " $ity    $g2   1.30    1.35  "  
+ 	rmesh[18]= " $ity    $g2   1.35    1.40  "  
+ 	rmesh[19]= " $ity    $g2   1.40    1.45  "  
+ 	rmesh[20]= " $ity    $g2   1.45    1.50  "  
+ 	rmesh[21]= " $ity    $g2   1.50    1.55  "  
+ 	rmesh[22]= " $ity    $g2   1.55    1.60  "  
+	rmesh[23]= " $ity    $g3   1.60    2.50  "  
+	rmesh[24]= " $ity    $g4   2.50    6.00  "  
+	if [[ $pot == DSG ]]; then
+	    rmesh[25]= " $ity    5   6.00    10.00  "  
+	    rmesh[26]= " $ity    5  10.00    15.00  "  
+	fi
+    fi
+	
+#---
+# symlam: = 0: Sigma;  
+#         = 1: Pi
+    case $sym in
+	sg)
+	    symlam=0; l0=0   ;;
+	su)
+	    symlam=0; l0=1   ;;
+	pu)
+	    symlam=1; l0=1   ;;
+	pg)
+	    symlam=1; l0=2   ;;
+    esac
+
+#---
+# nlproj: the maximum number of projections for the orbital; see LSTART, LMAX in alamn.s
+#         H2:  5: L = 0, 2, 4, 6, 8   
+#         N2:  9: L = 0, 2, ..., 16  for sigma_g
+#              8: L = 1, 3, ..., 15  for sigma_u & pi_u
+#
+# BE CAREFUL: INCREASE nlproj while NOT increasing nexdim will NOT get 
+# ** *******  converged kernel and cross sections!
+#
+# mlproj: the M_l for that orbital
+#         = 0: for sigma
+#         = 1: for pi
+# l0proj: the L0 for the orbital; minimum value of angular momentum
+#
+# nml:  nlporj  mlporj   l0proj
+    if [[ $tgt == H2 ]]; then
+	nml[0]="5   0    0"     # sigma_g
+    elif [[ $tgt == N2 ]]; then
+	nml[0]="9   0    0"     # sigma_g
+	nml[1]="8   0    1"     # sigma_u
+	nml[2]="9   0    0"     # sigma_g
+	case $CRD in
+	    1.600 | 1.700)
+		nml[3]="8   1   1"  # pi_u
+		nml[4]="8   0   1"  # sigma_u
+		nml[5]="9   0   0"  # sigma_g
+		;;
+	    1.800 | 1.850 | 1.900 | 1.950)
+		nml[3]="8   0   1"  # sigma_u
+		nml[4]="8   1   1"  # pi_u
+		nml[5]="9   0   0"  # sigma_g
+		;;
+	    2.00 | 2.020 | 2.068 | 2.100 | 2.200 | 2.300 | 2.400 | 2.500 | 2.600 | 2.700)
+		nml[3]="8   0   1"  # sigma_u
+		nml[4]="9   0   0"  # sigma_g
+		nml[5]="8   1   1"  # pi_u
+		;;
+	esac
+    fi
+
+#---
+    echo $nsym    > $input
+    echo $nbound >> $input
+    echo $npts   >> $input
+
+    echo ${#rmesh[@]}  >> $input
+    for (( i=0; i<${#rmesh[@]}; i++ )); do
+	echo ${rmesh[$i]} >> $input
+    done
+
+    echo "$l0  $symlam"  >> $input
+    
+    for (( i=0; i<${#nml[@]}; i++ )); do
+	echo ${nml[$i]}  >> $input
+    done
+
+    echo $nexdim >> $input
+}
+
+#--------------------------------------------------------------------------------
+#--- MAIN FUNCTION
+#
+handle_opt $@
+
+set_location
+cd_work
+
+make_inp $tgt.inp
+
+$work/exker.x < $tgt.inp > $tgt.out
+
+mv fort.11 $store/ker.$sym.R${CRD}

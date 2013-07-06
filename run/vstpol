@@ -73,9 +73,9 @@ function make_inp {
 # lamdeg : Delta Lambda (0 2 4 6 8 ... ---> 2; 0 1 2 3 ... ---> 1)
 
     if [[ $tgt == "H2" ]]; then
-	stlam=4;    pollam=2;   lamdeg=2;
+	stlam=6;    pollam=2;   lamdeg=2;
     elif [[ $tgt == "N2" ]]; then
-	stlam=8;    pollam=2;   lamdeg=2;
+	stlam=14;   pollam=2;   lamdeg=2;
     fi
 
     echo "$stlam   $pollam   $lamdeg" > $input

@@ -1,13 +1,13 @@
 # ================================================================
-# bfsca - vibker CMakeLists.txt
+# bfsca - exker CMakeLists.txt
 #
 # Hao Feng (RDS), XHU
 #
 # ================================================================
-set(BIN_NAME vibker.x)
+set(BIN_NAME exker.x)
 
 set(SRC_LIST 
-  vibker.f
+  exker.f
   )
 
 # ================================================================

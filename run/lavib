@@ -179,11 +179,13 @@ function make_inp {
 	irr=1;  infil="vsp.rr";  kernfil="exrr.$sym"
 
 	ln -s $datast/vspR${CRD}.dat       vsp.rr
-	ln -s $dataex/ker.$sym.$pot.R$CRD  exrr.$sym
+	ln -s $dataex/ker.$sym.R$CRD       exrr.$sym
 
 	cat   $datamp/A0.dat.R$CRD      >  mpmom
 	cat   $datamp/A2.dat.R$CRD     >>  mpmom
 	cat   $datamp/Q.dat.R$CRD      >>  mpmom
+
+	nvibin=1;  nvibxin=1; nvibx=1; nvtrunc=1;
     fi
 
 
@@ -420,10 +422,10 @@ make_inp $tgt.inp
 
 $work/lavib.x < $tgt.inp > $tgt.out
 
-cp fort.51  $store/xsc.$sym
-cp fort.70  $store/kmat.$sym
-
 if [[ $method == rr ]]; then
     cp fort.51  $store/xsc.$sym.R$CRD
     cp fort.70  $store/kmat.$sym.R$CRD
+else
+    cp fort.51  $store/xsc.$sym
+    cp fort.70  $store/kmat.$sym
 fi

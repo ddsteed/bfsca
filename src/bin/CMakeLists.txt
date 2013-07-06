@@ -4,7 +4,7 @@
 # Hao Feng (RDS), XHU
 #
 # ================================================================
-add_subdirectory(alamn)
+add_subdirectory(alam)
 add_subdirectory(vlam)
 add_subdirectory(fitpol)
 add_subdirectory(addpots)

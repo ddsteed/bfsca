@@ -1,13 +1,13 @@
 # ================================================================
-# bfsca - alamn CMakeLists.txt
+# bfsca - alam CMakeLists.txt
 #
 # Hao Feng (RDS), XHU
 #
 # ================================================================
-set(BIN_NAME alamn.x)
+set(BIN_NAME alam.x)
 
 set(SRC_LIST 
-  alamn.f
+  alam.f
   )
 
 # ================================================================

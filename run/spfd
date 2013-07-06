@@ -45,7 +45,7 @@ function set_location {
     work="/Users/fenghao/home1/feng/scatt/bfsca/work"
     storeT="/Users/fenghao/home1/feng/scatt/bfsca/store"
     store="$storeT/spfd/$tgt/$ref/$pot/$basis"
-    datain="$storeT/spfd/$tgt/DATA_IN/$ref/$basis"
+    datain="$storeT/enmv/$tgt/$basis"
 }
 
 #--------------------------------------------------------------------------------

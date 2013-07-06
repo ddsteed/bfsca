@@ -1,0 +1,77 @@
+#!/usr/bin/env  bash
+#
+#--------------------------------------------------------------------------------
+# do rigid-rotor scattering calculations
+#
+# RDS (Hao Feng)
+# Jul 06, 2013
+#
+# ---
+# Usage:
+#    total_rr -t N2 -p DSG -basis M2H -ref HF -sym pg -R 2.020
+#
+#--------------------------------------------------------------------------------
+#--- options
+
+while test "x$1" != "x"; do
+    case $1 in
+	-t)     shift; tgt=$1      ;;
+	-p)     shift; pot=$1      ;;
+	-R)     shift; CRD=$1      ;;
+	-basis) shift; basis=$1    ;;
+	-ref)   shift; ref=$1      ;;
+	-sym)   shift; sym=$1      ;;
+	*)                         ;;
+    esac
+    shift
+done
+
+if [ "$tgt" == ""    ]; then tgt=H2;     fi
+if [ "$pot" == ""    ]; then pot=DSG;    fi
+if [ "$ref" == ""    ]; then ref=HF;     fi
+
+if [ "$sym" == ""    ]; then 
+    SYMM=(sg su pg pu)
+else
+    SYMM=($sym)
+fi
+
+if [ "$basis" == ""  ]; then 
+    if [[ $tgt == H2 ]]; then
+	BS=(CCD CCT CCQ ACCD ACCT ACCQ M2H M2)
+    elif [[ $tgt == N2 ]]; then
+ 	BS=(CCD CCT CCQ ACCD ACCT ACCQ M2H)
+    fi
+else
+    BS=($basis)
+fi
+
+#---
+# get moments and local potentials
+#
+for basis in ${BS[@]}; do
+    ./enmv   -t $tgt -basis $basis -R $CRD 
+    ./alam   -t $tgt -basis $basis -R $CRD -p $pot
+    ./vstat  -t $tgt -basis $basis -R $CRD -p $pot
+#    ./vpola  -t $tgt -basis $basis -R $CRD -p $pot -method vxz
+
+    ./fitpol -t $tgt -basis $basis -R $CRD -p $pot
+    ./vstpol -t $tgt -basis $basis -R $CRD -p $pot
+    ./mpmom  -t $tgt -basis $basis -R $CRD -p $pot
+done
+
+#---
+# get exchange kernels
+#
+for basis in ${BS[@]}; do
+    for sym in ${SYMM[@]}; do
+	./exker  -t $tgt -basis $basis -R $CRD -p $pot -sym $sym
+    done
+done
+
+#---
+# cal rigid-rotor scattering matrices/cross sections
+#
+for sym in ${SYMM[@]}; do
+    ./lavib  -t $tgt -basis $basis -R $CRD -p $pot -sym $sym -method rr
+done

@@ -1,17 +1,20 @@
 #!/usr/bin/env  bash
 #-----------------------------------------------------------------------
-# This shell script is to set up the working scatch and the store 
-# directory and compile all the source codes.
+# This shell script is to clean the working scatch and the store 
+# directory 
 #-----------------------------------------------------------------------
-function make_work {
+function clean_work {
     echo -n " Please specify the working scratch directory, [./work]: "
     read work
 
     if [[ $work == "" ]]; then	work="$currpath/work"; fi
-    if [ ! -d $work ]; then mkdir $work; fi
-    cd $work
-    work=`pwd`
-    cd $currpath
+    if [ ! -d $work ]; then 
+	echo "no work directory found!"
+	exit
+    else
+	cd $work
+	rm -f *
+    fi
 }
 
 #-----------------------------------------------------------------------
@@ -413,55 +416,36 @@ function store_name {
 }
 
 #-----------------------------------------------------------------------
-function make_store {
+function clean_store {
     echo -n " Please specify the store dirctory, [./store]: "
     read store
 
     if [[ $store == "" ]]; then	store="$currpath/store"; fi
-    if [ ! -d $store ]; then mkdir -p $store; fi
+    if [ ! -d $store ]; then 
+	echo "no store directory found!"
+	exit
+    fi
     cd $store
     store=`pwd`
     store_name
     for dir in ${st[@]}; do
-	if [ ! -d $dir ]; then mkdir -p $dir; fi
+	cd $dir
+	echo "directory = $dir ..."
+	echo $dir | grep -q "DATA_IN"
+	if [ $? -eq 0 ]; then
+	    cd $store
+	else
+	    rm -f *
+	    cd $store
+	fi
     done
     cd $currpath
-}
-
-#-----------------------------------------------------------------------
-function ch_script {
-    cd $currpath/run
-
-    for file in *; do
-	sed -e 's:work=.*$:work="'"$work"'":' \
-            -e 's:storeT=.*$:storeT="'"$store"'":' \
-            $file > $file.tt
-	mv $file.tt $file
-	chmod a+x $file
-    done
-
-    cd ..
-}
-
-#-----------------------------------------------------------------------
-function compile {
-    echo
-    echo " NOTE: work = $work "
-    echo "      store = $store "
-    echo
-    echo " Now we are compiling all of the source codes!"
-    echo
-    
-    cd tools
-    ./compile.sh -r
-    cd ..
 }
 
 #-----------------------------------------------------------------------
 #--- main function
 
 currpath=`pwd`
-make_work
-make_store
-ch_script
-compile
+clean_work
+clean_store
+

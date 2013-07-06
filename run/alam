@@ -8,7 +8,7 @@
 #
 # ---
 #  Usage:
-#    alamn -t N2 -p DSG -basis ACCQ -R 2.02 -ref HF
+#    alam -t N2 -p DSG -basis ACCQ -R 2.02 -ref HF
 #
 #--------------------------------------------------------------------------------
 #--- options
@@ -43,7 +43,7 @@ function set_location {
     work="/Users/fenghao/home1/feng/scatt/bfsca/work"
     storeT="/Users/fenghao/home1/feng/scatt/bfsca/store"
     store="$storeT/alam/$tgt"
-    datain="$store/DATA_IN/$basis"
+    datain="$storeT/enmv/$tgt/$basis"
     storea="$store/$ref/$pot/$basis"
 }
 
@@ -54,7 +54,7 @@ function cd_work {
     curr=`pwd`
     if [ -d $work ]; then
 	rm -f   $work/*
-	ln -s   $curr/../bin/alamn.x   $work/.
+	ln -s   $curr/../bin/alam.x   $work/.
 	cd      $work
     else
 	echo "$work does NOT exit!"
@@ -275,7 +275,7 @@ cd_work
 
 make_inp $tgt.inp
 
-$work/alamn.x < $tgt.inp > $tgt.out
+$work/alam.x < $tgt.inp > $tgt.out
 
 mv fort.10  $storea/sphrjR${CRD}.dat    # MO projections
 mv fort.2   $storea/dalam_R${CRD}.dat   # charge density

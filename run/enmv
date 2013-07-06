@@ -40,10 +40,8 @@ function handle_opt {
 function set_location {
     work="/Users/fenghao/home1/feng/scatt/bfsca/work"
     storeT="/Users/fenghao/home1/feng/scatt/bfsca/store"
-    store="$storeT/alam/$tgt/DATA_IN/$basis"
+    store="$storeT/enmv/$tgt/$basis"
     datain="$storeT/vpol/$tgt/DATA_IN"
-    storev="$storeT/vpol/$tgt/DATA_IN/VEC/$ref/$basis"
-    storen="$storeT/spfd/$tgt/DATA_IN/$ref/$basis"
 }
 
 #--------------------------------------------------------------------------------
@@ -118,8 +116,8 @@ run_gamess   $tgt
 pick_vec     $tgt
 pick_en      $tgt
 
-cp out.R$CRD $storev/.
-cat ener.dat >> $storen/ener.dat
 
 cp GTObasis.dat $store/.
 cp MO.dat       $store/MOcoeR${CRD}
+cp out.R$CRD    $store/VEC_R${CRD}
+cat ener.dat >> $store/ener.dat

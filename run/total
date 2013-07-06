@@ -25,9 +25,13 @@ for basis in ${BS[@]}; do
     	./fitpol -t $1 -basis $basis -R $R -p $pot
     	./vstpol -t $1 -basis $basis -R $R -p $pot
     	./wlut   -t $1 -basis $basis -R $R -p $pot
-    	./spfd   -t $1 -basis $basis -R $R -p $pot
     	./mpmom  -t $1 -basis $basis -R $R -p $pot
     done
+
+    for R in ${RE[@]}; do
+    	./spfd   -t $1 -basis $basis -R $R -p $pot
+    done
+
     ./wlam  -t $1 -basis $basis -R ${RE[@]} -p $pot -cp mpmom
     ./wlam  -t $1 -basis $basis -R ${RE[@]} -p $pot -cp pot
 done

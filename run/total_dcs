@@ -1,0 +1,50 @@
+#!/usr/bin/env  bash
+#
+#--------------------------------------------------------------------------------
+# do DCS calculations
+#
+# RDS (Hao Feng)
+# Jul 06, 2013
+#
+# ---
+# Usage:
+#    total_dcs -t N2 -p DSG -basis M2H -ref HF -v0 0 -vf 0 -E 1.00
+#
+#--------------------------------------------------------------------------------
+#--- options
+
+while test "x$1" != "x"; do
+    case $1 in
+	-t)     shift; tgt=$1      ;;
+	-p)     shift; pot=$1      ;;
+	-basis) shift; basis=$1    ;;
+	-ref)   shift; ref=$1      ;;
+	-v0)    shift; v0=$1       ;;
+	-vf)    shift; vf=$1       ;;
+	-E)     shift; ener=$1     ;;
+	*)                         ;;
+    esac
+    shift
+done
+
+if [ "$tgt" == ""    ]; then tgt=H2;     fi
+if [ "$pot" == ""    ]; then pot=DSG;    fi
+if [ "$ref" == ""    ]; then ref=HF;     fi
+
+
+if [ "$basis" == ""  ]; then 
+    if [[ $tgt == H2 ]]; then
+	BS=(CCD CCT CCQ ACCD ACCT ACCQ M2H M2)
+    elif [[ $tgt == N2 ]]; then
+ 	BS=(CCD CCT CCQ ACCD ACCT ACCQ M2H)
+    fi
+else
+    BS=($basis)
+fi
+
+#---
+# get coupled moments and local potentials
+#
+for basis in ${BS[@]}; do
+	./abcvdcs -t $tgt -basis $basis -v0 $v0 -vf $vf -p $pot -E $ener
+done

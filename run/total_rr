@@ -72,6 +72,8 @@ done
 #---
 # cal rigid-rotor scattering matrices/cross sections
 #
-for sym in ${SYMM[@]}; do
-    ./lavib  -t $tgt -basis $basis -R $CRD -p $pot -sym $sym -method rr
+for basis in ${BS[@]}; do
+    for sym in ${SYMM[@]}; do
+        ./lavib  -t $tgt -basis $basis -R $CRD -p $pot -sym $sym -method rr
+    done	    
 done

@@ -1,0 +1,191 @@
+#!/usr/bin/env bash
+#
+#--------------------------------------------------------------------------------
+# Implement the calculation of the differential cross-section
+# utilizing the analytic born completion formalism as extended to
+# include non-elastic processes to get the charge density, a_lambda
+# coefficients,
+#
+#  RDS (Hao Feng)
+#  Jun 21, 2013
+#
+# ---
+#  Usage:
+#    abcvdcs -t N2 -p DSG -basis ACCQ -ref HF -kform lavib -E 1.00 -v0 0 -vf 4
+#
+#--------------------------------------------------------------------------------
+#--- options
+function handle_opt {
+    while test "x$1" != "x"; do
+	case $1 in
+	    -t)     shift; tgt=$1      ;;
+	    -p)     shift; pot=$1      ;;
+	    -basis) shift; basis=$1    ;;
+	    -E)     shift; ener=$1     ;;
+	    -v0)    shift; v0=$1       ;;
+	    -vf)    shift; vf=$1       ;;
+	    -ref)   shift; ref=$1      ;;
+	    -kform) shift; kform=$1    ;;
+	    *)                         ;;
+	esac
+	shift
+    done
+
+    if [ "$tgt" == ""    ]; then tgt=H2;     fi
+    if [ "$pot" == ""    ]; then pot=DSG;    fi
+    if [ "$basis" == ""  ]; then basis=CCD;  fi
+    if [ "$ref" == ""    ]; then ref=HF;     fi
+    if [ "$kform" == ""  ]; then kform=lavib;fi
+    if [ "$ener" == ""   ]; then ener=1.00;  fi
+    if [ "$v0" == ""     ]; then v0=0;       fi
+    if [ "$vf" == ""     ]; then vf=0;       fi
+
+# - echo OPTIONS
+    echo " The command is: "
+    echo "     $0 -t $tgt -p $pot -basis $basis -ref $ref -kform $kform -E $ener -v0 $v0 -vf $vf"
+    echo
+}
+
+#--------------------------------------------------------------------------------
+#--- locations
+function set_location {
+    work="/Users/fenghao/home1/feng/scatt/bfsca/work"
+    storeT="/Users/fenghao/home1/feng/scatt/bfsca/store"
+    store="$storeT/vdcs/$tgt/$ref/$pot/$basis"
+    kmatin="$storeT/$kform/$tgt/$ref/$pot/$basis"
+    momin="$storeT/wlam/$tgt/$ref/$pot/$basis"
+}
+
+#--------------------------------------------------------------------------------
+#--- cd work directory
+#
+function cd_work {
+    curr=`pwd`
+    if [ -d $work ]; then
+	rm -f   $work/*
+	ln -s   $curr/../bin/abcvdcs.x   $work/.
+	cd      $work
+    else
+	echo "$work does NOT exit!"
+	exit
+    fi
+}
+
+#--------------------------------------------------------------------------------
+#--- make input file
+#
+function make_inp {
+    input=$1
+
+#---
+#  lmax: the maximum l that is *not* Born
+#        use -1 to obtian pure Born results
+# tform: = 0 for using internal Born t-matrices (for testing)
+#          1 for reading standard lavib K-matrices.
+#          2 for reading bvfcc K-matrices
+# noabc: = 0  perform the abcv cross section calculation
+#          1  turn off abcv but still sum to a maximum
+#             partial wave
+#          2  turn off abcv and sum to a maximum symmetry
+#             for all available partial waves
+#             *** For noabc = 2, we change the meaning
+#             *** of lmax and lbext so that lmax is the
+#             *** maximum Lambda (symmetry) for which
+#             *** we use c.c. T-matrices and lbext is
+#             *** the maximum Lambda (symmetry) to which
+#             *** we extend these with Born values
+# lbext: the maximum value of l to extend our T matrices
+#        with Born values.  This should normally be set to lmax
+#        so that we automatically fill in any missing c.c.
+#        elements.  Be aware that you must verify that lmax
+#        is large enough by checking the 'goodness' values.
+#        It can also be usefull when noabc is non-zero.
+#        Also, see noabc = 2 for special meaning for lbext then
+#  
+# debug: can be set non-zero for debugging purposes (lots of
+#        extra output)
+#
+# nchs: is equal to the number of partial waves to be used for
+#       each symmetry, intended for use with noabc = 2, but
+#       will restrict the c.c. input in any case if non-zero
+#       When noabc = 2 and nchs is set to 0, each symmetry is
+#       filled to all partial waves implied by the maximum
+#       symmetry.
+    if [[ $kform == born ]];  then 
+	tform=0; 
+	title=" e-$tgt - Internal Born T-matrices"
+	k0=1; k=1;  a0=0; a2=0; q=1
+    elif [[ $kform == lavib ]]; then 
+	tform=1; 
+	title=" e-$tgt - K-matrices from the lavib code with exact exchange"
+    elif [[ $kform == bfvcc ]]; then 
+	tform=2; 
+	title=" e-$tgt - K-matrices from the bfvcc code with TFEGE exchange"
+    fi
+
+    lmax=2;  noabc=0;  lbext=2;  debug=0;  nchs=0
+
+#---
+#  energy: incident energy (eV)
+#      v0: the initial vib. state
+#       v: the final vib. state
+#    numv: No. of vib. levels (affects input of moments)
+#  numsym: No. of symmetries
+#
+#   we: harmonic vibrational constant
+# wexe: non-harmonic vibrational constant
+# swit: = 1: cm-1
+#       = 0: Hartree
+    sym=(sg su pg pu);    numsym=${#sym[@]}
+    if [[ $tgt == H2 ]]; then
+	numv=4; 
+	swit=1;  we=4395.2;  wexe=117.9
+    elif [[ $tgt == N2 ]]; then 
+	numv=15; 
+	swit=0;  we=1.07367848E-02;  wexe=6.43295472E-05
+    fi
+
+#---
+# momfile: path and filename of coupled vibrational moments (no spaces)
+    ln -s $momin/moms.avg     .
+    momfile="moms.avg"
+
+#---
+# kmatfile: path and filename of K matrics (no spaces)
+    for is in ${sym[@]}; do
+	ln -s $kmatin/kmat.$is   .
+	kmatfile=(${kmatfile[@]} kmat.$is)
+    done
+
+#---
+    echo "$title" > $input
+    echo "$lmax  $tform  $noabc  $lbext  $debug  $nchs"  >> $input
+
+    if [[ $tform == 0 ]]; then
+	echo "$k0  $k "     >> $input
+	echo "$a0  $a2  $q" >> $input
+    else
+	echo "$ener  $v0  $vf  $numv  $numsym"  >> $input
+	echo "$swit  $we  $wexe "               >> $input
+	echo "$momfile"                         >> $input
+	for is in ${kmatfile[@]}; do
+	    echo "$is"                          >> $input
+	done
+    fi
+}
+
+#--------------------------------------------------------------------------------
+#--- MAIN FUNCTION
+#
+handle_opt $@
+
+set_location
+cd_work
+
+make_inp $tgt.inp
+
+$work/abcvdcs.x < $tgt.inp > $tgt.out
+
+if [[ $tform -ne 0 ]]; then
+    cp fort.7  $store/DCS.E$ener.v$v0-v$vf.$kform
+fi

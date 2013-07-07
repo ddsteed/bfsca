@@ -94,6 +94,8 @@ done
 #---
 # cal vibrational scattering matrices/cross sections
 #
-for sym in ${SYMM[@]}; do
-    ./lavib  -t $tgt -basis $basis -R ${RE[@]} -p $pot -sym $sym
+for basis in ${BS[@]}; do
+    for sym in ${SYMM[@]}; do
+	./lavib  -t $tgt -basis $basis -R ${RE[@]} -p $pot -sym $sym
+    done
 done

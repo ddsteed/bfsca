@@ -28,9 +28,14 @@ while test "x$1" != "x"; do
 done
 
 if [ "$tgt" == ""    ]; then tgt=H2;     fi
-if [ "$pot" == ""    ]; then pot=DSG;    fi
 if [ "$ref" == ""    ]; then ref=HF;     fi
 
+
+if [ "$pot" == ""    ]; then 
+	PT=(BTAD DSG)   
+else
+    PT=($pot)
+fi
 
 if [ "$basis" == ""  ]; then 
     if [[ $tgt == H2 ]]; then
@@ -46,5 +51,7 @@ fi
 # get coupled moments and local potentials
 #
 for basis in ${BS[@]}; do
-	./abcvdcs -t $tgt -basis $basis -v0 $v0 -vf $vf -p $pot -E $ener
+	for pot in ${PT[@]}; do
+		./abcvdcs -t $tgt -basis $basis -v0 $v0 -vf $vf -p $pot -E $ener
+	done
 done

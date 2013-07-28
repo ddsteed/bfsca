@@ -10,4 +10,5 @@ tar zcvf bfsca.tgz  \
     doc \
     run \
     src \
-    tools
+    tools \
+    store

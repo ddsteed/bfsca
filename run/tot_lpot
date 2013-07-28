@@ -1,7 +1,7 @@
 #!/usr/bin/env  bash
 #
 #--------------------------------------------------------------------------------
-# do vibrational e-mol scattering calculations
+# do vibrational scattering calculations
 #
 # RDS (Hao Feng)
 # Jul 06, 2013
@@ -56,7 +56,6 @@ case $tgt in
 esac
 
 #---
-# vibratioal coupled local potentials and multipole moments
 for basis in ${BS[@]}; do
     for R in ${RE[@]}; do
     	./enmv   -t $tgt -basis $basis -R $R 
@@ -70,26 +69,22 @@ for basis in ${BS[@]}; do
     	./mpmom  -t $tgt -basis $basis -R $R -p $pot
     done
 
-    # for R in ${RE[@]}; do
-    # 	./spfd   -t $tgt -basis $basis -R $R -p $pot
-    # done
+#   for R in ${RE[@]}; do
+#   	./spfd   -t $tgt -basis $basis -R $R -p $pot
+#   done
 
     ./wlam  -t $tgt -basis $basis -R ${RE[@]} -p $pot -cp mpmom
     ./wlam  -t $tgt -basis $basis -R ${RE[@]} -p $pot -cp pot
-done
 
-#---
-# vibrational coupled exchange potential &
-# do Linear-Algebraic scatt. equ. cal.
-for basis in ${BS[@]}; do
-    for sym in ${SYMM[@]}; do
+    #---
+#   for sym in ${SYMM[@]}; do
 	#---
-	for R in ${RE[@]}; do
-	    ./exker  -t $tgt -basis $basis -R $R -p $pot -sym $sym
-	done
+#	for R in ${RE[@]}; do
+#	    ./exker  -t $tgt -basis $basis -R $R -p $pot -sym $sym
+#	done
 	#---
-	./wlam  -t $tgt -basis $basis -R ${RE[@]} -p $pot -sym $sym -cp exk
+#	./wlam  -t $tgt -basis $basis -R ${RE[@]} -p $pot -sym $sym -cp exk
 	#---
-	./lavib -t $tgt -basis $basis -R ${RE[@]} -p $pot -sym $sym
-    done
+#	./lavib -t $tgt -basis $basis -R ${RE[@]} -p $pot -sym $sym
+#   done
 done

@@ -2,6 +2,10 @@
 #-----------------------------------------------------------------------
 # This shell script is to set up the working scatch and the store 
 # directory and compile all the source codes.
+#
+#  RDS (Hao Feng)
+#  Jul 20, 2013
+#
 #-----------------------------------------------------------------------
 function make_work {
     echo -n " Please specify the working scratch directory, [./work]: "
@@ -37,6 +41,8 @@ function store_name {
 ./alam/H2/HF/DSG
 ./alam/H2/HF
 ./alam/H2
+./alam/N2/HF/BTAD/ACC5
+./alam/N2/HF/BTAD/ACC6
 ./alam/N2/HF/BTAD/ACCD
 ./alam/N2/HF/BTAD/ACCQ
 ./alam/N2/HF/BTAD/ACCT
@@ -45,6 +51,8 @@ function store_name {
 ./alam/N2/HF/BTAD/CCT
 ./alam/N2/HF/BTAD/M2H
 ./alam/N2/HF/BTAD
+./alam/N2/HF/DSG/ACC5
+./alam/N2/HF/DSG/ACC6
 ./alam/N2/HF/DSG/ACCD
 ./alam/N2/HF/DSG/ACCQ
 ./alam/N2/HF/DSG/ACCT
@@ -65,6 +73,8 @@ function store_name {
 ./enmv/H2/M2
 ./enmv/H2/M2H
 ./enmv/H2
+./enmv/N2/ACC5
+./enmv/N2/ACC6
 ./enmv/N2/ACCD
 ./enmv/N2/ACCQ
 ./enmv/N2/ACCT
@@ -94,6 +104,8 @@ function store_name {
 ./exker/H2/HF/DSG
 ./exker/H2/HF
 ./exker/H2
+./exker/N2/HF/BTAD/ACC5
+./exker/N2/HF/BTAD/ACC6
 ./exker/N2/HF/BTAD/ACCD
 ./exker/N2/HF/BTAD/ACCQ
 ./exker/N2/HF/BTAD/ACCT
@@ -102,6 +114,8 @@ function store_name {
 ./exker/N2/HF/BTAD/CCT
 ./exker/N2/HF/BTAD/M2H
 ./exker/N2/HF/BTAD
+./exker/N2/HF/DSG/ACC5
+./exker/N2/HF/DSG/ACC6
 ./exker/N2/HF/DSG/ACCD
 ./exker/N2/HF/DSG/ACCQ
 ./exker/N2/HF/DSG/ACCT
@@ -133,23 +147,8 @@ function store_name {
 ./lavib/H2/HF/DSG
 ./lavib/H2/HF
 ./lavib/H2
-./lavib/N2/CCSD/BTAD/ACCD
-./lavib/N2/CCSD/BTAD/ACCQ
-./lavib/N2/CCSD/BTAD/ACCT
-./lavib/N2/CCSD/BTAD/CCD
-./lavib/N2/CCSD/BTAD/CCQ
-./lavib/N2/CCSD/BTAD/CCT
-./lavib/N2/CCSD/BTAD/M2H
-./lavib/N2/CCSD/BTAD
-./lavib/N2/CCSD/DSG/ACCD
-./lavib/N2/CCSD/DSG/ACCQ
-./lavib/N2/CCSD/DSG/ACCT
-./lavib/N2/CCSD/DSG/CCD
-./lavib/N2/CCSD/DSG/CCQ
-./lavib/N2/CCSD/DSG/CCT
-./lavib/N2/CCSD/DSG/M2H
-./lavib/N2/CCSD/DSG
-./lavib/N2/CCSD
+./lavib/N2/HF/BTAD/ACC5
+./lavib/N2/HF/BTAD/ACC6
 ./lavib/N2/HF/BTAD/ACCD
 ./lavib/N2/HF/BTAD/ACCQ
 ./lavib/N2/HF/BTAD/ACCT
@@ -158,6 +157,8 @@ function store_name {
 ./lavib/N2/HF/BTAD/CCT
 ./lavib/N2/HF/BTAD/M2H
 ./lavib/N2/HF/BTAD
+./lavib/N2/HF/DSG/ACC5
+./lavib/N2/HF/DSG/ACC6
 ./lavib/N2/HF/DSG/ACCD
 ./lavib/N2/HF/DSG/ACCQ
 ./lavib/N2/HF/DSG/ACCT
@@ -189,6 +190,8 @@ function store_name {
 ./mpmom/H2/HF/DSG
 ./mpmom/H2/HF
 ./mpmom/H2
+./mpmom/N2/HF/BTAD/ACC5
+./mpmom/N2/HF/BTAD/ACC6
 ./mpmom/N2/HF/BTAD/ACCD
 ./mpmom/N2/HF/BTAD/ACCQ
 ./mpmom/N2/HF/BTAD/ACCT
@@ -197,6 +200,8 @@ function store_name {
 ./mpmom/N2/HF/BTAD/CCT
 ./mpmom/N2/HF/BTAD/M2H
 ./mpmom/N2/HF/BTAD
+./mpmom/N2/HF/DSG/ACC5
+./mpmom/N2/HF/DSG/ACC6
 ./mpmom/N2/HF/DSG/ACCD
 ./mpmom/N2/HF/DSG/ACCQ
 ./mpmom/N2/HF/DSG/ACCT
@@ -228,6 +233,8 @@ function store_name {
 ./spfd/H2/HF/DSG
 ./spfd/H2/HF
 ./spfd/H2
+./spfd/N2/HF/BTAD/ACC5
+./spfd/N2/HF/BTAD/ACC6
 ./spfd/N2/HF/BTAD/ACCD
 ./spfd/N2/HF/BTAD/ACCQ
 ./spfd/N2/HF/BTAD/ACCT
@@ -236,6 +243,8 @@ function store_name {
 ./spfd/N2/HF/BTAD/CCT
 ./spfd/N2/HF/BTAD/M2H
 ./spfd/N2/HF/BTAD
+./spfd/N2/HF/DSG/ACC5
+./spfd/N2/HF/DSG/ACC6
 ./spfd/N2/HF/DSG/ACCD
 ./spfd/N2/HF/DSG/ACCQ
 ./spfd/N2/HF/DSG/ACCT
@@ -247,6 +256,49 @@ function store_name {
 ./spfd/N2/HF
 ./spfd/N2
 ./spfd
+./vdcs/H2/HF/BTAD/ACCD
+./vdcs/H2/HF/BTAD/ACCQ
+./vdcs/H2/HF/BTAD/ACCT
+./vdcs/H2/HF/BTAD/CCD
+./vdcs/H2/HF/BTAD/CCQ
+./vdcs/H2/HF/BTAD/CCT
+./vdcs/H2/HF/BTAD/M2
+./vdcs/H2/HF/BTAD/M2H
+./vdcs/H2/HF/BTAD
+./vdcs/H2/HF/DSG/ACCD
+./vdcs/H2/HF/DSG/ACCQ
+./vdcs/H2/HF/DSG/ACCT
+./vdcs/H2/HF/DSG/CCD
+./vdcs/H2/HF/DSG/CCQ
+./vdcs/H2/HF/DSG/CCT
+./vdcs/H2/HF/DSG/M2
+./vdcs/H2/HF/DSG/M2H
+./vdcs/H2/HF/DSG
+./vdcs/H2/HF
+./vdcs/H2
+./vdcs/N2/HF/BTAD/ACC5
+./vdcs/N2/HF/BTAD/ACC6
+./vdcs/N2/HF/BTAD/ACCD
+./vdcs/N2/HF/BTAD/ACCQ
+./vdcs/N2/HF/BTAD/ACCT
+./vdcs/N2/HF/BTAD/CCD
+./vdcs/N2/HF/BTAD/CCQ
+./vdcs/N2/HF/BTAD/CCT
+./vdcs/N2/HF/BTAD/M2H
+./vdcs/N2/HF/BTAD
+./vdcs/N2/HF/DSG/ACC5
+./vdcs/N2/HF/DSG/ACC6
+./vdcs/N2/HF/DSG/ACCD
+./vdcs/N2/HF/DSG/ACCQ
+./vdcs/N2/HF/DSG/ACCT
+./vdcs/N2/HF/DSG/CCD
+./vdcs/N2/HF/DSG/CCQ
+./vdcs/N2/HF/DSG/CCT
+./vdcs/N2/HF/DSG/M2H
+./vdcs/N2/HF/DSG
+./vdcs/N2/HF
+./vdcs/N2
+./vdcs
 ./vpol/H2/DATA_IN
 ./vpol/H2/HF/BTAD/ACCD
 ./vpol/H2/HF/BTAD/ACCQ
@@ -289,6 +341,8 @@ function store_name {
 ./vpol/H2/POT_ORI
 ./vpol/H2
 ./vpol/N2/DATA_IN
+./vpol/N2/HF/BTAD/ACC5
+./vpol/N2/HF/BTAD/ACC6
 ./vpol/N2/HF/BTAD/ACCD
 ./vpol/N2/HF/BTAD/ACCQ
 ./vpol/N2/HF/BTAD/ACCT
@@ -297,6 +351,8 @@ function store_name {
 ./vpol/N2/HF/BTAD/CCT
 ./vpol/N2/HF/BTAD/M2H
 ./vpol/N2/HF/BTAD
+./vpol/N2/HF/DSG/ACC5
+./vpol/N2/HF/DSG/ACC6
 ./vpol/N2/HF/DSG/ACCD
 ./vpol/N2/HF/DSG/ACCQ
 ./vpol/N2/HF/DSG/ACCT
@@ -306,6 +362,8 @@ function store_name {
 ./vpol/N2/HF/DSG/M2H
 ./vpol/N2/HF/DSG
 ./vpol/N2/HF
+./vpol/N2/POT_ORI/HF/BTAD/ACC5
+./vpol/N2/POT_ORI/HF/BTAD/ACC6
 ./vpol/N2/POT_ORI/HF/BTAD/ACCD
 ./vpol/N2/POT_ORI/HF/BTAD/ACCQ
 ./vpol/N2/POT_ORI/HF/BTAD/ACCT
@@ -314,6 +372,8 @@ function store_name {
 ./vpol/N2/POT_ORI/HF/BTAD/CCT
 ./vpol/N2/POT_ORI/HF/BTAD/M2H
 ./vpol/N2/POT_ORI/HF/BTAD
+./vpol/N2/POT_ORI/HF/DSG/ACC5
+./vpol/N2/POT_ORI/HF/DSG/ACC6
 ./vpol/N2/POT_ORI/HF/DSG/ACCD
 ./vpol/N2/POT_ORI/HF/DSG/ACCQ
 ./vpol/N2/POT_ORI/HF/DSG/ACCT
@@ -346,6 +406,8 @@ function store_name {
 ./vstat/H2/HF/DSG
 ./vstat/H2/HF
 ./vstat/H2
+./vstat/N2/HF/BTAD/ACC5
+./vstat/N2/HF/BTAD/ACC6
 ./vstat/N2/HF/BTAD/ACCD
 ./vstat/N2/HF/BTAD/ACCQ
 ./vstat/N2/HF/BTAD/ACCT
@@ -354,6 +416,8 @@ function store_name {
 ./vstat/N2/HF/BTAD/CCT
 ./vstat/N2/HF/BTAD/M2H
 ./vstat/N2/HF/BTAD
+./vstat/N2/HF/DSG/ACC5
+./vstat/N2/HF/DSG/ACC6
 ./vstat/N2/HF/DSG/ACCD
 ./vstat/N2/HF/DSG/ACCQ
 ./vstat/N2/HF/DSG/ACCT
@@ -385,6 +449,8 @@ function store_name {
 ./vstpol/H2/HF/DSG
 ./vstpol/H2/HF
 ./vstpol/H2
+./vstpol/N2/HF/BTAD/ACC5
+./vstpol/N2/HF/BTAD/ACC6
 ./vstpol/N2/HF/BTAD/ACCD
 ./vstpol/N2/HF/BTAD/ACCQ
 ./vstpol/N2/HF/BTAD/ACCT
@@ -393,6 +459,8 @@ function store_name {
 ./vstpol/N2/HF/BTAD/CCT
 ./vstpol/N2/HF/BTAD/M2H
 ./vstpol/N2/HF/BTAD
+./vstpol/N2/HF/DSG/ACC5
+./vstpol/N2/HF/DSG/ACC6
 ./vstpol/N2/HF/DSG/ACCD
 ./vstpol/N2/HF/DSG/ACCQ
 ./vstpol/N2/HF/DSG/ACCT
@@ -408,7 +476,90 @@ function store_name {
 ./wlam/H2/HF/BTAD/ACCD
 ./wlam/H2/HF/BTAD/ACCQ
 ./wlam/H2/HF/BTAD/ACCT
-./wlam/
+./wlam/H2/HF/BTAD/CCD
+./wlam/H2/HF/BTAD/CCQ
+./wlam/H2/HF/BTAD/CCT
+./wlam/H2/HF/BTAD/M2
+./wlam/H2/HF/BTAD/M2H
+./wlam/H2/HF/BTAD
+./wlam/H2/HF/DSG/ACCD
+./wlam/H2/HF/DSG/ACCQ
+./wlam/H2/HF/DSG/ACCT
+./wlam/H2/HF/DSG/CCD
+./wlam/H2/HF/DSG/CCQ
+./wlam/H2/HF/DSG/CCT
+./wlam/H2/HF/DSG/M2
+./wlam/H2/HF/DSG/M2H
+./wlam/H2/HF/DSG
+./wlam/H2/HF
+./wlam/H2
+./wlam/N2/DATA_IN
+./wlam/N2/HF/BTAD/ACC5
+./wlam/N2/HF/BTAD/ACC6
+./wlam/N2/HF/BTAD/ACCD
+./wlam/N2/HF/BTAD/ACCQ
+./wlam/N2/HF/BTAD/ACCT
+./wlam/N2/HF/BTAD/CCD
+./wlam/N2/HF/BTAD/CCQ
+./wlam/N2/HF/BTAD/CCT
+./wlam/N2/HF/BTAD/M2H
+./wlam/N2/HF/BTAD
+./wlam/N2/HF/DSG/ACC5
+./wlam/N2/HF/DSG/ACC6
+./wlam/N2/HF/DSG/ACCD
+./wlam/N2/HF/DSG/ACCQ
+./wlam/N2/HF/DSG/ACCT
+./wlam/N2/HF/DSG/CCD
+./wlam/N2/HF/DSG/CCQ
+./wlam/N2/HF/DSG/CCT
+./wlam/N2/HF/DSG/M2H
+./wlam/N2/HF/DSG
+./wlam/N2/HF
+./wlam/N2
+./wlam
+./wlut/H2/HF/BTAD/ACCD
+./wlut/H2/HF/BTAD/ACCQ
+./wlut/H2/HF/BTAD/ACCT
+./wlut/H2/HF/BTAD/CCD
+./wlut/H2/HF/BTAD/CCQ
+./wlut/H2/HF/BTAD/CCT
+./wlut/H2/HF/BTAD/M2
+./wlut/H2/HF/BTAD/M2H
+./wlut/H2/HF/BTAD
+./wlut/H2/HF/DSG/ACCD
+./wlut/H2/HF/DSG/ACCQ
+./wlut/H2/HF/DSG/ACCT
+./wlut/H2/HF/DSG/CCD
+./wlut/H2/HF/DSG/CCQ
+./wlut/H2/HF/DSG/CCT
+./wlut/H2/HF/DSG/M2
+./wlut/H2/HF/DSG/M2H
+./wlut/H2/HF/DSG
+./wlut/H2/HF
+./wlut/H2
+./wlut/N2/HF/BTAD/ACC5
+./wlut/N2/HF/BTAD/ACC6
+./wlut/N2/HF/BTAD/ACCD
+./wlut/N2/HF/BTAD/ACCQ
+./wlut/N2/HF/BTAD/ACCT
+./wlut/N2/HF/BTAD/CCD
+./wlut/N2/HF/BTAD/CCQ
+./wlut/N2/HF/BTAD/CCT
+./wlut/N2/HF/BTAD/M2H
+./wlut/N2/HF/BTAD
+./wlut/N2/HF/DSG/ACC5
+./wlut/N2/HF/DSG/ACC6
+./wlut/N2/HF/DSG/ACCD
+./wlut/N2/HF/DSG/ACCQ
+./wlut/N2/HF/DSG/ACCT
+./wlut/N2/HF/DSG/CCD
+./wlut/N2/HF/DSG/CCQ
+./wlut/N2/HF/DSG/CCT
+./wlut/N2/HF/DSG/M2H
+./wlut/N2/HF/DSG
+./wlut/N2/HF
+./wlut/N2
+./wlut
 )
 }
 
@@ -453,7 +604,7 @@ function compile {
     echo
     
     cd tools
-    ./compile.sh -r
+    ./compile.sh 
     cd ..
 }
 

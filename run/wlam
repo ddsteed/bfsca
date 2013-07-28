@@ -160,18 +160,19 @@ function make_gen_para {
 
     case $tgt in
 	H2)
-	    bmass=0.10078250e+01; cmass=0.10078250e+01; We=0.20053400e-01; Re=0.14011000e+01
-	    minvib=1; maxvib=4; nhermt=12; ivibtr=`expr $maxvib - $minvib + 1`; ihoex=0 
-	    ralfa=0.90; rx=1.13; noscil=12
-	    WeXe=0.55282000e-03;  Be=0.27727000e-03;  Alfe=0.13950000e-04;  De=0.21460000e-06
+	    bmass=0.10078250e+01; cmass=0.10078250e+01; We=0.20053400e-01;   Re=0.14011000e+01
+	    minvib=1;             maxvib=4;             nhermt=12;           ihoex=0
+	    ralfa=0.90;           rx=1.13;              noscil=12
+	    WeXe=0.55282000e-03;  Be=0.27727000e-03;    Alfe=0.13950000e-04; De=0.21460000e-06
 	    ;;
 	N2)
-	    bmass=0.14003074D+02; cmass=0.14003074D+02; We=0.10746436D-01; Re=0.20200000D+01 
-	    minvib=1; maxvib=15; nhermt=30; ivibtr=`expr $maxvib - $minvib + 1`; ihoex=0 
-	    ralfa=1.00; rx=1.00; noscil=10
-	    WeXe=0.65264950D-04;  Be=0.91046518D-05;  Alfe=0.78906618D-07;  De=0.26244493D-10
+	    bmass=0.14003074D+02; cmass=0.14003074D+02; We=0.10746436D-01;   Re=0.20200000D+01 
+	    minvib=1;             maxvib=15;            nhermt=30;           ihoex=0
+	    ralfa=1.00;           rx=1.00;              noscil=10
+	    WeXe=0.65264950D-04;  Be=0.91046518D-05;    Alfe=0.78906618D-07; De=0.26244493D-10
 	    ;;
     esac
+    ivibtr=`expr $maxvib - $minvib + 1`
 
 #---
 # jmin(i),jmax(i) - are the minimum and maximum values of
@@ -180,8 +181,7 @@ function make_gen_para {
 #                   that jmin must equal jmax.  this could be
 #                   fairly easily adapted.
     for (( i=0; i<maxvib; i++ )); do
-	jmin[$i]=0; 
-	jmax[$i]=0
+	jmin[$i]=0; jmax[$i]=0
     done
 
     echo " $idegub $ibasis $wrtvib $redvib $sho $outvib" >> $inf
@@ -285,7 +285,7 @@ function make_inp_sp {
     input=vsp;  output=pots.avg
 
     for ir in ${lir[@]}; do
-	ln -s $datasp/sp.R${ir}   $input$ir
+	ln -s $datasp/sp.R${ir}           $input$ir
 	iflnm=(${iflnm[@]} "$input$ir")
     done
     iflnm=(${iflnm[@]} "$output")
@@ -326,14 +326,11 @@ function make_inp_sp {
 #          must be small enough or a smooth wlam will not appear.
     nofr=1;  
     lelctr=`tail -n 1 $input${lir[0]} | awk '{print $1}'`
-    if [[ $tgt == H2 ]]; then
-	lammax=20  
-    elif [[ $tgt == N2 ]]; then
-	lammax=30
-    else
-	lammax=lelctr
-    fi
-    nsepar=${#lir[@]};  iprint=1;  irad=1;  rerr=0.00000001
+    lammax=lelctr
+    if [[ $tgt == H2 ]]; then lammax=20; fi
+    if [[ $tgt == N2 ]]; then lammax=30; fi
+    nsepar=${#lir[@]};   iprint=1;  
+    irad=1;              rerr=0.00000001
 
 #---
 # rnl, rnr: left and right nuclear locations.
@@ -403,7 +400,6 @@ function make_inp_ex {
     done
     iflnm=(${iflnm[@]} "$output")
 
-
     title=" Vibrational matrix elements of e-$tgt exchange kernel, symm=$sym."
 
 #---
@@ -441,21 +437,19 @@ function make_inp_ex {
 #---
 # norbi - no. of orbitals input.
 # norbo - no. of orbitals output.
+# both norbi and norbo are NOT used deadwood for the exchange kernel
+#
 # nlexi - no. of l values input.  = nexdim of exker
 # nlexo - no. of l values output. = nexdim of exker
 #
 # npts - no. of the r
     norbi=250; norbo=250;  
     if [[ $tgt == H2 ]]; then
-	nlexi=5;  nlexo=5
-	npts=250
+	nlexi=5;  nlexo=5;          npts=250
     elif [[ $tgt == N2 ]]; then
 	nlexi=11; nlexo=11
-	if [[ $pot == BTAD ]]; then
-	    npts=202
-	elif [[ $pot == DSG ]]; then
-	    npts=212
-	fi
+	if [[ $pot == BTAD ]]; then npts=202; fi
+	if [[ $pot == DSG ]];  then npts=212; fi
     fi
 
 #---

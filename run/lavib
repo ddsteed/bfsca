@@ -30,10 +30,12 @@ function handle_opt {
     if [ "$tgt" == ""    ]; then tgt=H2;     fi
     if [ "$pot" == ""    ]; then pot=DSG;    fi
     if [ "$basis" == ""  ]; then basis=CCD;  fi
-    if [ "$CRD" == ""    ]; then CRD=1.400;  fi
     if [ "$ref" == ""    ]; then ref=HF;     fi
     if [ "$sym" == ""    ]; then sym=sg;     fi
     if [ "$method" == "" ]; then method=vib; fi
+
+    if [[ "$CRD" == ""  && $tgt == H2 ]]; then CRD=1.400;  fi
+    if [[ "$CRD" == ""  && $tgt == N2 ]]; then CRD=2.020;  fi
 
 # - echo OPTIONS
     echo " The command is: "
@@ -86,7 +88,9 @@ function make_inp {
 # ENERGY(): the list of energies to be used; <= 60 energies are allowed
 #           in the source code
 #
-    energy=(0.1 0.5 1.0 1.5 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0)
+#   energy=(0.1 0.5 1.0 1.5 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0)
+    energy=(1.50)
+#   energy=(1.50 5.00)
     numener=${#energy[@]};   eunits=1
 
 #---
@@ -184,6 +188,8 @@ function make_inp {
 	cat   $datamp/A0.dat.R$CRD      >  mpmom
 	cat   $datamp/A2.dat.R$CRD     >>  mpmom
 	cat   $datamp/Q.dat.R$CRD      >>  mpmom
+	awk   '{print $2}' mpmom       >   mpmom.tt
+	mv    mpmom.tt                     mpmom
 
 	nvibin=1;  nvibxin=1; nvibx=1; nvtrunc=1;
     fi
@@ -360,7 +366,7 @@ function make_inp {
 		nml[4]="8   1   1"  # pi_u
 		nml[5]="9   0   0"  # sigma_g
 		;;
-	    2.00 | 2.020 | 2.068 | 2.100 | 2.200 | 2.300 | 2.400 | 2.500 | 2.600 | 2.700)
+	    2.000 | 2.020 | 2.068 | 2.100 | 2.200 | 2.300 | 2.400 | 2.500 | 2.600 | 2.700)
 		nml[3]="8   0   1"  # sigma_u
 		nml[4]="9   0   0"  # sigma_g
 		nml[5]="8   1   1"  # pi_u
@@ -420,12 +426,14 @@ cd_work
 
 make_inp $tgt.inp
 
+date
 $work/lavib.x < $tgt.inp > $tgt.out
+date
 
 if [[ $method == rr ]]; then
-    cp fort.51  $store/xsc.$sym.R$CRD
-    cp fort.70  $store/kmat.$sym.R$CRD
+    cat fort.51 >> $store/xsc.$sym.R$CRD
+    cat fort.70 >> $store/kmat.$sym.R$CRD
 else
-    cp fort.51  $store/xsc.$sym
-    cp fort.70  $store/kmat.$sym
+    cat fort.51 >> $store/xsc.$sym
+    cat fort.70 >> $store/kmat.$sym
 fi

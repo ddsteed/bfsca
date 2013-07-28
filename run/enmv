@@ -117,7 +117,7 @@ pick_vec     $tgt
 pick_en      $tgt
 
 
-cp GTObasis.dat $store/.
+cp GTObasis.dat $store/.                   # please check gamess input file, DNH symmetry is NOT supported!
 cp MO.dat       $store/MOcoeR${CRD}
 cp out.R$CRD    $store/VEC_R${CRD}
 cat ener.dat >> $store/ener.dat

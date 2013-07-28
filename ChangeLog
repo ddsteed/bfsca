@@ -1,20 +1,27 @@
-2013-07-02 Hao Feng (RDS) <fenghao#mail.xhu.edu.cn>
+2013-07-28 Hao Feng (RDS) <fenghao@mail.xhu.edu.cn>
+	* update alam to handle high diffuse basis (spd ---> spdghi)
+
+2013-07-20 Hao Feng (RDS) <fenghao@mail.xhu.edu.cn>
+	* fix exchange kernel bugs
+ 	* finish BFsca suite
+
+2013-07-02 Hao Feng (RDS) <fenghao@mail.xhu.edu.cn>
 	* rewrite config file to setup bfsca package
-	
+
 2013-07-01 Hao Feng (RDS) <fenghao@mail.xhu.edu.cn>
-    * change autoconf/automake to cmake
+	* change autoconf/automake to cmake
 
 2013-06-28 Hao Feng (RDS) <fenghao@mail.xhu.edu.cn>
-    * rename lavib to bfsca
-    * rewrite all run scripts
+	* rename lavib to bfsca
+	* rewrite all run scripts
 
 2013-06-01 Hao Feng (RDS) <fenghao@mail.xhu.edu.cn>
-    * modify GAMESS 2013 to calculate BTAD/DSG potential (rewrite)
-	
+	* modify GAMESS 2013 to calculate BTAD/DSG potential (rewrite)
+
 2008-06-23 Hao Feng (RDS) <fenghao@scu.edu.cn>
 	* modify all scripts to deal with DSGH/BTADH polarization
 	potentials
-	
+
 2008-04-08 Hao Feng (RDS) <fenghao@scu.edu.cn>
 	* modify configure.ac to adjust the order of FORTRAN compiler
 
@@ -30,90 +37,90 @@
 2006-06-24 Hao Feng (RDS) <fenghao@scu.edu.cn>
 	* add a subroutine gauleg to generate gauss-legendre abscissas and
 	weights with any dimension
-	
+
 2006-06-22 Hao Feng (RDS) <fenghao@scu.edu.cn>
 	* modify lavib.f so that input potential, exchange and LA mesh
 	could be different
-	* trapezoidal integrals give the same results as the original code 
-	
+	* trapezoidal integrals give the same results as the original code
+
 2006-06-13 Hao Feng (RDS) <fenghao@scu.edu.cn>
 	* rewrite all subroutines of LA calculation with fast
 	Gauss-Legendre integral in lavib.f so that lavib could work with
 	e-N2 vibrational scattering
-	
+
 2006-05-27 Hao Feng (RDS) <fenghao@scu.edu.cn>
 	* add a judgement to ensure the convergence of exchange kernel in
-	vibker.f/lavib.f 
+	vibker.f/lavib.f
 	* rewrite clebexch/kerncalc in lavib.f to cope with e-N2
 
 2006-05-05 Hao Feng (RDS) <fenghao@scu.edu.cn>
 	* remove variable nlamex --- set lambda_ex automatically in
 	accordance with lmax and nlproj in vibker.f
-	
+
 2006-04-25 Hao Feng (RDS) <fenghao@scu.edu.cn>
 	* fix the two bugs of calculating the exchange kernel (summing
 	kernel) in vibker.f
-	* add another choice (fkerncalc) to calculate the exchange kernel 
-	
+	* add another choice (fkerncalc) to calculate the exchange kernel
+
 2006-03-29 Hao Feng (RDS) <fenghao@scu.edu.cn>
 	* fix the bug of calculating the coupled moments when some
 	specific internuclear distances are used. (mpmom.s is modified to
 	output moments for each R and wlam.s is modified to read them
-	correctly.)  
-	
+	correctly.)
+
 2006-02-03 Hao Feng (RDS) <fenghao@scu.edu.cn>
 	* finish the clean script
-	
+
 2006-02-01 Hao Feng (RDS) <fenghao@scu.edu.cn>
 	* finish the setup script
-	
+
 2006-01-25 Hao Feng (RDS) <fenghao@scu.edu.cn>
 	* modify lavib.f/rclosure.f to do e-N2
-	
+
 2006-01-02 Hao Feng (RDS) <fenghao@scu.edu.cn>
 	* finish all configure/Makefile files
-	
+
 2005-12-31 Hao Feng (RDS) <fenghao@scu.edu.cn>
-	* modify wlam.f to calcuate coupled exchange kernel 
-	
+	* modify wlam.f to calcuate coupled exchange kernel
+
 2005-12-28 Hao Feng (RDS) <fenghao@scu.edu.cn>
 	* generalize vibker.f to deal e-N2
-	
+
 2005-10-04 Hao Feng (RDS) <fenghao@scu.edu.cn>
 	* modify wlam.f to calculate coupled static(+pol.) potentials by
 	using Morse/Murrel-Sorbie/ECM vibrational wavefunctions (or any
 	other accurate vibrational wavefunctions)
-	
+
 2005-10-03 Hao Feng (RDS) <fenghao@scu.edu.cn>
-	* modify wlam.f to calculate coupled moments by using 
+	* modify wlam.f to calculate coupled moments by using
 	Morse/Murrel-Sorbie/ECM vibrational wavefunctions (or any
 	other accurate vibrational wavefunctions)
-	
+
 2005-09-17 Hao Feng (RDS) <fenghao@scu.edu.cn>
 	* write mpmom to calculate multi-moments: Dipole, Qudrupole,
 	polarizabilities, etc.
-	
+
 2005-08-29 Hao Feng (RDS) <fenghao@scu.edu.cn>
 	* Large-r fit correction for alamn
-	
+
 2005-08-20 Hao Feng (RDS) <fenghao@scu.edu.cn>
 	* write vpola.s/fitpol.f to interpolate polarization potential of
 	e-H2 and e-N2 from original C/P data sets
 	* write addpots to sum up static and polarization potentials
-	
+
 2005-08-18 Hao Feng (RDS) <fenghao@scu.edu.cn>
-	* modify/generalize static.s/vlam.f to calculate static 
-	potential of e-H2 and e-N2 
+	* modify/generalize static.s/vlam.f to calculate static
+	potential of e-H2 and e-N2
 
 2005-08-16 Hao Feng (RDS) <fenghao@scu.edu.cn>
 	* modify/generalize alamn.s/alamn.f to calculate A_lambda of
-	e-H2 and e-N2 
+	e-H2 and e-N2
 	* modify all input data as free formatted except GTObasis
 	and MOcoef$ir [D(J,I)]
 	* change ICENTR from Character to Integer (for GAMESS)
 	* change ICTR   from Character to Integer (for GAMESS)
 	* change KCNT   from Character to Integer (for GAMESS)
 	* move the suffix-blanks of ITYPE(I) as pre-blanks (for GAMESS)
-	
+
 2005-08-07 Hao Feng (RDS) <fenghao@scu.edu.cn>
 	* build BFsca architecture by referring to Andy's LAVIB package

@@ -1,7 +1,7 @@
 #!/usr/bin/env  bash
 #
 #--------------------------------------------------------------------------------
-# do rigid-rotor scattering calculations
+# do rigid-rotor e-mol scattering calculations
 #
 # RDS (Hao Feng)
 # Jul 06, 2013
@@ -30,6 +30,9 @@ if [ "$tgt" == ""    ]; then tgt=H2;     fi
 if [ "$pot" == ""    ]; then pot=DSG;    fi
 if [ "$ref" == ""    ]; then ref=HF;     fi
 
+if [[ "$CRD" == ""  && $tgt == H2 ]]; then CRD=1.400;     fi
+if [[ "$CRD" == ""  && $tgt == N2 ]]; then CRD=2.020;     fi
+
 if [ "$sym" == ""    ]; then 
     SYMM=(sg su pg pu)
 else
@@ -53,7 +56,7 @@ for basis in ${BS[@]}; do
     ./enmv   -t $tgt -basis $basis -R $CRD 
     ./alam   -t $tgt -basis $basis -R $CRD -p $pot
     ./vstat  -t $tgt -basis $basis -R $CRD -p $pot
-#    ./vpola  -t $tgt -basis $basis -R $CRD -p $pot -method vxz
+    ./vpola  -t $tgt -basis $basis -R $CRD -p $pot -method vxz
 
     ./fitpol -t $tgt -basis $basis -R $CRD -p $pot
     ./vstpol -t $tgt -basis $basis -R $CRD -p $pot

@@ -56,7 +56,7 @@ for basis in ${BS[@]}; do
     ./enmv   -t $tgt -basis $basis -R $CRD 
     ./alam   -t $tgt -basis $basis -R $CRD -p $pot
     ./vstat  -t $tgt -basis $basis -R $CRD -p $pot
-    ./vpola  -t $tgt -basis $basis -R $CRD -p $pot -method vxz
+#   ./vpola  -t $tgt -basis $basis -R $CRD -p $pot -method vxz
 
     ./fitpol -t $tgt -basis $basis -R $CRD -p $pot
     ./vstpol -t $tgt -basis $basis -R $CRD -p $pot

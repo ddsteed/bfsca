@@ -89,7 +89,7 @@ function make_inp {
 #           in the source code
 #
 #   energy=(0.1 0.5 1.0 1.5 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0)
-    energy=(1.50)
+    energy=($2)
 #   energy=(1.50 5.00)
     numener=${#energy[@]};   eunits=1
 
@@ -424,16 +424,23 @@ handle_opt $@
 set_location
 cd_work
 
-make_inp $tgt.inp
+ENER=(5.00 1.50)
+for ener in ${ENER[@]}; do
+    echo "Now handle energy = $ener ..."
 
-date
-$work/lavib.x < $tgt.inp > $tgt.out
-date
+    make_inp $tgt.inp $ener
 
-if [[ $method == rr ]]; then
-    cat fort.51 >> $store/xsc.$sym.R$CRD
-    cat fort.70 >> $store/kmat.$sym.R$CRD
-else
-    cat fort.51 >> $store/xsc.$sym
-    cat fort.70 >> $store/kmat.$sym
-fi
+    date
+    $work/lavib.x < $tgt.inp > $tgt.out
+    rm -f  *.avg exvib.* vsp.rr exrr.*
+    date
+    echo
+
+    if [[ $method == rr ]]; then
+	cat fort.51 >> $store/xsc.$sym.R$CRD
+	cat fort.70 >> $store/kmat.$sym.R$CRD
+    else
+	cp fort.51 $store/xsc.$sym.E$ener
+	cp fort.70 $store/kmat.$sym.E$ener
+    fi
+done

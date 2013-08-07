@@ -1,5 +1,12 @@
+C * JUN 12 2006 - RDS - ADD GAUSS-LEGENDRE NODES IN EXCHANGE KERNEL INTEGRAL
+C * JUN 06 2006 - RDS - UPDATE SPHRJ
+C * APR 25 2006 - RDS - FIX BUG OF KERNCALC
+C * DEC 28 2005 - RDS - REMOVE THE NAMES OF I/O FILES
+C *                     REMOVE # OF GEOMETRIES SO THAT ONLY ONE GIVEN GEOMETRY ONE TIME
+C *                     UPDATE CLEBEXCH/KERNCALC TO HANDLE E-N2
+C * JAN 01 1990 - WT  - FIRST VERSION
 C *-
-C * PROGRAM VIBKER
+C * PROGRAM EXKER
 C *
 C * program to calculate the exchange kernels at a given internuclear
 C * geometries so they may be used in the construction of a
@@ -7,40 +14,6 @@ C * vibrational exchange kernel
 
 C * Now, it is ONLY for homonuclear diatomic molecule! (Hao Feng)
 C *                     ***********
-
-C * V1.0: Wayne Trail (OU)
-C *
-C * V2.0: Hao Feng (SCU), Dec. 28, 2005
-C *       1) remove the names of input/output files, give the names 
-C *          in the shell script of vibker.s
-C *       2) remove the number of geometries so that only one given
-C *          geometry is calculated once
-C *       3) expand CLEBEXCH/KERNCALC to cope with e-N2
-C *
-C * V3.0: Hao Feng (SCU), Apr. 1, 2006
-C *       1) fix the bug of the initial value of lambda (lam0) in 
-C *          CLEBEXCH/KERNCALC 
-C *
-C * V3.1: Hao Feng (SCU), Apr. 25, 2006
-C *       1) fix the bug of summing kernel in KERNCALC
-C *       2) add another choice (FKERNCALC) to cal. exchange kernel
-C *
-C * V3.2: Hao Feng (SCU), May 5, 2006
-C *       1) Remove variable nlamex --- set lambda_ex automatically 
-C *          in accordance with l and lp (nexdim and nlproj)
-C *
-C * V3.3: Hao Feng (SCU), Jun. 6, 2006
-C *       1) add a judgement to ensure the convergence of exchange kernel
-C *                  nexdim >= nlproj
-C *       2) remove dummy variable "lmax" 
-C *       3) re-declarate sphrj as sphrj(nbound,nexdim,npts) in sphjread
-C *
-C * V4.0: Hao Feng (SCU), Jun. 12, 2006
-C *       1) modified to cal. exchange kernel with Gauss-Legendre nodes
-C *          It will save much time and space! 
-C *          Coupled exchange kernel is very HUGE!
-C *-/
-
       implicit none
       integer chanmax,ptsmax,lammax,symmax
       integer boundmax,nrgmax

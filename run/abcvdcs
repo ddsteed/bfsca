@@ -153,7 +153,7 @@ function make_inp {
 #---
 # kmatfile: path and filename of K matrics (no spaces)
     for is in ${sym[@]}; do
-	ln -s $kmatin/kmat.$is   .
+	ln -s $kmatin/kmat.$is.E$ener   kmat.$is
 	kmatfile=(${kmatfile[@]} kmat.$is)
     done
 

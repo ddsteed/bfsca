@@ -116,8 +116,12 @@ run_gamess   $tgt
 pick_vec     $tgt
 pick_en      $tgt
 
-
+# save output files
 cp GTObasis.dat $store/.                   # please check gamess input file, DNH symmetry is NOT supported!
+
+sed '1d' MO.dat > tt && mv tt MO.dat
 cp MO.dat       $store/MOcoeR${CRD}
+
 cp out.R$CRD    $store/VEC_R${CRD}
+
 cat ener.dat >> $store/ener.dat

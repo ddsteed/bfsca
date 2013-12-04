@@ -109,6 +109,12 @@ function make_inp {
 	    rmesh[4]="6.00    10.00    0.10"
 	    rmesh[5]="10.00   15.00    0.10"
 	fi
+    elif [[ $tgt == "Li2" ]]; then
+	LMINI=0;  LMAXI=8; LSTEP=2
+	rmesh[0]="0.00    1.00    0.01"
+	rmesh[1]="1.00    4.00    0.02"
+	rmesh[2]="4.00    6.00    0.05"
+	rmesh[3]="6.00   10.00    0.10"
     fi
     NREG=${#rmesh[@]};  ICASE=1;  IRW3=0;  IPRNT=1; IFLG=1;
 

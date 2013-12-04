@@ -437,10 +437,10 @@ for ener in ${ENER[@]}; do
     echo
 
     if [[ $method == rr ]]; then
-	cat fort.51 >> $store/xsc.$sym.R$CRD
-	cat fort.70 >> $store/kmat.$sym.R$CRD
+	    cat fort.51 >> $store/xsc.$sym.R$CRD
+	    cat fort.70 >> $store/kmat.$sym.R$CRD
     else
-	cp fort.51 $store/xsc.$sym.E$ener
-	cp fort.70 $store/kmat.$sym.E$ener
+	    cp fort.51 $store/xsc.$sym.E$ener
+	    cp fort.70 $store/kmat.$sym.E$ener
     fi
 done

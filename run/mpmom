@@ -74,7 +74,7 @@ handle_opt $@
 set_location
 cd_work
 
-#--- vstat and polarization potential
+#--- static and polarization potential
 ln -s $datap/polR${CRD}.dat   fort.3
 ln -s $datas/vstR${CRD}.dat   fort.2
 

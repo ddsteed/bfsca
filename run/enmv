@@ -70,9 +70,9 @@ function make_inp {
 	extfil=".FALSE."; ISPHER=1
     fi
 
-    sed -e "s/CRD=[^[:space:]]*/CRD=$CRD/g"  \
-        -e "s/GBASIS=[^[:space:]]*/GBASIS=$basis/g" \
-	-e "s/EXTFIL=[^[:space:]]*/EXTFIL=$extfil/g" \
+    sed -e "s/CRD=[^[:space:]]*/CRD=$CRD/g"          \
+        -e "s/GBASIS=[^[:space:]]*/GBASIS=$basis/g"  \
+        -e "s/EXTFIL=[^[:space:]]*/EXTFIL=$extfil/g" \
         -e "s/ISPHER=[^[:space:]]*/ISPHER=$ISPHER/g" \
         $tgt.inp > $tgt.inp.tt
 

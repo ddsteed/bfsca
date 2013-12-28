@@ -128,6 +128,7 @@ function run_gamess {
 #--- MAIN FUNCTION
 #
 handle_opt $@
+
 make_pot_parameter
 
 set_location
@@ -155,9 +156,15 @@ for r in "${re[@]}"; do
     if [[ $method == "vxz" ]]; then
 	for rp in X Z; do
 	    echo "Now running r = $r, rp = $rp ..."
-	    make_e_coord $r $rp
-	    make_inp
-	    run_gamess $tgt
+
+        if [[ $pot == "NP" ]]; then 
+           echo "$r 0.0" > HFVpol.dat
+           echo "$r 0.0" > HFApol.dat
+        else
+   	       make_e_coord $r $rp
+	       make_inp
+	       run_gamess $tgt
+        fi
 	    
 	    cat HFVpol.dat  >> HFVP_${rp}.dat
 	    cat HFApol.dat  >> HFAP_${rp}.dat

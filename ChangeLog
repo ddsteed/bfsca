@@ -1,3 +1,6 @@
+2013-12-08 Hao Feng (RDS) <fenghao@mail.xhu.edu.cn>
+	* fix MO orbitals output (some virtual orbitals may have negative energy)
+
 2013-07-28 Hao Feng (RDS) <fenghao@mail.xhu.edu.cn>
 	* update alam to handle high diffuse basis (spd ---> spdghi)
 

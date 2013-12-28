@@ -424,7 +424,7 @@ handle_opt $@
 set_location
 cd_work
 
-ENER=(5.00 1.50)
+ENER=(1.98)
 for ener in ${ENER[@]}; do
     echo "Now handle energy = $ener ..."
 
@@ -437,8 +437,10 @@ for ener in ${ENER[@]}; do
     echo
 
     if [[ $method == rr ]]; then
-	    cat fort.51 >> $store/xsc.$sym.R$CRD
-	    cat fort.70 >> $store/kmat.$sym.R$CRD
+	    cp fort.51 $store/xsc.$sym.E$ener
+	    cp fort.70 $store/kmat.$sym.E$ener
+	    cp fort.51 $store/xsc.$sym.R$CRD.E$ener
+	    cp fort.70 $store/kmat.$sym.R$CRD.E$ener
     else
 	    cp fort.51 $store/xsc.$sym.E$ener
 	    cp fort.70 $store/kmat.$sym.E$ener

@@ -82,6 +82,7 @@ function make_inp {
 
     ln -s $datast/vstR${CRD}.dat  fort.10
     ln -s $datapl/polR${CRD}.dat  fort.11
+
 }
 
 #--------------------------------------------------------------------------------

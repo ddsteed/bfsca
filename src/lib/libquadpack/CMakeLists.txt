@@ -8,7 +8,7 @@ set(LIB_NAME quadpack)
 
 set(LIBMINTS_SRC
   d1mach.f	dqage.f		dqagse.f	dqk15.f		
-  dqk31.f	dqk51.f		dqpsrt.f        dqag.f	        
+  dqk31.f	dqk51.f		dqpsrt.f    dqag.f	        
   dqags.f	dqelg.f		dqk21.f		dqk41.f		
   dqk61.f
 )

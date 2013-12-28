@@ -449,7 +449,8 @@ function make_inp_ex {
     elif [[ $tgt == N2 ]]; then
 	nlexi=11; nlexo=11
 	if [[ $pot == BTAD ]]; then npts=202; fi
-	if [[ $pot == DSG ]];  then npts=212; fi
+	if [[ $pot == NP   ]]; then npts=202; fi
+	if [[ $pot == DSG  ]]; then npts=212; fi
     fi
 
 #---

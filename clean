@@ -13,11 +13,11 @@ function clean_work {
 
     if [[ $work == "" ]]; then	work="$currpath/work"; fi
     if [ ! -d $work ]; then 
-	echo "no work directory found!"
-	exit
+	    echo "no work directory found!"
+	    exit
     else
-	cd $work
-	rm -f *
+	    cd $work
+	    rm -f *
     fi
 }
 
@@ -28,8 +28,8 @@ function clean_store {
 
     if [[ $store == "" ]]; then	store="$currpath/store"; fi
     if [ ! -d $store ]; then 
-	echo "no store directory found!"
-	exit
+	    echo "no store directory found!"
+	    exit
     fi
 
     cd $store

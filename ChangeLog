@@ -1,3 +1,6 @@
+2014-08-02 Hao Feng (RDS) <fenghao@mail.xhu.edu.cn>
+	* print wavefunctions in lavib
+
 2013-12-08 Hao Feng (RDS) <fenghao@mail.xhu.edu.cn>
 	* fix MO orbitals output (some virtual orbitals may have negative energy)
 

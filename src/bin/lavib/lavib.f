@@ -1,4 +1,4 @@
-C *-
+C7013.00 14.00 15.00) *-
 C * PROGRAM LAVIB
 C *
 C * This program uses the Direct iterative procedure in the
@@ -362,6 +362,9 @@ C *  wexe: non-harmonic vibrational spectroscopic constant
 C * variables for C-G coeff.
       common/faclg/faclog,rac,u9,ia,ib,ic,id,ie,if,l9,kselc
 
+C * dummy variables for print
+      integer ii, jj, nf, ipts
+
 C * set up the factorial table
       kselc = 1
       call facset
@@ -669,6 +672,18 @@ C * can go on to the next one
             close(exunit)
          end do
       end do
+
+C * print wavefunction
+      nf = 100
+      do ii = 1, nvib
+         do jj = 1, nvib
+            nf = nf + 1
+            do ipts = 1, nptsex
+               write(nf,'(1x,f10.5,2x,1pe12.4)') rgs(ipts),
+     &               psi(ii,jj,ipts)
+            enddo
+         enddo
+      enddo
 
 C * here we want to create some tables from the results of all the runs
 C * this will eventually be turned into a separate routine

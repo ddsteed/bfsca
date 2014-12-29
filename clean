@@ -44,4 +44,4 @@ function clean_store {
 currpath=`pwd`
 clean_work
 clean_store
-
+rm -rf build bin lib

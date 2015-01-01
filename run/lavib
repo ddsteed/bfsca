@@ -272,14 +272,11 @@ function make_inp {
     nregpot=${#potmesh[@]}
 
 #---
-# nsym: number of symmetries considered
-#
 # symlam: = 0: Sigma;  
 #         = 1: Pi
 #
 # l0,lmax: the lowest and highest legendre expansion included in the
 #          scattering equation
-    nsym=1
     case $sym in
 	sg)
 	    symlam=0; l0=0   ;;
@@ -382,7 +379,6 @@ function make_inp {
     echo "$infil"                        >> $inf
     cat  mpmom                           >> $inf
     echo "$numiter"                      >> $inf
-    echo "$nsym"                         >> $inf
     echo "$l0  $lmax  $symlam  $nvibin"  >> $inf
     echo "$nlamdin  $nlamloc"            >> $inf
 

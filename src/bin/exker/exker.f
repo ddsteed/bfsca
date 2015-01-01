@@ -1,3 +1,4 @@
+C * JAN 01 2015 - RDS - REMOVE SYMMETRY NUMBER DEPENDENCY
 C * JUN 12 2006 - RDS - ADD GAUSS-LEGENDRE NODES IN EXCHANGE KERNEL INTEGRAL
 C * JUN 06 2006 - RDS - UPDATE SPHRJ
 C * APR 25 2006 - RDS - FIX BUG OF KERNCALC
@@ -15,12 +16,12 @@ C * vibrational exchange kernel
 C * Now, it is ONLY for homonuclear diatomic molecule! (Hao Feng)
 C *                     ***********
       implicit none
-      integer chanmax,ptsmax,lammax,symmax
+      integer chanmax,ptsmax,lammax
       integer boundmax,nrgmax
 
       integer nlmomax
-      parameter (boundmax=6,chanmax=21,ptsmax=1200,lammax=60,nlmomax=16
-     $     ,symmax=4,nrgmax=100)
+      parameter (boundmax=6, chanmax=21, ptsmax=1200, lammax=60,
+     $           nlmomax=16, nrgmax=100)
 
       integer isymind
       integer nreg
@@ -32,10 +33,7 @@ C *     NPTS: the number of radial mesh points in the MO coefficients
 C * NPTSEXCH: the number of radial mesh points in the exchange region
       integer nbound,npts,nptsexch
 
-C * NSYM: the number of symmetries considered
-C * ISYM: an index used for counting symmetries
-      integer nsym,isym
-      integer l0(symmax),symlam(symmax)
+      integer l0, symlam
 
 C * the exchange stuff
 
@@ -44,14 +42,13 @@ C *           kernel (the '.ker' will be appended internally here) for
 C *           all symmetries
       character*8 kernlfil
       character*8 sphnam
-      character*8 symlab(symmax)
 
 C * EXUNIT: the unit associated with the exchang kernel. I set it to 55
 C * NEXDIM: the number of partial waves used in the CREATION of the
 C *         Exchange kernel.  It is important to get this number right 
 C *         so that the unformatted reads of the exchange kernel work
 C *         out ok.
-      integer nexdim(symmax)
+      integer nexdim
 
 C * SPHRJ(): the spherical projections of the molecular orbitals
 C *          of the target.
@@ -84,10 +81,6 @@ C     double precision clebx5(boundmax,chanmax,lammax,chanmax)
 C * set up the factorial table
       dat='.dat'
       ker='.ker'
-      symlab(1)='sg'
-      symlab(2)='su'
-      symlab(3)='pu'
-      symlab(4)='pg'
       kselc=1
 
       call facset
@@ -95,51 +88,49 @@ C * set up the factorial table
       iunit=10
       ounit=11
 
-      call indata(nsym,l0,symlam,nbound,sphnam,kernlfil,nexdim
-     $     ,nlproj,mlproj,l0proj,npts,nptsexch,rgs,wtt)
+      call indata(l0,symlam,nbound,sphnam,kernlfil,nexdim,nlproj,mlproj
+     $     ,l0proj,npts,nptsexch,rgs,wtt)
 
 C * judge if the number of partial waves is enough
-      call judgenpwav(nsym,nbound,nlproj,nexdim)
+      call judgenpwav(nbound,nlproj,nexdim)
 
       call sphjread(sphrj,nlproj,nbound,npts,nptsexch,rgs,nexdim,iunit)
 
-      do isym = 1, nsym
-         if(l0(isym).eq.0 .and. symlam(isym).eq.0) then
-            isymind = 1
-         else if(l0(isym).eq.1 .and. symlam(isym).eq.0) then
-            isymind = 2
-         else if(l0(isym).eq.1 .and. symlam(isym).eq.1) then
-            isymind = 3
-         else if(l0(isym).eq.2 .and. symlam(isym).eq.1) then
-            isymind = 4
-         else
-            WRITE (6,*) 'isym=',isym,',l0=',l0(isym), 'symlam='
-     $           ,symlam(isym)
-            stop 'error---symmetry outside range'
-         endif
+      if(l0.eq.0 .and. symlam.eq.0) then
+         isymind = 1
+      else if(l0.eq.1 .and. symlam.eq.0) then
+         isymind = 2
+      else if(l0.eq.1 .and. symlam.eq.1) then
+         isymind = 3
+      else if(l0.eq.2 .and. symlam.eq.1) then
+         isymind = 4
+      else
+         WRITE (6,*) 'l0=',l0, 'symlam=', symlam
+         stop 'error---symmetry outside range'
+      endif
 
 C * fkerncalc is just a choice to test clebexch/kernel. It is NOT optimized! 
 C * Apr. 25, 2006 --- Hao Feng
-         iwhich = 0
-         if (iwhich .eq. 0) then
-            call clebexch(clebx1,clebx2,clebx3,clebx4,clebx5
-     $           ,symlam(isym),l0(isym),nlproj,mlproj,l0proj,nbound
-     $           ,nexdim(isym))
+      iwhich = 0
+      if (iwhich .eq. 0) then
+         call clebexch(clebx1,clebx2,clebx3,clebx4,clebx5
+     $        ,symlam,l0,nlproj,mlproj,l0proj,nbound
+     $        ,nexdim)
 
 
 C * Calculate the exchange Kernel for this symmetry 
 C * of course, you should only do this once for all energies
 
-            call kerncalc(sphrj,kernel,clebx1,clebx2,clebx3,clebx4
-     $           ,clebx5,nlproj,l0proj,ounit,l0(isym),nexdim(isym)
-     $           ,nbound,rgs,nptsexch)
-         else if (iwhich .eq. 1) then
-            call fkerncalc(sphrj,kernel,symlam,nlproj,mlproj,l0proj
-     $           ,ounit,l0(isym),nexdim(isym),nbound,rgs,nptsexch)
-         endif
+         call kerncalc(sphrj,kernel,clebx1,clebx2,clebx3,clebx4
+     $        ,clebx5,nlproj,l0proj,ounit,l0,nexdim
+     $        ,nbound,rgs,nptsexch)
+      else if (iwhich .eq. 1) then
+         call fkerncalc(sphrj,kernel,symlam,nlproj,mlproj,l0proj
+     $        ,ounit,l0,nexdim,nbound,rgs,nptsexch)
+      endif
+      
+      close(unit=11)
 
-         close(unit=11)
-      end do
       close(unit=10)
       stop
       end
@@ -147,17 +138,16 @@ C * of course, you should only do this once for all energies
 C *- 
 C * This subroutine reads in the input
 
-      subroutine indata(nsym,l0,symlam,nbound,sphnam,kernfil,nexdim
+      subroutine indata(l0,symlam,nbound,sphnam,kernfil,nexdim
      $     ,nlproj,mlproj,l0proj,npts,nptsexch,rgs,wtt)
 
       implicit none
-      integer symmax,boundmax,nrgmax,ptsmax
-      parameter(symmax=4,boundmax=6,nrgmax=100,ptsmax=1200)
-      integer nsym,l0(symmax),symlam(symmax)
-      integer nbound,nexdim(symmax),nreg
+      integer boundmax, nrgmax, ptsmax
+      parameter(boundmax=6, nrgmax=100, ptsmax=1200)
+      integer l0,symlam
+      integer nbound,nexdim,nreg
       character*8 sphnam,kernfil
       integer nlproj(boundmax),mlproj(boundmax),l0proj(boundmax)
-      integer isym
       integer i, l
       character*4 dat
 
@@ -167,10 +157,6 @@ C * This subroutine reads in the input
       double precision wnode(ptsmax),rnode(ptsmax)
 
       dat='.dat'
-
-      READ (5,*) nsym
-      WRITE (6,*)' There are',nsym,' symmetries'
-      WRITE (6,*)
 
       READ (5,*) nbound
       WRITE (6,*)' There are',nbound,' target molecular orbitals'
@@ -248,10 +234,8 @@ C * rfn = ending radius of region
 
       WRITE (6,*)
       WRITE (6,*)'   l0   Symlam'
-      do isym = 1, nsym
-         READ (5,*) l0(isym),symlam(isym)
-         WRITE (6,*)l0(isym),symlam(isym)
-      end do
+      READ (5,*) l0, symlam
+      WRITE (6,*)l0, symlam
 
       WRITE (6,*)
       WRITE (6,*)'nlproj  mlproj  l0proj'
@@ -263,11 +247,10 @@ C * rfn = ending radius of region
 
       WRITE (6,*)
       WRITE (6,*) 'ExChans'
-      do isym = 1, nsym
-         READ (5,*) nexdim(isym)
-         WRITE (6,*) nexdim(isym)
-         write (6,*)
-      end do
+
+      READ (5,*) nexdim
+      WRITE (6,*) nexdim
+      write (6,*)
 
       return
       end
@@ -959,30 +942,28 @@ C *-/
 C *-
 C * judge if the number of partial waves is enough
 
-      subroutine judgenpwav(nsym,nbound,nlproj,nexdim)
+      subroutine judgenpwav(nbound,nlproj,nexdim)
       implicit none
       
-      integer symmax,boundmax
-      parameter(symmax=4,boundmax=6)
-      integer nexdim(symmax),nlproj(boundmax)
+      integer boundmax
+      parameter(boundmax=6)
+      integer nexdim,nlproj(boundmax)
 
-      integer nsym,nbound,i,nlmax,isym
+      integer nbound,i,nlmax
 
       nlmax = 0
       do i = 1, nbound
          if(nlproj(i) .gt. nlmax) nlmax = nlproj(i)
       enddo
 
-      do isym = 1, nsym
-         if(nexdim(isym) .lt. nlmax) then
-            write (0,*)
-            write(0,*) 'nexdim is TOO SMALL and should be greater than',
-     $           nlmax
-            write(0,*) 'or nlproj is TOO LARGE and should be less than'
-     $           ,nexdim(isym)
-            stop
-         endif
-      enddo
+      if(nexdim .lt. nlmax) then
+         write (0,*)
+         write(0,*) 'nexdim is TOO SMALL and should be greater than',
+     $        nlmax
+         write(0,*) 'or nlproj is TOO LARGE and should be less than'
+     $        ,nexdim
+         stop
+      endif
 
       end
 C *-/

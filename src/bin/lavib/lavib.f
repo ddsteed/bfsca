@@ -1,4 +1,40 @@
-C7013.00 14.00 15.00) *-
+C * JAN 01 2015 - RDS - REMOVE SYMMETRY NUMBER DEPENDENCY
+C *
+C * JUN 24 2006 - RDS - ADD SUBROUTINE GAULEG TO GENERATE GAUSS-LEGENDRE ABSCISSAS AND
+C *                   - WEIGHTS WITH ANY DIMENSION
+C *
+C * JUN 22 2006 - RDS - MODIFY LAVIB.F SO THAT 
+C *                   - INPUT POTENTIAL, EXCHANGE AND LA MESH COULD BE DIFFERENT
+C *                   - TRAPEZOIDAL INTEGRALS GIVE THE SAME RESULTS AS THE ORIGINAL CODE
+C *
+C * JUN 13 2006 - RDS - MODIFIED ALL SUBROUTINES OF LA CAL. WITH NEW INTEGRAL FORMULA
+C *                   - (Gauss-Legendre or trapezoidal points) TRAPEZOIDAL INTEGRAL
+C *
+C * JUN 06 2006 - RDS - FIX THE BUG OF DEFINING NEXDIM (IN SUBROUTINE OF INDATA)
+C *
+C * MAY 27 2006 - RDS - REWRITE CLEBEXCH AND KERNCALC TO COPE WITH E-N2
+C *                   - ADD A JUDGEMENT TO ENSURE THE CONVERGENCE OF EXCHANGE KERNEL- nexdim >= nlproj
+C *                   - FIX THE BUG OF VNUC [ADD (-1)**LAM TO LEFT ATOM]
+C *
+C * MAY 10 2006 - RDS - READ VIBRATIONAL SPECTROSCOPIC CONSTANTS FROM OUTER FILE
+C *                   - DEFINED MULTI-DIMENSIONAL ARRAYS AS FIXED BOUNDARIES 
+C *                   - IF THEY MAY BE PASSED TO MAIN PROGRAM (DYNAMIC ALLOCATED 
+C *                   - ARRAYS ARE EASILY PASSED WRONG ADDRESSES.)
+C *
+C * MAY 02 1991 - WKT - THE CLOSED CHANNEL BUSINESS WORKS (BELIEVE IT OR NOT)
+C *
+C * APR 19 1991 - WKT - PRODUCES CORRECT VIBRATIONAL EXCITATION CROSS SECTIONS WITH EXACT EXCHANGE
+C *
+C * APR 12 1991 - WKT - WORKS FOR VIBRATIONAL EXCITATION FOR A LOCAL POTENTIAL
+C *
+C * Mar 26 1991 - WKT - THE R-MATRIX PROPAGATOR IS IN WORKING ORDER
+C *
+C * Mar 19 1991 - WKT - NON-LOCAL POTENTIAL WORKS TO 10 BOHR
+C *                   - NOW WE ARE INSTALLING TH R-MATRIX PROPAGATOR FOR THE ASYMPTOTIC REGION
+C *
+C * Mar 01 1991 - WKT - THE NON-LOCAL POTENTIAL IS IN THE WORKS HERE
+C *                   - THE NON-LOCAL EXCHANGE POTENTIAL NOW WORKS
+C *
 C * PROGRAM LAVIB
 C *
 C * This program uses the Direct iterative procedure in the
@@ -26,73 +62,15 @@ C *      to produce an accurate solution.
 C *
 C *   2) The LA max bound is at the exchange bound
 C *
-C * V1.0: Wayne Trail (OU) 
-C *       1) the Non-Local potential is in the works here.
-C *       2) the non-local exchange potential now works.
-C *
-C * V2.0: Wayne Trail (OU), Mar. 19, 1991
-C *       1) Non-local potential works to 10 bohr
-C *       2) now we are installing th r-matrix propagator for the 
-C *          asymptotic region
-C *
-C * V2.1: Wayne Trail (OU), Mar. 26, 1991
-C *       1) the r-matrix propagator is in working order.
-C *
-C * V2.2: Wayne Trail (OU), Apr. 12, 1991
-C *       1) works for vibrational excitation for a local potential.  
-C *
-C * V2.3: Wayne Trail (OU), Apr. 19, 1991
-C *       1) produces correct vibrational excitation cross sections 
-C *          with exact exchange.
-C *
-C * V2.4: Wayne Trail (OU), May. 2, 1991
-C *       1) the closed channel business works (believe it or not)
-C *
-C * V3.0: Hao Feng (SCU), May. 10, 2006
-C *       1) read vibrational spectroscopic constants from outer file
-C *       2) defined multi-dimensional arrays as fixed boundaries if 
-C *          they may be passed to main program (dynamic allocated arrays
-C *          are easily passed wrong addresses.)
-C *
-C * V3.1: Hao Feng (SCU), May 27, 2006
-C *       1) rewrite clebexch and kerncalc to cope with e-N2
-C *       2) add a judgement to ensure the convergence of exchange kernel
-C *                nexdim >= nlproj
-C *       3) fix the bug of vnuc [add (-1)**lam to left atom]
-C *
-C * V3.2: Hao Feng (SCU), Jun. 6, 2006
-C *       1) fix the bug of defining nexdim (in subroutine of indata)
-C *
-C * V4.0: Hao Feng (SCU), Jun. 13, 2006
-C *       modified all subroutines of LA cal. with new integral formula
-C *       (Gauss-Legendre or trapezoidal points)
-C *        trapezoidal integral is similar with the original code;
-C *        Gauss integral costs much less time than the original one
-C *                             **** **** ****
-C *        1) so lavib could be used to cal. e-N2 vib. scattering with 
-C *           exact exchange on PC machine ( > 15 vib. + 11 partial waves)
-C *        2) and G-L integral uses less nodes so 32 bit machine could work
-C *           (trapezoidal integral needs 240 points so for vib. scat. only
-C *            64 bit machine could cope with the arrays of psifin/xhifin)
-C *
-C * V4.1: Hao Feng (SCU), Jun. 22, 2006
-C *       modify lavib.f so that 
-C *       1) input potential, exchange and LA mesh could be different. 
-C *       2) trapezoidal integrals give the same results as the original code
-C *
-C * V4.2: Hao Feng (SCU), Jun. 24, 2006
-C *       1) add subroutine gauleg to generate gauss-legendre abscissas and
-C *          weights with any dimension
-C *
 C *-/
 
       program lavib
       implicit none
 
-      integer chanmax,itermax,nrgmax,lammax,symmax
+      integer chanmax,itermax,nrgmax,lammax
       integer enermax,setmax,boundmax,vibmax,pwavemax
       integer nlmomax,exlmmax
-      parameter(chanmax=165,itermax=10,nrgmax=100,enermax=120,symmax=4,
+      parameter(chanmax=165,itermax=10,nrgmax=100,enermax=120,
      $     lammax=21,setmax=1,boundmax=6,vibmax=15,pwavemax=11,nlmomax
      $     =16,exlmmax=60)
       integer potptsmax,ptsmax
@@ -192,18 +170,18 @@ C * V: the interaction potential
 C * KMAT: the K-Matrix
       double precision kmat(chanmax,chanmax)
       double precision kmattemp(chanmax,chanmax)
-      double precision eigshft(chanmax),eigsum(symmax)
+      double precision eigshft(chanmax), eigsum
       double precision eigvec(chanmax,chanmax)
 
 C * TMATI, TMATR: the real and imag parts of the T-Matrix
-      double precision tmati(chanmax,chanmax),tmatr(chanmax,chanmax)
+      double precision tmati(chanmax,chanmax), tmatr(chanmax,chanmax)
 
 C *   CROSS: contains the cross sections temporarily having the
 C *          same dimension as the T-Matrix
 C * CROSSLA: has the cross sections calculated at the end of the LA region
 C *   KW(i): the wavenumber of the ith channel
-      double precision cross(enermax,symmax+1,vibmax),kw(chanmax)
-      double precision crossla(enermax,symmax+1,vibmax)
+      double precision cross(enermax,vibmax), kw(chanmax)
+      double precision crossla(enermax,vibmax)
 
 C * ASYMPSI(n,n): the wavefunction matrix at the end of the Linear 
 C *               Algebraic region
@@ -213,10 +191,7 @@ C *      ASYMPSI: truncated and put into RMAT when the R-Matrix option is on
       double precision rmat(chanmax,chanmax)
       integer i,j,k,numv,iex
 
-C * NSYM: the number of symmetries considered
-C * ISYM: an index used for counting symmetries
-      integer nsym,isym
-      integer l0(symmax),lmax(symmax),symlam(symmax)
+      integer l0,lmax,symlam
 
 C * VLAM: contains the Legendre projections of the local potential
       double precision vlam(lammax,vibmax,vibmax,potptsmax)
@@ -282,19 +257,17 @@ C *          in from a formatted file (unstead of the unformatted file)
 C *   INFIL: The name of the input file (as usual) 
 C * RCLOSURE = 1: if we are doing Born r-closure
       integer chin(chanmax,2),nvib,nvibin,nofr,npw,npwin
-      integer nvibsym(symmax)
+      integer nvibsym
       character*8 infil
       integer irr,ind,rclosure
 
 C * the exchange stuff
 C *
-C * KERNLFIL: an array of the names of the files containing the kernel
-C *           (the '.ker' will be appended internally here) for all
-C *           symmetries
-C *  NAMELEN: an array containing the length in characters of the above
+C * KERNLFIL: names of the files containing the kernel (the '.ker' will be appended internally here) 
+C *  NAMELEN: containing the length in characters of the above
 C *           filenames.  NAMELEN is calculated in the routine INDATA
-      character*8 kernlfil(symmax)
-      integer namelen(symmax)
+      character*8 kernlfil
+      integer namelen
 
 C * EXUNIT: the unit associated with the exchang kernel. I set it to 55
 C *  NCHEX: the number of partial wave l's in the sphercal projections
@@ -303,7 +276,7 @@ C * NEXDIM: this is the number of partial waves used in the CREATION of
 C *         the Exchange kernel.  It is important to get this number 
 C *         right so that the unformatted reads of the exchange kernel
 C *         work out ok.
-      integer exunit,nchex(symmax),nexdim(symmax)
+      integer exunit,nchex,nexdim
 
 C *    NVIBX: the number of vib levels in the exchange kernel that are 
 C *           retained in this calculation
@@ -311,8 +284,8 @@ C *   NPWAVX: the number of partial wave channels in the exchange kernel
 C *           that are retained in the calculation
 C *  NVIBXIN: the number of vibrational levels in the input potential
 C * NPWAVXIN: the number of partial wave channels in the input potential
-      integer nvibx(symmax),npwavx(symmax)
-      integer nvibxin(symmax),npwavxin(symmax)
+      integer nvibx,npwavx
+      integer nvibxin,npwavxin
 
 C * SPHRJ(): the spherical projections of the molecular orbitals of the
 C *          target.
@@ -371,7 +344,7 @@ C * set up the factorial table
 
 C * start the main program
 
-      call indata(nbset,numiter,nsym,l0,lmax,symlam,nlamdain,numener
+      call indata(nbset,numiter,l0,lmax,symlam,nlamdain,numener
      $     ,energy,iex,choice,ipot,nreg,nstep,step,nregex,nstepex,stepex
      $     ,nregpot,nsteppot,steppot,npts,nptsex,nptspot,nbound,nlproj
      $     ,mlproj,l0proj,irmat,rmax,rmatstep,rasym,alpha0,alpha2,q
@@ -403,122 +376,112 @@ C * channels (unless we set up variables for exchange channels)(!)
       do iener = 1,numener
          exunit = 55
          write(0,'(a,i2,a,i2,a,f6.3,a)') "   Now cal. No.",iener," of ",
-     $        numener,"; Energy = ",energy(iener)*27.2116d0, " eV"
-         do isym = 1,nsym
-            npw = (lmax(isym)-l0(isym))/2+1
-            nvib = nvibsym(isym)
-            nvtrunc = nvtrunci
-            npwin = npw
-            nch = nvib*npw
-            write(6,*) " nch = ", nch
-            nchsr = nch
+     $        numener,"; Energy = ", energy(iener)*27.2116d0, " eV"
+
+         npw = (lmax-l0)/2 + 1
+         nvib = nvibsym
+         nvtrunc = nvtrunci
+         npwin = npw
+         nch = nvib*npw
+         write(6,*) " nch = ", nch
+         nchsr = nch
 
 C * set up the channel indexing matrix
-            write(6,*)
-            write(6,*)' The channel indexing is as follows'
-            call chindex(chin,npw,nch)
-            write(6,*)
+         write(6,*)
+         write(6,*)' The channel indexing is as follows'
+         call chindex(chin,npw,nch)
+         write(6,*)
 
 C * Exchange stuff
 C * if IEX=2 then we already have the exchange kernel
 C * and just need to read it out of FORT.55 
-            if (iex.eq.2) then
+         if (iex.eq.2) then
 C * Open as unit EXUNIT the file containing the appropriate exchange
 C * kernel.  Notice that since iex=2 the file is opened as 'old'
-C              open(unit=exunit,status='old',file
-C    $              =kernlfil(isym)(1:namelen(isym))//'.ker',form
-C    $              ='unformatted')
-               open(unit=exunit,status='old',file
-     $              =kernlfil(isym)(1:namelen(isym)),form
-     $              ='unformatted')
+            open(unit=exunit,status='old',file =kernlfil(1:namelen),form
+     $           ='unformatted')
 
 C * Otherwise we have to calculate the exchange kernel
-            else if (iex.eq.1) then
+         else if (iex.eq.1) then
 C * Judge if the number of partial waves is enough
-               call judgenpwav(nsym,nbound,nlproj,nexdim)
+            call judgenpwav(nbound,nlproj,nexdim)
 
 C * Open as unit EXUNIT the file containing the appropriate exchange
 C * kernel.  Notice that since iex=1 the file is opened as 'new'
-               open(unit=exunit,status='new',file
-C    $              =kernlfil(isym)(1:namelen(isym))//'.ker',form
-     $              =kernlfil(isym)(1:namelen(isym)),form
-     $              ='unformatted')
+            open(unit=exunit,status='new',file =kernlfil(1:namelen),form
+     $           ='unformatted')
 
 C * If we are just beginning, then read in the spherical projections
 C * Of course, they only need be read in once for all syms and eners
-               if (iener.eq.1.and.isym.eq.1)then
-                  call sphjread(sphrj,nlproj,nbound,nptspot,nptsex,rgs
-     $                 ,nexdim)
-               endif
+            if (iener .eq. 1) then
+               call sphjread(sphrj,nlproj,nbound,nptspot,nptsex,rgs
+     $              ,nexdim)
+            endif
 
-               call clebexch(clebx1,clebx2,clebx3,clebx4,clebx5
-     $              ,symlam(isym),l0(isym),nlproj,mlproj,l0proj,nbound
-     $              ,nexdim(isym))
+            call clebexch(clebx1,clebx2,clebx3,clebx4,clebx5,symlam,l0
+     $           ,nlproj,mlproj,l0proj,nbound ,nexdim)
 
 C * Calculate the exchange Kernel for this symmetry
 C * of course, you should only do this once for all energies
-               call kerncalc(sphrj,xhi,clebx1,clebx2,clebx3,clebx4
-     $              ,clebx5,nlproj,l0proj,exunit,l0(isym),nexdim(isym)
-     $              ,nbound,rgs,nptsex)
+            call kerncalc(sphrj,xhi,clebx1,clebx2,clebx3,clebx4 ,clebx5
+     $           ,nlproj,l0proj,exunit,l0,nexdim ,nbound,rgs,nptsex)
 
 C * Once we have calculated the exchange kernels for each symmetry then
 C * we don't need to do it anymore (since they are energy independent)
-               if(isym.eq.nsym) iex = 2
-            endif
+            iex = 2
+         endif
 
 C * the subroutine fmatrix calculates the angular coupling
 C * coefficients for the local potential.. (Clebsch Gordons)
-            call fmatrix(fmat,chin,l0(isym),nlamdain,symlam(isym),npw
-     $           ,nch)
+         call fmatrix(fmat,chin,l0,nlamdain,symlam,npw ,nch)
 
-            do ibset = 1,nbset
-               niter = numiter(ibset)
-               write(6,*) 'Energy =  ',energy(iener)
-               write(6,*) 'Number of Iterations: ',numiter(ibset)
+         do ibset = 1,nbset
+            niter = numiter(ibset)
+            write(6,*) 'Energy =  ',energy(iener)
+            write(6,*) 'Number of Iterations: ',numiter(ibset)
 
 C * kw(nch) is the energy of the particular channel
 C * this routine sets up the channel energies
-               call chener(energy(iener),kw,chin,nvib,nch,nvopen,iswit
-     $              ,we,wexe)
+            call chener(energy(iener),kw,chin,nvib,nch,nvopen,iswit,we
+     $           ,wexe)
 
-               write(6,*)'there are',nvopen,' open channels'
-               write(6,*)
-               write(6,*)' The channel energies are as follows'
-               do i = 1,nch
-                  if (chin(i,1).le.nvopen)then
-                     write(6,*)i,kw(i),13.6058*kw(i)*kw(i)
-                  else
-                     write(6,*)i,kw(i),-13.6058*kw(i)*kw(i)
-                  endif
-               end do
+            write(6,*)'there are',nvopen,' open channels'
+            write(6,*)
+            write(6,*)' The channel energies are as follows'
+            do i = 1,nch
+               if (chin(i,1).le.nvopen)then
+                  write(6,*)i,kw(i),13.6058*kw(i)*kw(i)
+               else
+                  write(6,*)i,kw(i),-13.6058*kw(i)*kw(i)
+               endif
+            end do
 
 C * we now set up the greens function arrays from the routine bessel
-               call bessl(irmat,g1,g2,b,kw,l0(isym),rgs,chin,nch,npts
-     $              ,nvopen)
+            call bessl(irmat,g1,g2,b,kw,l0,rgs,chin,nch,npts ,nvopen)
 
 C * call pot to fill the v matrix for all channels at all mesh points
-               call pot(v,fmat,vlam,chin,nlamdain,nlamloc,nvibin,nch
-     $              ,nptspot,npts,rpot,rgs,npw)
+            call pot(v,fmat,vlam,chin,nlamdain,nlamloc,nvibin,nch
+     $           ,nptspot,npts,rpot,rgs,npw)
 
 C * now we submit the first guess to the solution... it will be 
 C * unnormalized and we will call it xhi^0
-               call frstgues(g1,xhi,choice,nch,npts)
+            call frstgues(g1,xhi,choice,nch,npts)
 
 C * now we start the crunch part of the code.  once we have the trial
 C * initial function above, we generate the rest of the through the`
 C * direct iterative variational procedure.  this is a short cut
 C * (at least in the memory sense) to the linear algebraic matrices.
-               do numv = 1,niter
+            do numv = 1,niter
 
 C * First we rewind the file containing the exchange kernel
 C * so that we can get the exchange potential
 C * at every iteration
-                  rewind(exunit)
+               rewind(exunit)
 
 C * then we gram-schmidt orthonormalize these vectors with the already
 C * orthonormal set currently in psi and we add them to psi
-                  call gramschm(xhi,xhifin,psifin,psi,numv,step,nstep
-     $                 ,nreg,nch,npts,wtt,niter,ity)
+               call gramschm(xhi,xhifin,psifin,psi,numv,step,nstep ,nreg
+     $              ,nch,npts,wtt,niter,ity)
 
 C * first we calculate the q1 and q2 matrices from collins and schneider 
 C * cpc paper
@@ -526,95 +489,92 @@ C * cpc paper
 C * if iex=1 then we call the exchange version and we pass XHI for it to
 C * use as a dummy variable for storing the exchange kernel
 C * also, we send ibn the array i1 to be used as a dummy array
-                  if (iex .ne. 0) then
-                     call qget3x(q1,q2,g1,g2,v,xhi,i1,exunit,psi,kpsi,
-     $                    nstep,step,nreg,nregex,nptsex,nch,npts
-     $                    ,nchex(isym),nexdim(isym),nvib,nvibx(isym)
-     $                    ,nvibxin(isym),npw,npwavx(isym)
-     $                    ,npwavxin(isym),wtt,ity)
-                  else
-                     call qget3(q1,q2,g1,g2,v,psi,nstep,step,nreg,nch
-     $                    ,npts,wtt,ity)
-                  endif
-
+               if (iex .ne. 0) then
+                  call qget3x(q1,q2,g1,g2,v,xhi,i1,exunit,psi,kpsi,
+     $                 nstep,step,nreg,nregex,nptsex,nch,npts,nchex
+     $                 ,nexdim,nvib,nvibx ,nvibxin,npw,npwavx,npwavxin
+     $                 ,wtt,ity)
+               else
+                  call qget3(q1,q2,g1,g2,v,psi,nstep,step,nreg,nch,npts
+     $                 ,wtt,ity)
+               endif
+                  
 C * then from the q matrices we get the i matrices
-                  call imats(i1,i2,q1,q2,nch,npts)
+               call imats(i1,i2,q1,q2,nch,npts)
 
 C * then from the i matrices and the greens functions we get 
 C * the new wavefunction basis set iterates (xhi^1)
-                  call newxhi(xhi,g1,g2,i1,i2,nch,npts,chin)
-               end do
+               call newxhi(xhi,g1,g2,i1,i2,nch,npts,chin)
+            end do
 
 C * now we have a set of vectors to span the space of the solution
 C * to the linear algebraic equations
 C * so we now calculate the projection coefficients of the solution
 C * on the orthonormal basis we created.
-               call expcoefs(psifin,xhifin,acoefs,b,step,nstep,nreg,nch
-     $              ,npts,niter,wtt,ity)
+            call expcoefs(psifin,xhifin,acoefs,b,step,nstep,nreg,nch
+     $           ,npts,niter,wtt,ity)
 
 C * this routine calculates the final solution from the basis
 C * of orthonormal functions stored in psifin... the solution
 C * gets stored in psi
-               call psifinal(psifin,psi,acoefs,asympsi,nch,npts,niter)
+            call psifinal(psifin,psi,acoefs,asympsi,nch,npts,niter)
 
-               k = 6
-               if(niter.lt.k) k = niter
+            k = 6
+            if(niter.lt.k) k = niter
 
 C * get the K-matrix
 C * if we plan to propagate the r-matrix into the Asymptotic
 C * region then that is done here before K-matrix extraction
-               if (irmat.eq.1) then
-                  write(6,*)
-                  write(6,*)
-                  write(6,*)' The K-matrix before R-Mat prop:'
-                  write(20,*)
-                  write(20,*)' The K-matrix before R-Mat prop:'
-                  call rkmat(kmat,kw,rmax,l0(isym),asympsi,chin,nch)
-                  write(20,*)
-                  write(20,*)'R-Matrix before truncation'
-                  do i = 1,nch
-                     write(20,504)(asympsi(i,j),j = 1,nch)
-                  end do
-                  write(20,*)
+            if (irmat.eq.1) then
+               write(6,*)
+               write(6,*)
+               write(6,*)' The K-matrix before R-Mat prop:'
+               write(20,*)
+               write(20,*)' The K-matrix before R-Mat prop:'
+               call rkmat(kmat,kw,rmax,l0,asympsi,chin,nch)
+               write(20,*)
+               write(20,*)'R-Matrix before truncation'
+               do i = 1,nch
+                  write(20,504)(asympsi(i,j),j = 1,nch)
+               end do
+               write(20,*)
 
 C * -----------------------------------------------------------------
 C * This little section of code truncates the R-Matrix before
 C * propagation into the asymptotic region
-                  write(6,*)'number of open channels',nvopen
-                  if (nvtrunc.gt.nvopen) nvtrunc = nvopen
-                  nchtrunc = nvtrunc*nltrunc
-                  call rtrunc(asympsi,nvtrunc,nltrunc,nchtrunc,rmat
-     $                 ,chin,nch)
-                  nch = nchtrunc
-                  nvib = nvtrunc
-                  npw = nltrunc
-                  call chindex(chin,nltrunc,nch)
-                  call chener(energy(iener),kw,chin,nvib,nch,nvopen
-     $                 ,iswit,we,wexe)
+               write(6,*)'number of open channels',nvopen
+               if (nvtrunc.gt.nvopen) nvtrunc = nvopen
+               nchtrunc = nvtrunc*nltrunc
+               call rtrunc(asympsi,nvtrunc,nltrunc,nchtrunc,rmat,chin
+     $              ,nch)
+               nch = nchtrunc
+               nvib = nvtrunc
+               npw = nltrunc
+               call chindex(chin,nltrunc,nch)
+               call chener(energy(iener),kw,chin,nvib,nch,nvopen,iswit
+     $              ,we,wexe)
 C * ----------------------------------------------------------------
 
-                  write(20,*)'the energies'
-                  write(20,504)(kw(i)*kw(i)*2.d0*13.6058d0,i=1,nch)
-                  write(20,*)
-                  write(20,*)'after truncation'
-                  call rkmat(kmat,kw,rmax,l0(isym),rmat,chin,nch)
+               write(20,*)'the energies'
+               write(20,504)(kw(i)*kw(i)*2.d0*13.6058d0,i=1,nch)
+               write(20,*)
+               write(20,*)'after truncation'
+               call rkmat(kmat,kw,rmax,l0,rmat,chin,nch)
 
 C * Here we are going to get the T-Matrix and the Cross Sections
 C * at the end of the LA region.
 
 C * calculate the t matrix from the k matrix
-                  call tmatrix(kmat,tmati,tmatr,kmattemp,nch)
+               call tmatrix(kmat,tmati,tmatr,kmattemp,nch)
 
 C * calculate the cross sections from the t matrix
-                  call crossec(tmati,tmatr,kw,crossla,symlam(isym),nvib
-     $                 ,npw,nch,numener,nsym,iener,isym)
-                  write(20,*)
-                  write(6,*)
-                  write(6,*)
-     $                 'Now carry out the Propagation of the R-Mat'
-                  write(20,*)
-     $                 'Now carry out the Propagation of the R-Mat'
-                  write(6,*)
+               call crossec(tmati,tmatr,kw,crossla,symlam,nvib,npw,nch
+     $              ,numener,iener)
+               write(20,*)
+               write(6,*)
+               write(6,*) 'Now carry out the Propagation of the R-Mat'
+               write(20,*)'Now carry out the Propagation of the R-Mat'
+               write(6,*)
 
 C * Call the R-Matrix propagator for the 
 C * asymptotic propagation
@@ -623,54 +583,50 @@ C * 7-30-04 A. Feldt fix - change to pass vibmax instead of nvibin so
 C *         that further usage gets the appropriate long range elements
 C *         This fixes the dimensioning error that had obtained if
 C *         nvibin < vibmax
-                  call rprop(rmat,rmax,rasym,rmatstep,kw,l0(isym),
-     $                 alpha0,alpha2,q,fmat,nlamdain,nlams,chin,vibmax
-     $                 ,nch,npwin)
+               call rprop(rmat,rmax,rasym,rmatstep,kw,l0,alpha0,alpha2
+     $              ,q,fmat,nlamdain,nlams,chin,vibmax ,nch,npwin)
 
 C * convert the r-matrix to the K-matrix
-                  call rkmat(kmat,kw,rasym,l0(isym),rmat,chin,nch)
-                  rend = rasym
-               else
+               call rkmat(kmat,kw,rasym,l0,rmat,chin,nch)
+               rend = rasym
+            else
 
 C * else calculate the K-matrix directly from the linear Algebraic
 C * solution wavefunction
-                  call kmatrix(asympsi,kmat,kw,g1,g2,nch,npts)
-                  rend = rmax
-               endif
+               call kmatrix(asympsi,kmat,kw,g1,g2,nch,npts)
+               rend = rmax
+            endif
 
 C * now perform Born r-closure, if we so choose - added by A. Feldt
 C * 8-11-04 (this required adding the variable 'rend' and setting
 C * it appropriately above, too).  The choice of doing r-closure is
 C * made by a variable in the very first line of input to the code.
-               if (rclosure .eq. 1) then
-                  call addbornk(kmat,kw,rend,l0(isym),chin,nch,alpha0
-     $                 ,alpha2,q,vibmax,fmat,npwin,nlamdain)
-               endif
+            if (rclosure .eq. 1) then
+               call addbornk(kmat,kw,rend,l0,chin,nch,alpha0,alpha2,q
+     $              ,vibmax,fmat,npwin,nlamdain)
+            endif
 
 C * calculate the eigenphase sums
-               call eigfas(kmat,kmattemp,eigshft,eigsum(isym),eigvec
-     $              ,nch)
+            call eigfas(kmat,kmattemp,eigshft,eigsum,eigvec,nch)
 
 C * calculate the t matrix from the k matrix
-               call tmatrix(kmat,tmati,tmatr,kmattemp,nch)
+            call tmatrix(kmat,tmati,tmatr,kmattemp,nch)
 
 C * calculate the cross sections from the t matrix
-               call crossec(tmati,tmatr,kw,cross,symlam(isym),nvib,npw
-     $              ,nch,numener,nsym,iener,isym)
+            call crossec(tmati,tmatr,kw,cross,symlam,nvib,npw,nch
+     $           ,numener,iener)
 
 C * the routine OUTDATA takes care of most of the output
 C * -- an effort to localize the write statements
 C * -- probably a failure
-               call outdata(kmat,tmati,tmatr,cross,crossla, kw,asympsi
-     $              ,eigshft,eigvec, v,energy(iener),step,nstep,nreg,
-     $              nch,nchsr,npts,l0(isym),symlam(isym), nvib,npw,iener
-     $              ,isym,numener,nsym)
-            end do
+            call outdata(kmat,tmati,tmatr,cross,crossla,kw,asympsi
+     $           ,eigshft,eigvec,v,energy(iener),step,nstep,nreg,nch
+     $           ,nchsr,npts,l0,symlam,nvib,npw,iener,numener)
+         end do
 
 C * We are now done with this symmetry so close the kernel file and we 
 C * can go on to the next one
-            close(exunit)
-         end do
+         close(exunit)
       end do
 
 C * print wavefunction
@@ -688,9 +644,9 @@ C * print wavefunction
 C * here we want to create some tables from the results of all the runs
 C * this will eventually be turned into a separate routine
       write(50,*)'Cross Sections at the LA/R-Mat Boundary'
-      call crossprt(crossla,energy,numener,nsym,nvib,50)
+      call crossprt(crossla,energy,numener,nvib,50)
       write(51,*)'Cross Sections at the asymptotic boundary'
-      call crossprt(cross,energy,numener,nsym,nvib,51)
+      call crossprt(cross,energy,numener,nvib,51)
 
  504  format(6(1pe12.4))
       stop
@@ -700,7 +656,7 @@ C *-
 C * this subroutine prints the output
       subroutine outdata(kmat,tmati,tmatr,cross,crossla,k,asympsi
      $     ,eigshft,eigvec,v,energy,step,nstep,nreg,nch,nchsr,npts,l0
-     $     ,symlam,nvib,npw,iener,isym,numener,nsym)
+     $     ,symlam,nvib,npw,iener,numener)
 
       integer npts,nch,nreg,nchsr
       integer l0,symlam,npw,nvib
@@ -708,19 +664,11 @@ CARR
       integer chanmax,enermax,symmax,vibmax,nrgmax,potptsmax
       parameter(chanmax=165,enermax=120,symmax=4,vibmax=15,nrgmax=100
      $     ,potptsmax=330)
-c$$$      double precision eigshft(nch),eigvec(nch,nch)
-c$$$      double precision kmat(nch,nch),tmati(nch,nch),tmatr(nch,nch)
-c$$$      double precision cross(numener,nsym+1,nvib)
-c$$$      double precision crossla(numener,nsym+1,nvib)
-c$$$      double precision k(nch),energy
-c$$$      double precision step(nreg)
-c$$$      integer nstep(nreg)
-c$$$      double precision asympsi(nch,nch),v(nchsr,nchsr,npts)
       double precision eigshft(chanmax),eigvec(chanmax,chanmax)
       double precision kmat(chanmax,chanmax),tmati(chanmax,chanmax)
      $     ,tmatr(chanmax,chanmax)
-      double precision cross(enermax,symmax+1,vibmax)
-      double precision crossla(enermax,symmax+1,vibmax)
+      double precision cross(enermax,vibmax)
+      double precision crossla(enermax,vibmax)
       double precision k(chanmax),energy
       double precision step(nrgmax)
       integer nstep(nrgmax)
@@ -784,12 +732,12 @@ C501  format(4d24.16)
       end do
       write(6,*)
       write(6,*) ' the cross section is at the LA boundary is :'
-      write(6,511)energy*htoev,(crossla(iener,isym,j),j=1,nvib)
+      write(6,511) energy*htoev, (crossla(iener,j),j=1,nvib)
       write(6,*)
       write(6,*) ' the cross section at the asymptotic region is :'
-      write(6,511)energy*htoev,(cross(iener,isym,j),j=1,nvib)
+      write(6,511) energy*htoev, (cross(iener,j),j=1,nvib)
       write(19,*) ' the cross section is:'
-      write(19,511)energy*htoev,(cross(iener,isym,j),j=1,nvib)
+      write(19,511) energy*htoev, (cross(iener,j),j=1,nvib)
  500  format(8(1pe10.2))
       write(6,*)
       write(20,*) ' the K-Matrix is:'
@@ -805,7 +753,7 @@ C501  format(4d24.16)
 
 C *-
 C * This is the routine that reads in the Unit 5 crap
-      Subroutine indata(nbset,numiter,nsym,l0,lmax,symlam,nlamdain,
+      Subroutine indata(nbset,numiter,l0,lmax,symlam,nlamdain,
      $     numener,energy,iex,choice,ipot,nreg,nstep,step,nregex,nstepex
      $     ,stepex,nregpot,nsteppot,steppot,npts,nptsex,nptspot,nbound
      $     ,nlproj ,mlproj,l0proj,irmat,rmax,rmatstep,rasym,alpha0
@@ -827,9 +775,9 @@ C * This is the routine that reads in the Unit 5 crap
 
       integer nreg,nregex,nregpot,nptspot,nptsex,npts
       integer nvibin,nofr
-      integer nvibxin(symmax),npwavxin(symmax)
-      integer npwavx(symmax),nvibx(symmax)
-      integer nvibsym(symmax)
+      integer nvibxin,npwavxin
+      integer npwavx,nvibx
+      integer nvibsym
       character*8 infil
       double precision rmax
       double precision rmatstep,rasym
@@ -851,8 +799,8 @@ C * NLAMS number of lambdas in the long range region
 C *      IRR = 1 ==> RR or VIBAV calculation
 C * RCLOSURE = 1 ==> do Born r-closure
       integer irr,rclosure
-      integer nbset,numiter(setmax),nsym
-      integer l0(symmax),lmax(symmax),symlam(symmax)
+      integer nbset,numiter(setmax)
+      integer l0,lmax,symlam
 
 C * EUNITS -- Units for the input energies
 C *        = 0 ==> Hartree
@@ -864,13 +812,13 @@ C *        = 1 ==> eV
 C * Exchange stuff
 C * NEXDIM: the number of partial waves used in the CREATION
 C *         of the exchange kernel
-      integer nbound,nchex(symmax),nexdim(symmax)
+      integer nbound,nchex,nexdim
       integer nlproj(boundmax),mlproj(boundmax),l0proj(boundmax)
 
 C * KERNLFIL: an array containing the names of the kernel files
 C *  NAMELEN: an array containing the lengths of the above filenames
-      character*8 kernlfil(symmax)
-      integer namelen(symmax)
+      character*8 kernlfil
+      integer namelen
       integer nstep(nrgmax),nstepex(nrgmax),nsteppot(nrgmax)
       integer i,j,ind
 
@@ -966,14 +914,11 @@ C        write(6,*) ' is: ', infil(1:ind-1)//'.vib'
       write(6,*) 'The number of iterations in each trial:'
       write(6,*) (numiter(i),i=1,nbset)
       write(6,*)
-      read(5,*) nsym
-      write(6,*) 'The number of symmetries considered is:',nsym
-      write(6,*)
       write(6,*) 'l0, lmax, symlam, vib chans:'
-      do i = 1,nsym
-         read(5,*) l0(i),lmax(i),symlam(i),nvibsym(i)
-         write(6,*) l0(i),lmax(i),symlam(i),nvibsym(i)
-      end do
+
+      read(5,*)  l0,lmax,symlam,nvibsym
+      write(6,*) l0,lmax,symlam,nvibsym
+
       write(6,*)
       read(5,*) nlamdain,nlamloc
       write(6,*)'Number of Lamdas in input potential file:',nlamdain
@@ -1000,52 +945,49 @@ C * the exchange part... iex turns non-local exchange on
 
 C * exchange stuff
       write(6,*)
-      read(5,*)nbound
-      write(6,*)'Number of bound target MOs = ',nbound
-      read(5,*)(npwavxin(i),i=1,nsym)
-      read(5,*)(nvibxin(i),i=1,nsym)
+      read(5,*) nbound
+      write(6,*)'Number of bound target MOs = ', nbound
+      read(5,*) npwavxin
+      read(5,*) nvibxin
       write(6,*)
       write(6,*)'Total number of vib chans in input Exch Kernel file:'
-      write(6,*)(nvibxin(i),i=1,nsym)
+      write(6,*) nvibxin
       write(6,*)
       write(6,*)'Total number of Prtl Waves in input Exch Kernel file:'
-      write(6,*)(npwavxin(i),i=1,nsym)
+      write(6,*) npwavxin
       write(6,*)
-      read(5,*)(npwavx(i),i=1,nsym)
-      read(5,*)(nvibx(i),i=1,nsym)
+      read(5,*) npwavx
+      read(5,*) nvibx
       write(6,*)'Number of vib chans in Exch Kernel:'
       write(6,*)' for this calculation'
-      write(6,*)(nvibx(i),i=1,nsym)
+      write(6,*) nvibx
       write(6,*)
       write(6,*)'Number of Prtl Waves in Exch Kernel:'
       write(6,*)' for this calculation'
-      write(6,*)(npwavx(i),i=1,nsym)
+      write(6,*) npwavx
       write(6,*)
 
 C * NCHEX: the number of exchange channels included in the scattering
 C *        calculation
-      do i = 1,nsym
-         nexdim(i) = nvibxin(i)*npwavxin(i)
-         nchex(i) = nvibx(i)*npwavx(i)
-      end do
+      nexdim = nvibxin * npwavxin
+      nchex  =   nvibx * npwavx
+
       write(6,500)
  500  format('   Orbital    nlproj    mlproj    l0proj')
  501  format(4i10)
-      do i = 1,nbound
-         read(5,*) nlproj(i),mlproj(i),l0proj(i)
-         write(6,501)i,nlproj(i),mlproj(i),l0proj(i)
+      do i = 1, nbound
+         read(5,*)      nlproj(i),mlproj(i),l0proj(i)
+         write(6,501) i,nlproj(i),mlproj(i),l0proj(i)
       end do
 
 C * now we read in the names of the files containing the exchange kernels
 C * clearly, one will be read in for each scattering symmetry (right?)
-      read(5,1500)(kernlfil(i),i=1,nsym)
+      read(5,1500) kernlfil
       write(6,*) 'The names of the input kernel files are:'
-      do i = 1,nsym
-         namelen(i) = index(kernlfil(i),' ')-1
-         if(namelen(i).eq.-1)namelen(i) = 8
-C        write(6,*)kernlfil(i)(1:namelen(i))//'.ker'
-         write(6,*)kernlfil(i)(1:namelen(i))
-      end do
+
+      namelen = index(kernlfil,' ')-1
+      if(namelen .eq. -1) namelen = 8
+      write(6,*) kernlfil(1:namelen)
 
 C * the following lines set up the interaction potential
 C * what kind of first guess?
@@ -1203,16 +1145,14 @@ C * the LA max bound is at the exchange bound
 C *-
 C * This is a subroutine to print out the cross sections in
 C * a neat table. (HAHAHAHAHAHAHAHAHAHHAHAHA)
-      subroutine crossprt(cross,energy,nener,nsym,nvib,ounit)
+      subroutine crossprt(cross,energy,nener,nvib,ounit)
       implicit none
-      integer nener,nsym,nvib
-CARR
-      integer enermax,symmax,vibmax
-      parameter(enermax=120,symmax=4,vibmax=15)
-      double precision cross(enermax,symmax+1,vibmax)
+      integer nener,nvib
+
+      integer enermax, vibmax
+      parameter(enermax=120, vibmax=15)
+      double precision cross(enermax, vibmax)
       double precision energy(enermax)
-c$$$      double precision cross(nener,nsym+1,nvib)
-c$$$      double precision energy(nener)
 
       integer ounit
       integer i,j,k
@@ -1221,20 +1161,12 @@ c$$$      double precision energy(nener)
 C * first get the sum of the symmetries for each vib exit channel
       htoev = 2.d0*13.6058d0
       do i = 1,nvib
-         do j = 1,nener
-            cross(j,nsym+1,i) = 0.d0
-            do k = 1,nsym
-               cross(j,nsym+1,i) = cross(j,nsym+1,i)+cross(j,k,i)
-            end do
-         end do
-      end do
-      do i = 1,nvib
          write(ounit,*)
          do j = 1,nener
-            write(ounit,500)htoev*energy(j),(cross(j,k,i),k=1,nsym)
+            write(ounit,500) htoev*energy(j), cross(j,i)
          end do
       end do
- 500  format(f7.3,5f13.8)
+ 500  format(f7.3, f13.8)
       return
       end
 
@@ -1242,38 +1174,35 @@ C *-
 C * This routine calculates the cross sections from the T-Matrices
 C * It currently gives for each channel
       subroutine crossec(tmati,tmatr,k,cross,symlam,nvib,npw,nch,nener
-     $     ,nsym,iener,isym)
+     $     ,iener)
 
       implicit none
       integer nch,symlam,nvib,npw
-      integer nener,nsym
-      integer iener,isym
+      integer nener, iener
 CARR
-      integer chanmax,enermax,symmax,vibmax
-      parameter(chanmax=165,enermax=120,symmax=4,vibmax=15)
-c$$$      double precision tmati(nch,nch),tmatr(nch,nch)
-c$$$      double precision k(nch),pi
-c$$$      double precision cross(nener,nsym+1,nvib)
+      integer chanmax,enermax,vibmax
+      parameter(chanmax=165,enermax=120,vibmax=15)
       double precision tmati(chanmax,chanmax),tmatr(chanmax,chanmax)
       double precision k(chanmax),pi
-      double precision cross(enermax,symmax+1,vibmax)
+      double precision cross(enermax,vibmax)
 
       integer i,j,l
 
       pi = 4.d0*datan(1.d0)
       do i = 1,nvib
-         cross(iener,isym,i) = 0.d0
          do j = 1,npw
             do l = 1,npw
-               cross(iener,isym,i) = cross(iener,isym,i)+(tmati(j,(i-1)
-     $              *npw+l)*tmati(j,(i-1)*npw+l)+tmatr(j,(i-1)*npw+l)
-     $              *tmatr(j,(i-1)*npw+l))
+               cross(iener,i) = cross(iener,i) +
+     $              (tmati(j,(i-1)*npw+l)*tmati(j,(i-1)*npw+l) +
+     $               tmatr(j,(i-1)*npw+l)*tmatr(j,(i-1)*npw+l))
             end do
          end do
-         if(symlam.ne.0) cross(iener,isym,i) = cross(iener,isym,i)*2.d0
-         cross(iener,isym,i) = pi*cross(iener,isym,i)/(k(1)*k(1))
+
+         if(symlam.ne.0) cross(iener,i) = cross(iener,i)*2.d0
+         cross(iener,i) = pi*cross(iener,i)/(k(1)*k(1))
          write(6,*)' in the routine Crossec'
-         write(6,*)cross(iener,isym,i)
+         write(6,*) cross(iener,i)
+
       end do
       return
       end
@@ -1647,9 +1576,6 @@ C * so that the eigenvalues are real.
 CARR
       integer chanmax
       parameter(chanmax=165)
-c$$$      double precision kmattemp(nch,nch)
-c$$$      double precision kmat(nch,nch),eigshft(nch)
-c$$$      double precision eigsum,eigvec(nch,nch)
       double precision kmattemp(chanmax,chanmax)
       double precision kmat(chanmax,chanmax),eigshft(chanmax)
       double precision eigsum,eigvec(chanmax,chanmax)
@@ -1666,7 +1592,7 @@ C     call jacobi(kmattemp,nch,nch,eigshft,eigvec,nrot)
       end do
       eigsum = 0.d0
       do i = 1,nch
-         eigsum = eigsum+eigshft(i)
+         eigsum = eigsum + eigshft(i)
       end do
       return
       end
@@ -4362,31 +4288,29 @@ C *-/
 C *-
 C * judge if the number of partial waves is enough
 
-      subroutine judgenpwav(nsym,nbound,nlproj,nexdim)
+      subroutine judgenpwav(nbound,nlproj,nexdim)
       implicit none
       
-      integer symmax,boundmax
-      parameter(symmax=4,boundmax=6)
-      integer nexdim(symmax),nlproj(boundmax)
+      integer boundmax
+      parameter (boundmax=6)
+      integer nexdim,nlproj(boundmax)
 
-      integer nsym,nbound,i,nlmax,isym,nexdimc,factor
+      integer nbound,i,nlmax,nexdimc,factor
 
       nlmax = 0
       do i = 1, nbound
          if(nlproj(i) .gt. nlmax) nlmax = nlproj(i)
       enddo
 
-      do isym = 1, nsym
-         if(nexdim(isym) .lt. nlmax) then
-            write (0,*)
-            write (0,*) 'nexdim is TOO SMALL and should be greater than'
-     $           ,nlmax
-            write (0,*) "   nexdim = npwavxin for cal. exchange kernel!"
-            write(0,*) 'or nlproj is TOO LARGE and should be less than'
-     $           ,nexdim(isym)
-            stop
-         endif
-      enddo
+      if(nexdim .lt. nlmax) then
+         write (0,*)
+         write (0,*) 'nexdim is TOO SMALL and should be greater than'
+     $        ,nlmax
+         write (0,*) "   nexdim = npwavxin for cal. exchange kernel!"
+         write(0,*) 'or nlproj is TOO LARGE and should be less than'
+     $        ,nexdim
+         stop
+      endif
 
       return
       end

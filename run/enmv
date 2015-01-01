@@ -14,21 +14,21 @@
 #--- options
 function handle_opt {
     while test "x$1" != "x"; do
-	case $1 in
-	    -t)     shift; tgt=$1      ;;
-	    -basis) shift; basis=$1    ;;
-	    -R)     shift; CRD=$1      ;;
-	    -ref)   shift; ref=$1      ;;
-	    *)                         ;;
-	esac
-	shift
+	    case $1 in
+	        -t)     shift; tgt=$1      ;;
+	        -basis) shift; basis=$1    ;;
+	        -R)     shift; CRD=$1      ;;
+	        -ref)   shift; ref=$1      ;;
+	        *)                         ;;
+	    esac
+	    shift
     done
-
+    
     if [ "$tgt" == ""    ]; then tgt=H2;     fi
     if [ "$basis" == ""  ]; then basis=CCD;  fi
     if [ "$CRD" == ""    ]; then CRD=1.400;  fi
     if [ "$ref" == ""    ]; then ref=HF;     fi
-
+    
 # - echo OPTIONS
     echo " The command is: "
     echo "     $0 -t $tgt -basis $basis -R $CRD -ref $ref"
@@ -50,11 +50,11 @@ function set_location {
 function cd_work {
     curr=`pwd`
     if [ -d $work ]; then
-	rm -f   $work/*
-	cd      $work
+	    rm -f   $work/*
+	    cd      $work
     else
-	echo "$work does NOT exit!"
-	exit
+	    echo "$work does NOT exit!"
+	    exit
     fi
 }
 
@@ -65,9 +65,9 @@ function make_inp {
     cp    $datain/${ref}_bnd.inp        $tgt.inp
 
     if [[ $basis == "M2" || $basis == "M2H" ]]; then
-	extfil=".TRUE."; ISPHER=-1
+	    extfil=".TRUE."; ISPHER=-1
     else
-	extfil=".FALSE."; ISPHER=1
+	    extfil=".FALSE."; ISPHER=1
     fi
 
     sed -e "s/CRD=[^[:space:]]*/CRD=$CRD/g"          \

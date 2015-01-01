@@ -73,15 +73,10 @@ function make_inp {
     ln -s $datain/dalam_R${CRD}.dat   dalam
 
 #---
-# nsym: the number of symmetries considered
-    nsym=1
-
-#---
 # nbound: the number of bound target orbitals
 # nexdim: the number of partial waves used in the CREATION of the 
 #         Exchange kernel.  It is important to get this number right
 #         so that the unformatted reads of the exchange kernel work out ok.
-# nexdim(i) i=1,nsym
     if [[ $tgt == H2 ]]; then
 	nbound=1;  
 	nexdim=5
@@ -197,8 +192,7 @@ function make_inp {
     fi
 
 #---
-    echo $nsym    > $input
-    echo $nbound >> $input
+    echo $nbound >  $input
     echo $npts   >> $input
 
     echo ${#rmesh[@]}  >> $input

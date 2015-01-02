@@ -1,16 +1,7 @@
-C *-
-C * PROGRAM WLUT
+C * MAY 25 2006 - RDS - AUGMENT THE DIMENSION OF LAM AND V TO COPE WITH E-N2
+C * JAN 01 1984 - AF  - READS IN THE POTENTIAL (VLAM) PRODUCED BY VLAM
 C *
-C * program reads in the potential (vlam) produced by vlam
-C * and reorders it so that the wlam program can use it
-C * i.e. produces output with lambda varying most rapidly
 C * file 10 is input  : file 11 output
-
-C * V1.0: A. FELDT (OU)
-C *
-C * V2.0: Hao Feng (SCU), May. 25, 2006
-C *       1) augment the dimension of LAM and V to cope with e-N2
-C *-/
 
       program wlut
       implicit none

@@ -1,5 +1,6 @@
-C * fix a bug of reading K matrix if the k-mat does NOT include the 
-C * input energy --- Hao Feng Jun. 19, 2006
+C * JUN 19 2006 - RDS - FIX A BUG OF READING K MATRIX IF THE K-MAT DOES NOT INCLUDE THE 
+C *                   - INPUT ENERGY
+C *
 
       subroutine lavibtmats(Einp,d,tre,tim,ldim,lmax,lsymmax,worst,k0,k
      $     ,alpha0,alpha2,q,lbext,noabc,tform,debug,nchs)

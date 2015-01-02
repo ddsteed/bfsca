@@ -1,10 +1,5 @@
-C *-
-C * PROGRAM SUMXSC
-C *
-C * Sum up the cross sections of different symmetries
+C * APR 05 2008 - RDS - SUM UP THE CROSS SECTIONS OF DIFFERENT SYMMETRIES
 C * 
-C * V1.0: Hao Feng (SCU), Apr. 05, 2008
-C *
 C *-/
       parameter (maxsym = 10, maxexi = 30)
       double precision xsc(maxexi,maxsym), energy

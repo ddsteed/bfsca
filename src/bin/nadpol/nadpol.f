@@ -1,13 +1,7 @@
-C *             NADPOL.f
+C * SEP 01 2006 - RDS - CALCULATE THE COORDINATES OF SCATTERED ELECTRON. (XIE,YIE,ZIE)
+C *                   - CALCULATE THE COEFFICIENTS OF LEGENDRE POLYNOMIAL OF POLARIZATION
+C *                   - POTENTIAL USING GAUSSIAN QUADRATURE.
 C *
-C *   Author: Hao Feng (RDS)
-C *           Sichuan University
-C *
-C *   1.) To calculate the coordinates of scattered electron. (xie,yie,zie)
-C *       
-C *   2.) To calculate the coefficients of Legendre polynomial of polarization
-C *       potential using Gaussian quadrature.
-
 C * v_lam = \int_0^{\pi} V(rsina,0,rcosa)*P_lam(cosa)*sina*da
 C * 
 

@@ -1,3 +1,5 @@
+C * JAN 01 2006 - RDS - COMPUTE POLARIZABILITIES AND POTENTIALS
+C *
 C * vxz_to_v02
 C *
 C * v0 = (vz + 2vx)/3

@@ -1,10 +1,9 @@
+C * SEP 01 2005 - AF  - CAL. DCS USING ABCVIB FORMALISM
 c
 c  This is a program to calculate the differential cross-section for
 c  a homonuclear system utilizing the abcvib formalism of Feldt
 c  and Morrison (extended from the elastic abc formalism of Isaacs
 c  and Morrison).
-c
-c  Written by A. Feldt, Fall of 2005
 c
       implicit none
 

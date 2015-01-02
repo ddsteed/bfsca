@@ -1,16 +1,9 @@
+C * AUG 20 2005 - RDS - GENERALIZE TO HETERONUCLEAR DIATOMIC MOLECULE AND INCLUDE DSG POTENTIAL
+C *
+C * JAN 01 1984 - WKT - ADD STATIC POTENTIAL AND POLARIZATION POTENTIAL
 C *-
 C * PROGRAM ADDPOTS
 C *
-C * Add static potential and polarization potential
-C * 
-C * V1.0: Wayne Trail and Tom Gibson (OU)
-C *
-C * V2.0: Hao Feng (SCU), Aug. 20, 2005
-C *       1) enlarge restart(i), rstep(i), rstop(i) to 
-C *          calculate DSG potentials
-C *       2) generalize to heteronuclear diatomic molecule
-C *       3) generalize to add polarization potential which includes 
-C *          over 2 lambda
 C *-/
       double precision stat,r,pol
       character title(80)

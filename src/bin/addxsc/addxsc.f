@@ -1,9 +1,7 @@
+C * APR 06 2008 - RDS - ADD INTEGRAL/MOMENTUM CROSS SECTIONS FROM 0-> 0 TO VMAX
 C *-
 C * PROGRAM ADDXSC
-C *
-C * Add integral/momentum cross sections from 0-> 0 to vmax
 C * 
-C * V1.0: Hao Feng (SCU), Apr. 06, 2008
 C *-/
       double precision energy, xsc, msc, txsc, mxsc
       integer i, j, numv, nume, ifile, tfile, mfile

@@ -1,15 +1,7 @@
-C     *-
-C     * PROGRAM VLAM 
-C     *
-C     * Program to compute legendre coefficients of static potential
-C     * for electron collisions with linear diatomic and triatomic molecules
-C     * from legendre expansion coefficients of the target charge density
-C     * in a single centre representation
-C     *
-C     * V1.0: L. A. COLLINS (LASL), D. W. NORCROSS (JILA) 
-C     *       G. BRUNO SCHMID (JILA)
-C     *-/
-
+C * JAN 01 1982 - LAC,DWN,GBS - COMPUTE LEGENDRE COEFFICIENTS OF STATIC POTENTIAL
+C *
+C  * L. A. COLLINS (LASL), D. W. NORCROSS (JILA), G. BRUNO SCHMID (JILA)
+C *
 C     * THESE DIMENSIONS ARE AT THE DISPOSAL OF THE USER
 C     *
 C     * MXAL IS MAXIMUM SIZE OF INPUT ALAM ARRAYS

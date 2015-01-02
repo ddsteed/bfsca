@@ -1,13 +1,9 @@
-C *-
-C * PROGRAM SPFDFIT
+C * JAN 01 1984 - AF  - FIT SIMONS-PARR-FINLAN-DUNHAM PARAMETERS TO INPUT POTENTIAL
 C *
-C * program to fit SIMONS-PARR-FINLAN-DUNHAM parameters to input
-C * potential. The position of the minimum is assumed to be known or
+C * The position of the minimum is assumed to be known or
 C * can be guessed and an accurate minimum found by minimizing the
 C * chisquare
-
-C * V1.0: A. Feldt (OU)
-C *-/
+C *
 
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
 

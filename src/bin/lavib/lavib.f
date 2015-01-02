@@ -525,17 +525,17 @@ C * gets stored in psi
 C * get the K-matrix
 C * if we plan to propagate the r-matrix into the Asymptotic
 C * region then that is done here before K-matrix extraction
-            if (irmat.eq.1) then
+            if (irmat .eq. 1) then
                write(6,*)
                write(6,*)
-               write(6,*)' The K-matrix before R-Mat prop:'
+               write(6,*) ' The K-matrix before R-Mat prop:'
                write(20,*)
-               write(20,*)' The K-matrix before R-Mat prop:'
+               write(20,*) ' The K-matrix before R-Mat prop:'
                call rkmat(kmat,kw,rmax,l0,asympsi,chin,nch)
                write(20,*)
-               write(20,*)'R-Matrix before truncation'
-               do i = 1,nch
-                  write(20,504)(asympsi(i,j),j = 1,nch)
+               write(20,*) 'R-Matrix before truncation'
+               do i = 1, nch
+                  write(20,504) (asympsi(i,j), j = 1,nch)
                end do
                write(20,*)
 
@@ -543,7 +543,7 @@ C * -----------------------------------------------------------------
 C * This little section of code truncates the R-Matrix before
 C * propagation into the asymptotic region
                write(6,*)'number of open channels',nvopen
-               if (nvtrunc.gt.nvopen) nvtrunc = nvopen
+               if (nvtrunc .gt. nvopen) nvtrunc = nvopen
                nchtrunc = nvtrunc*nltrunc
                call rtrunc(asympsi,nvtrunc,nltrunc,nchtrunc,rmat,chin
      $              ,nch)
@@ -555,10 +555,10 @@ C * propagation into the asymptotic region
      $              ,we,wexe)
 C * ----------------------------------------------------------------
 
-               write(20,*)'the energies'
-               write(20,504)(kw(i)*kw(i)*2.d0*13.6058d0,i=1,nch)
+               write(20,*) 'the energies'
+               write(20,504) (kw(i)*kw(i)*2.d0*13.6058d0, i=1,nch)
                write(20,*)
-               write(20,*)'after truncation'
+               write(20,*) 'after truncation'
                call rkmat(kmat,kw,rmax,l0,rmat,chin,nch)
 
 C * Here we are going to get the T-Matrix and the Cross Sections
@@ -1484,29 +1484,29 @@ C * to carry out LU decomposition and create an inverse
 C * rmatn now contains the untransformed ratio of the wfn to
 C * the deriv of the wfn
       write(6,*)
-      write(6,*)'This is the R-Matrix:'
+      write(6,*) 'This is the R-Matrix:'
       write(6,*)
       do i = 1,nch
-         write(6,501)(rmatn(i,j),j=1,nch)
+         write(6,501) (rmatn(i,j), j=1,nch)
       end do
  501  format(6(1pe12.3))
 
       write(6,*)
-      write(6,*)'k=',(k(i),i=1,nch)
+      write(6,*) 'k=', (k(i), i=1,nch)
       write(6,*)
-      write(6,*)'r=',r
-      write(6,*)'l0=',l0
-      write(6,*)'end of R-Matrix stuff'
+      write(6,*) 'r=', r
+      write(6,*) 'l0=', l0
+      write(6,*) 'end of R-Matrix stuff'
 
       do i = 1,nch
-         l = 2*(chin(i,2)-1)+l0
-         do j = 1,nch
-            lp = 2*(chin(j,2)-1)+l0
+         l = 2*(chin(i,2)-1) + l0
+         do j = 1, nch
+            lp = 2*(chin(j,2)-1) + l0
             numer(i,j) = rmatn(i,j)*rbesp(k(j),r,lp)
             dummy(i,j) = rmatn(i,j)*rneup(k(j),r,lp)
          end do
-         numer(i,i) = numer(i,i)-rbes(k(i),r,l)
-         dummy(i,i) = dummy(i,i)-rneu(k(i),r,l)
+         numer(i,i) = numer(i,i) - rbes(k(i),r,l)
+         dummy(i,i) = dummy(i,i) - rneu(k(i),r,l)
       end do
 
       call nrinverse(dummy,denom,temp,nch,nch,indx)
@@ -1515,15 +1515,15 @@ C * the deriv of the wfn
          do j = 1,nch
             kmatrix(i,j) = 0.d0
             do ii = 1,nch
-               kmatrix(i,j) = kmatrix(i,j)+denom(i,ii)*numer(ii,j)
+               kmatrix(i,j) = kmatrix(i,j) + denom(i,ii)*numer(ii,j)
             end do
             kmatrix(i,j) = kmatrix(i,j)*dsqrt(k(i)/k(j))
          end do
       end do
-      write(6,*)'K matrix at the asymptotic boundary'
+      write(6,*) 'K matrix at the asymptotic boundary'
       do i = 1,nch
-         write(6,500)(kmatrix(i,j),j = 1,nch)
-         write(20,500)(kmatrix(i,j),j = 1,nch)
+         write(6,500)  (kmatrix(i,j),j = 1,nch)
+         write(20,500) (kmatrix(i,j),j = 1,nch)
       end do
  500  format(6(1pe12.4))
       return
@@ -2919,17 +2919,9 @@ C *         alpha0, alpha2 and q now properly use this size
 
       integer i,l0,nch,npts,nlams,nlamdain
       integer vibdim,npw
-CARR
+
       integer chanmax, pwavemax, vibmax, lammax
       parameter(chanmax=165,pwavemax=11,vibmax=15,lammax=21)
-c$$$      double precision fmat(npw,npw,nlamdain)
-c$$$      double precision alpha0(vibdim,vibdim),alpha2(vibdim,vibdim)
-c$$$      double precision q(vibdim,vibdim) 
-c$$$      double precision rstart,rasym,k(nch)
-c$$$      double precision rmatp(nch,nch)
-c$$$      integer chin(nch,2)
-c$$$      double precision rptrans(nch,nch),transp(nch,nch)
-c$$$      double precision rmatn(nch,nch)
       double precision fmat(pwavemax,pwavemax,lammax)
       double precision alpha0(vibmax,vibmax),alpha2(vibmax,vibmax)
       double precision q(vibmax,vibmax) 
@@ -2948,9 +2940,9 @@ c$$$      double precision rmatn(nch,nch)
 
       write(6,*)
       write(6,*) ' In R-Prop'
-      write(6,*)'rstart      rasym      step     nlams     '
-      write(6,*)rstart,rasym,step,nlams
-      write(6,*)'nch = ',nch
+      write(6,*) 'rstart      rasym      step     nlams     '
+      write(6,*) rstart,rasym,step,nlams
+      write(6,*) 'nch = ',nch
       call rinit(trans,transp,nch)
 
 C * Set up the initial conditions:
@@ -2960,11 +2952,11 @@ c * this seems to be necessary for linux
       npts = nint((rasym-rstart)/step)
 c * end olen modification
 
-      write(6,*)'npts = ',npts,' l0 = ',l0
+      write(6,*) 'npts = ', npts, ' l0 = ', l0
       do i = 1,npts
 C * we want the potential at the midpoints of the grid for the
 C * R-matrix propagator
-         r = rstart+(i-1)*step+step/2.d0
+         r = rstart + (i-1)*step + step/2.d0
          call lrpot(v,r,l0,alpha0,alpha2,q,vibdim,fmat,chin,nlamdain
      $        ,nlams,nch,npw)
          call lamdiag(v,k,lamsq,abslam,habslam,trans,nch,step)

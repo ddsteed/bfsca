@@ -68,7 +68,7 @@ done
 #
 for basis in ${BS[@]}; do
     for sym in ${SYMM[@]}; do
-	./exker  -t $tgt -basis $basis -R $CRD -p $pot -sym $sym
+#	./exker  -t $tgt -basis $basis -R $CRD -p $pot -sym $sym
     done
 done
 
@@ -77,6 +77,6 @@ done
 #
 for basis in ${BS[@]}; do
     for sym in ${SYMM[@]}; do
-        ./lavib  -t $tgt -basis $basis -R $CRD -p $pot -sym $sym -method rr
+#       ./lavib  -t $tgt -basis $basis -R $CRD -p $pot -sym $sym -method rr
     done	    
 done

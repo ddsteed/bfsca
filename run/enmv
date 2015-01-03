@@ -50,11 +50,11 @@ function set_location {
 function cd_work {
     curr=`pwd`
     if [ -d $work ]; then
-	    rm -f   $work/*
-	    cd      $work
+	rm -f   $work/*
+	cd      $work
     else
-	    echo "$work does NOT exit!"
-	    exit
+	echo "$work does NOT exit!"
+	exit
     fi
 }
 
@@ -65,9 +65,9 @@ function make_inp {
     cp    $datain/${ref}_bnd.inp        $tgt.inp
 
     if [[ $basis == "M2" || $basis == "M2H" ]]; then
-	    extfil=".TRUE."; ISPHER=-1
+	extfil=".TRUE."; ISPHER=-1
     else
-	    extfil=".FALSE."; ISPHER=1
+	extfil=".FALSE."; ISPHER=1
     fi
 
     sed -e "s/CRD=[^[:space:]]*/CRD=$CRD/g"          \
@@ -96,7 +96,7 @@ function pick_vec {
 }
 
 #--------------------------------------------------------------------------------
-function pick_en {
+function pick_energy {
     ener=`grep "TOTAL ENERGY =" $1.log | tail -n 1 | awk '{print $4}'`
 
     echo "$CRD   $ener" > ener.dat
@@ -114,7 +114,7 @@ make_inp
 run_gamess   $tgt
 
 pick_vec     $tgt
-pick_en      $tgt
+pick_energy  $tgt
 
 # save output files
 cp GTObasis.dat $store/.                   # please check gamess input file, DNH symmetry is NOT supported!

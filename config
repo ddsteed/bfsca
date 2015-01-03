@@ -574,7 +574,7 @@ function make_store {
     store=`pwd`
     store_name
     for dir in ${st[@]}; do
-	if [ ! -d $dir ]; then mkdir -p $dir; fi
+        if [ ! -d $dir ]; then mkdir -p $dir; fi
     done
     cd $currpath
 }
@@ -584,11 +584,11 @@ function ch_script {
     cd $currpath/run
 
     for file in *; do
-	sed -e 's:work=.*$:work="'"$work"'":' \
+        sed -e 's:work=.*$:work="'"$work"'":' \
             -e 's:storeT=.*$:storeT="'"$store"'":' \
-            $file > $file.tt
-	mv $file.tt $file
-	chmod a+x $file
+                $file > $file.tt
+        mv $file.tt $file
+        chmod a+x $file
     done
 
     cd ..

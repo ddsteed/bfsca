@@ -122,7 +122,7 @@ function make_inp {
 
 #---
     if [[ $tgt == "H2" ]]; then
-	rmesh[0]="0.00    1.00    0.01"
+        rmesh[0]="0.00    1.00    0.01"
 	rmesh[1]="1.00    2.00    0.02"
 	rmesh[2]="2.00    4.00    0.05"
 	rmesh[3]="4.00   10.00    0.10"
@@ -207,7 +207,7 @@ function make_inp {
 	MORB="0"; LSTART="0";
     elif [[ $tgt == "N2" ]]; then
 	case $CRD in
-	    1.600 | 1.700) 
+	    1.500 | 1.600 | 1.700) 
 		MORB="0 0 0 1 2 0 0"; LSTART="0 1 0 1 1 1 0" ;;
 	    1.800 | 1.850 | 1.900 | 1.950) 
 		MORB="0 0 0 0 1 2 0"; LSTART="0 1 0 1 1 1 0" ;;
@@ -232,12 +232,12 @@ function make_inp {
 # NDAT: if NFIT = 2, the # of last A_lambda to fit large-r ( NDAT > 3 )
 #       if NFIT != 2, NDAT could be set ANY VALUE! (It doesn't work.)
     if [[ $tgt == "H2" ]]; then
-#	NFIT=1;  NDAT=3;
-	NFIT=3;  NDAT=80;
+#       NFIT=1;  NDAT=3;
+        NFIT=3;  NDAT=80;
     elif [[ $tgt == "N2" ]]; then
-	NFIT=3;  NDAT=80;
+        NFIT=3;  NDAT=80;
     elif [[ $tgt == "Li2" ]]; then
-	NFIT=3;  NDAT=80;
+        NFIT=3;  NDAT=80;
     fi
 
 #---
@@ -258,7 +258,7 @@ function make_inp {
 
     echo "${#rmesh[@]}" >> $input
     for index in ${!rmesh[@]}; do
-	echo ${rmesh[index]}  >> $input
+        echo ${rmesh[index]}  >> $input
     done
 
     echo $title1 >> $input
@@ -266,7 +266,7 @@ function make_inp {
     echo "$NON $NAC" >> $input
 
     for index in ${!atom[@]}; do
-	echo ${atom[index]} >> $input
+        echo ${atom[index]} >> $input
     done
 
     echo "$NGAUS $NCBFN $NOCC" >> $input

@@ -6,6 +6,21 @@
 #  RDS (Hao Feng)
 #  Jul 20, 2013
 #
+# ---
+# Usage:
+#       ./config
+#  or   ./config   -c mac|intel|gnu
+
+#-----------------------------------------------------------------------
+# Options
+while test "X$1" != "X" ; do
+    case $1 in
+	-c) shift; comp=$1     ;;        # compiler vendors
+	*)                     ;;
+    esac
+    shift
+done
+
 #-----------------------------------------------------------------------
 function make_work {
     echo -n " Please specify the working scratch directory, [./work]: "
@@ -604,7 +619,7 @@ function compile {
     echo
     
     cd tools
-    ./compile.sh 
+    ./compile.sh  -c $comp
     cd ..
 }
 

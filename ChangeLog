@@ -1,5 +1,8 @@
+2015-01-17 Hao Feng (RDS) <fenghao@mail.xhu.edu.cn>
+	* modify config script
+	
 2015-01-01 Hao Feng (RDS) <fenghao@mail.xhu.edu.cn>
-	* remove symmetry number depency
+	* remove symmetry number dependency
 
 2014-08-02 Hao Feng (RDS) <fenghao@mail.xhu.edu.cn>
 	* print wavefunctions in lavib

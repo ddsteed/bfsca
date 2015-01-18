@@ -1,5 +1,5 @@
 2015-01-17 Hao Feng (RDS) <fenghao@mail.xhu.edu.cn>
-	* modify config script
+	* modify config script and add rmfiles script
 	
 2015-01-01 Hao Feng (RDS) <fenghao@mail.xhu.edu.cn>
 	* remove symmetry number dependency

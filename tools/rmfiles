@@ -1,0 +1,68 @@
+#!/usr/bin/env   bash
+#-----------------------------------------------------------------------
+# This shell script is to delete all the files under current directory
+# and sub-directories but keep the structure of directory.
+#
+# RDS (Hao Feng)
+# Dec 21, 2013
+#
+# ---
+# Usage:
+#   rmfiles -keep dirs
+#
+#-----------------------------------------------------------------------
+#--- options
+function handle_opt {
+    while test "x$1" != "x"
+    do
+	    case $1 in
+	        -keep)  shift; kdir=($*) ;;
+	        *)                       ;;
+	    esac
+	    shift
+    done
+
+# - handle keep directories
+    num=${#kdir[@]};
+    for (( i=0; i<=num; i++ ))
+    do
+	    echo ${kdir[$i]} | grep -q "-"
+	    if [ $? -eq 0 ]; then num=$i; break; fi
+    done
+    dir=(${kdir[@]:0:num})
+    unset kdir
+    kdir=(${dir[@]})
+
+# - echo OPTIONS
+    echo " The command is: "
+    echo "     $0 -keep ${kdir[@]} "
+    echo
+}
+
+#--------------------------------------------------------------------------------
+# - delete files under current directory
+function rmf {
+    curr=`pwd | xargs basename`
+    findkeep=`echo ${kdir[*]} | grep $curr`
+
+# --- keep directory will NOT be deleted, the others will
+    if [[ $findkeep == "" ]]
+    then
+	    for file in *
+	    do
+	        if [ -d "$file" ]
+	        then 
+		        cd $file && rmf  && cd ..
+	        else
+		        rm -f $file
+	        fi
+	    done
+    fi
+}
+
+#--------------------------------------------------------------------------------
+#--- MAIN FUNCTION
+#
+
+handle_opt $@
+rmf 

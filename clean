@@ -33,7 +33,7 @@ function clean_store {
     fi
 
     cd $store
-    rmfiles -keep POT_ORI DATA_IN
+    $currpath/tools/rmfiles -keep POT_ORI DATA_IN
 
     cd $currpath
 }

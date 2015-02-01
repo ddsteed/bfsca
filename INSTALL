@@ -8,6 +8,6 @@
 
 2. Steps
 1) modify the path of GAMESS in run/enmv and run/vpola
-2) ./config
+2) ./setup
    choose working directory and store directory. If you want to set them in the current path, only press RETURN.
 

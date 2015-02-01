@@ -420,7 +420,7 @@ handle_opt $@
 set_location
 cd_work
 
-ENER=(13.00 14.00 15.00)
+ENER=(1.50 2.40 5.00)
 for ener in ${ENER[@]}; do
     echo "Now handle energy = $ener ..."
 

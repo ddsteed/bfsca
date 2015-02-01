@@ -399,7 +399,7 @@ C     dimension wlamda(10,10),nmunit(16)
       common/readvib/outvib,lvib
  
       common/store/ h(20),xx(21),num(21)
-      common/vvp/iv,ivp,rss(15),vrs(15),ndo
+      common/vvp/iv,ivp,rss(18),vrs(18),ndo
 
       aerr = 1.0e-06
 
@@ -867,7 +867,7 @@ C * maxqd is max quadrature, maxho=max harmonic osc.
      $     ,points)
       double precision finone(pwav,pwav,points)
       dimension chis(nquad,ivm),fnum(1),rquad(1),vquad(1),wquad(1)
-     $     ,nmunit(16),rss(15)
+     $     ,nmunit(16),rss(18)
       dimension ho(maxqd,maxho),hox(maxho)
       common/need/rx,alpha,re
  
@@ -970,7 +970,7 @@ c  ***
       dimension finone(nlexi,nlexi,npts)
       dimension fout(nlexo*ivm,nlexo*ivm,npts)
       dimension chis(nquad,ivm),fnum(1),rquad(1),vquad(1),wquad(1)
-     $     ,nmunit(16),rss(15)
+     $     ,nmunit(16),rss(18)
       character*8 iflnm(20)
 
       logical outvib
@@ -3604,7 +3604,7 @@ C *-
 C *  function for electron-nuclear pot.: relc .gt. rn.
 
       common /silly/ vect(20,20),noscil
-      common/vvp/iv,ivp,rss(15),vrs(15),ndo
+      common/vvp/iv,ivp,rss(18),vrs(18),ndo
 
       common /need/ rx,alpha,re
  
@@ -3632,7 +3632,7 @@ C *-
 C *  function for electron-nuclear pot.: relc .lt. rn.
 
       common /silly/ vect(20,20),noscil
-      common/vvp/iv,ivp,rss(15),vrs(15),ndo
+      common/vvp/iv,ivp,rss(18),vrs(18),ndo
 
       common /need/ rx,alpha,re
  
@@ -3746,7 +3746,7 @@ C *-
       implicit double precision (a-h,o-z)
       logical second
       common/store/ h(20),xx(21),num(21)
-      common/vvp/iv,ivp,rss(15),vrs(15),ndo
+      common/vvp/iv,ivp,rss(18),vrs(18),ndo
 
       common/need/rx,alpha,re
 
@@ -3949,21 +3949,21 @@ C *-
      $     ,minvib,ivibtr,ihoex)
 
       implicit double precision (A-H,O-Z)
-      parameter (maxqd=20,maxho=20)
+      parameter (maxqd=20, maxho=20)
 C * maxqd is max quadrature   maxho=max harmonic osc.
-      dimension fin(35,21,11),fout(20,18,5,12)
+      dimension fin(35,21,11), fout(20,18,5,12)
       character*8 iflnm(20)
       integer doexch
 
       logical outvib
 
-      dimension chis(nquad,ivm),fnum(1),rquad(1),fmat(ivm,ivm), vquad(1)
-     $     ,wquad(1),nmunit(16),rss(15)
-      dimension ho(maxqd,maxho),hox(maxho)
-      common /splin/ bpar(11),csplin(5000)
+      dimension chis(nquad,ivm), fnum(1), rquad(1),fmat(ivm,ivm),
+     $     vquad(1), wquad(1), nmunit(16), rss(18)
+      dimension ho(maxqd,maxho), hox(maxho)
+      common /splin/ bpar(11), csplin(5000)
 
-      common/need/rx,alpha,re
-      common/readvib/outvib,lvib
+      common/need/rx, alpha, re
+      common/readvib/outvib, lvib
  
       zero = 0.0e+00
       if (outvib) then

@@ -1,3 +1,4 @@
+C * FEB 01 2015 - RDS - AUGMENT MORE NUCLEAR VIBRATIONAL WAVEFUNCTIONS
 C * JUL 06 2013 - RDS - AUGMENT COUPLING NUMBER
 C * MAY 29 2006 - RDS - DO E-E AND E-N COUPLING POTENTIALS SEPERATELY
 C * DEC 31 2005 - RDS - AUGMENT THE ORDER OF GAUSS-HERMITE QUADRATURE FROM 20 -> 50
@@ -384,11 +385,11 @@ C     dimension wlamda(10,10),nmunit(16)
       dimension wlamda(50,50),nmunit(20)
 
       dimension rs(1),rstrt(1),rstop(1),delp(1),nstep(1),vrsep(1),
-     $     chis(nquad,ivm),rquad(1),vquad(1),wquad(1),rnl(15),rnr(15)
+     $     chis(nquad,ivm),rquad(1),vquad(1),wquad(1),rnl(18),rnr(18)
 
       integer vibmax
       integer geomax
-      parameter(geomax=15)
+      parameter(geomax=18)
       double precision venuc(geomax),venq(50)
 
       common /splin/ bpar(11),csplin(5000)

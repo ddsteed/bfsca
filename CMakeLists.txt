@@ -11,6 +11,11 @@ cmake_minimum_required(VERSION 2.8)
 project(BFSCA
         CXX Fortran C)
 
+# handle mem > 2 GB by using Intel compiler
+if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
+   set(CMAKE_Fortran_FLAGS "-mcmodel medium -shared-intel")
+endif()
+
 # Source code subdirectory
 add_subdirectory(src)
 

@@ -1,3 +1,5 @@
+C * FEB 02 2015 - RDS - AUGMENT TO MORE VIBRATIONAL LEVELS
+C *
 C * JAN 01 2015 - RDS - REMOVE SYMMETRY NUMBER DEPENDENCY
 C *
 C * JUN 24 2006 - RDS - ADD SUBROUTINE GAULEG TO GENERATE GAUSS-LEGENDRE ABSCISSAS AND
@@ -70,8 +72,8 @@ C *-/
       integer chanmax,itermax,nrgmax,lammax
       integer enermax,setmax,boundmax,vibmax,pwavemax
       integer nlmomax,exlmmax
-      parameter(chanmax=165,itermax=10,nrgmax=100,enermax=120,
-     $     lammax=21,setmax=1,boundmax=6,vibmax=15,pwavemax=11,nlmomax
+      parameter(chanmax=500,itermax=10,nrgmax=100,enermax=120,
+     $     lammax=21,setmax=1,boundmax=6,vibmax=25,pwavemax=20,nlmomax
      $     =16,exlmmax=60)
       integer potptsmax,ptsmax
       parameter(potptsmax=330,ptsmax=331)
@@ -662,7 +664,7 @@ C * this subroutine prints the output
       integer l0,symlam,npw,nvib
 CARR
       integer chanmax,enermax,symmax,vibmax,nrgmax,potptsmax
-      parameter(chanmax=165,enermax=120,symmax=4,vibmax=15,nrgmax=100
+      parameter(chanmax=500,enermax=120,symmax=4,vibmax=25,nrgmax=100
      $     ,potptsmax=330)
       double precision eigshft(chanmax),eigvec(chanmax,chanmax)
       double precision kmat(chanmax,chanmax),tmati(chanmax,chanmax)
@@ -767,8 +769,8 @@ C * This is the routine that reads in the Unit 5 crap
       integer chanmax,itermax,nrgmax,lammax,symmax,enermax
       integer setmax,boundmax,vibmax
 
-      parameter(chanmax=165,itermax=10,nrgmax=100,lammax=21,symmax=4
-     $     ,enermax=120,setmax=1,boundmax=6,vibmax=15)
+      parameter(chanmax=500,itermax=10,nrgmax=100,lammax=21,symmax=4
+     $     ,enermax=120,setmax=1,boundmax=6,vibmax=25)
       
       integer potptsmax,ptsmax
       parameter(potptsmax=330,ptsmax=331)
@@ -1150,7 +1152,7 @@ C * a neat table. (HAHAHAHAHAHAHAHAHAHHAHAHA)
       integer nener,nvib
 
       integer enermax, vibmax
-      parameter(enermax=120, vibmax=15)
+      parameter(enermax=120, vibmax=25)
       double precision cross(enermax, vibmax)
       double precision energy(enermax)
 
@@ -1181,7 +1183,7 @@ C * It currently gives for each channel
       integer nener, iener
 CARR
       integer chanmax,enermax,vibmax
-      parameter(chanmax=165,enermax=120,vibmax=15)
+      parameter(chanmax=500,enermax=120,vibmax=25)
       double precision tmati(chanmax,chanmax),tmatr(chanmax,chanmax)
       double precision k(chanmax),pi
       double precision cross(enermax,vibmax)
@@ -1221,7 +1223,7 @@ C *-
       integer ity
 CARR
       integer chanmax,ptsmax,itermax
-      parameter (chanmax=165,ptsmax=331,itermax=10)
+      parameter (chanmax=500,ptsmax=331,itermax=10)
 c$$$      double precision psifin(niter,nch,nch,npts)
 c$$$      double precision xhifin(niter,nch,nch,npts)
 c$$$      double precision acoefs(nch*niter,nch)
@@ -1377,7 +1379,7 @@ C *-
       integer nch,npts
 CARR
       integer chanmax, ptsmax
-      parameter (chanmax=165,ptsmax=331)
+      parameter (chanmax=500,ptsmax=331)
 c$$$      double precision a(nch,npts)
 c$$$      double precision psi(nch,nch,npts)
       double precision a(chanmax,ptsmax)
@@ -1415,7 +1417,7 @@ C *-
       integer nch,npts
 CARR
       integer chanmax, ptsmax
-      parameter(chanmax=165,ptsmax=331)
+      parameter(chanmax=500,ptsmax=331)
 c$$$      double precision i1(nch,nch,npts),i2(nch,nch,npts)
 c$$$      double precision q1(nch,nch,npts),q2(nch,nch,npts)
       double precision i1(chanmax,chanmax,ptsmax)
@@ -1462,7 +1464,7 @@ C * were are using sins and cosines
       integer nch
 CARR
       integer chanmax
-      parameter(chanmax=165)
+      parameter(chanmax=500)
 c$$$      double precision kmatrix(nch,nch),k(nch),r
 c$$$      double precision rmatn(nch,nch)
 c$$$      integer chin(nch,2)
@@ -1536,7 +1538,7 @@ C *-
       integer nch,npts
 CARR
       integer chanmax,ptsmax
-      parameter (chanmax=165,ptsmax=331)
+      parameter (chanmax=500,ptsmax=331)
 c$$$      double precision asympsi(nch,nch)
 c$$$      double precision kmat(nch,nch)
 c$$$      double precision k(nch),g1(nch,npts),g2(nch,npts)
@@ -1575,7 +1577,7 @@ C * so that the eigenvalues are real.
       integer i,j,nch,nrot
 CARR
       integer chanmax
-      parameter(chanmax=165)
+      parameter(chanmax=500)
       double precision kmattemp(chanmax,chanmax)
       double precision kmat(chanmax,chanmax),eigshft(chanmax)
       double precision eigsum,eigvec(chanmax,chanmax)
@@ -1609,7 +1611,7 @@ C * when calculating the exchange potential
       integer nlproj(nbound),l0proj(nbound),mlproj(nbound)
 
       integer boundmax,chanmax,exlmmax,nlmomax
-      parameter(chanmax=165,exlmmax=60,boundmax=6,nlmomax=16)
+      parameter(chanmax=500,exlmmax=60,boundmax=6,nlmomax=16)
       double precision clebx1(boundmax,chanmax,exlmmax,nlmomax)
       double precision clebx2(boundmax,chanmax,exlmmax,nlmomax)
       double precision clebx3(boundmax,chanmax,exlmmax,nlmomax)
@@ -1694,7 +1696,7 @@ C * exchange potential
       double precision ralfa,rbeta,rless,rgrtr,rfact
 
       integer boundmax,chanmax,exlmmax,nlmomax
-      parameter(chanmax=165,exlmmax=60,boundmax=6,nlmomax=16)
+      parameter(chanmax=500,exlmmax=60,boundmax=6,nlmomax=16)
       double precision clebx1(boundmax,chanmax,exlmmax,nlmomax)
       double precision clebx2(boundmax,chanmax,exlmmax,nlmomax)
       double precision clebx3(boundmax,chanmax,exlmmax,nlmomax)
@@ -1806,7 +1808,7 @@ C * EXUNIT: the unit to read the Kernel from
       double precision dum1(nch,nch,nptsex)
 CARR
       integer chanmax,ptsmax
-      parameter(chanmax=165,ptsmax=331)
+      parameter(chanmax=500,ptsmax=331)
 c$$$      double precision kpsi(nch,nch)
 c$$$      double precision psi(nch,nch,npts)
       double precision kpsi(chanmax,chanmax)
@@ -1897,7 +1899,7 @@ C *         calculation
       integer ity
 CARR
       integer chanmax,ptsmax
-      parameter(chanmax=165,ptsmax=331)
+      parameter(chanmax=500,ptsmax=331)
 c$$$      double precision psi(nch,nch,npts),kpsi(nch,nch)
       double precision psi(chanmax,chanmax,ptsmax)
       double precision kpsi(chanmax,chanmax)
@@ -2044,7 +2046,7 @@ C *-
       integer nch,npts
 CARR
       integer chanmax,ptsmax
-      parameter(chanmax=165,ptsmax=331)
+      parameter(chanmax=500,ptsmax=331)
 c$$$      double precision m1(nch,nch,npts),m2(nch,nch,npts)
 c$$$      double precision m3(nch,nch,npts)
       double precision m1(chanmax,chanmax,ptsmax)
@@ -2083,7 +2085,7 @@ C * number of vectors (numv) to numv + nch
       double precision wtt(npts)
 CARR
       integer chanmax,ptsmax,itermax
-      parameter (chanmax=165,ptsmax=331,itermax=10) 
+      parameter (chanmax=500,ptsmax=331,itermax=10) 
 c$$$      double precision xhi(nch,nch,npts),psifin(niter,nch,nch,npts)
 c$$$      double precision xhifin(niter,nch,nch,npts)
 c$$$      double precision psi(nch,nch,npts)
@@ -2227,7 +2229,7 @@ C * the xhi's
 C * this is right out of the Linear Algebraic papers
 CARR
       integer chanmax,ptsmax
-      parameter (chanmax=165,ptsmax=331) 
+      parameter (chanmax=500,ptsmax=331) 
 c$$$      integer nch,npts
 c$$$      double precision xhi(nch,nch,npts)
 c$$$      double precision g1(nch,npts),g2(nch,npts),b(nch,npts)
@@ -2263,7 +2265,7 @@ C * the orthonormal basis psifin and the coefficients a
       integer nch,npts,niter
 CARR
       integer chanmax,ptsmax,itermax
-      parameter (chanmax=165,ptsmax=331,itermax=10) 
+      parameter (chanmax=500,ptsmax=331,itermax=10) 
 c$$$      double precision psifin(niter,nch,nch,npts)
 c$$$      double precision psi(nch,nch,npts)
 c$$$      double precision acoef(nch*niter,nch)
@@ -2337,7 +2339,7 @@ C *-
       integer ity
 CARR
       integer chanmax,ptsmax
-      parameter(chanmax=165,ptsmax=331)
+      parameter(chanmax=500,ptsmax=331)
 c$$$      double precision q1(nch,nch,npts),q2(nch,nch,npts)
 c$$$      double precision g1(nch,npts),g2(nch,npts)
 c$$$      double precision v(nch,nch,npts)
@@ -2428,7 +2430,7 @@ C * we include the exchange potential
       integer ity
 CARR
       integer chanmax,ptsmax
-      parameter(chanmax=165,ptsmax=331)
+      parameter(chanmax=500,ptsmax=331)
 c$$$      double precision q1(nch,nch,npts),q2(nch,nch,npts)
 c$$$      double precision g1(nch,npts),g2(nch,npts)
 c$$$      double precision v(nch,nch,npts)
@@ -2547,7 +2549,7 @@ C *-
 C * numerical recipes inverse routines
 CARR
       integer chanmax
-      parameter(chanmax=165)
+      parameter(chanmax=500)
 c$$$      double precision temp(nch,nch)
 c$$$      double precision kmat(nch,nch)
 c$$$      double precision tmatr(nch,nch),tmati(nch,nch)
@@ -2741,7 +2743,7 @@ C *       short range part of the local part of the potential
 
 CARR
       integer potptsmax,lammax,vibmax,nrgmax,cntrmax
-      parameter(potptsmax=330,lammax=21,vibmax=15,cntrmax=2,nrgmax=100)
+      parameter(potptsmax=330,lammax=21,vibmax=25,cntrmax=2,nrgmax=100)
 c$$$      integer nstepimesh(nregimesh)
 c$$$      double precision vlam(nlam,1,1,nptsimesh),vnuc
 c$$$      double precision stepimesh(nregimesh)
@@ -2869,7 +2871,7 @@ C * products with Clebsch Gordons -- See Morrison and Collins PRA 1978
 
 CARR
       integer pwavemax,lammax,chanmax
-      parameter(chanmax=165,pwavemax=11,lammax=21)
+      parameter(chanmax=500,pwavemax=20,lammax=21)
 c$$$      double precision fmat(npw,npw,nlamdain),c1,c2
 c$$$      integer chin(nch,2)
       double precision fmat(pwavemax,pwavemax,lammax),c1,c2
@@ -2921,7 +2923,7 @@ C *         alpha0, alpha2 and q now properly use this size
       integer vibdim,npw
 
       integer chanmax, pwavemax, vibmax, lammax
-      parameter(chanmax=165,pwavemax=11,vibmax=15,lammax=21)
+      parameter(chanmax=500,pwavemax=20,vibmax=25,lammax=21)
       double precision fmat(pwavemax,pwavemax,lammax)
       double precision alpha0(vibmax,vibmax),alpha2(vibmax,vibmax)
       double precision q(vibmax,vibmax) 
@@ -3028,7 +3030,7 @@ C * Calculate the R matrix at the next box using its value at the prev box
       integer nch,i,j
 CARR
       integer chanmax
-      parameter(chanmax=165)
+      parameter(chanmax=500)
 c$$$      integer indx(nch)
 c$$$      double precision rmatp(nch,nch)
 c$$$      double precision rmatn(nch,nch),rptrans(nch,nch)
@@ -3088,7 +3090,7 @@ C * matrices used to diagonalize the interaction potential.
       integer i,j,nch
 CARR
       integer chanmax
-      parameter(chanmax=165)
+      parameter(chanmax=500)
 c$$$      double precision rmatp(nch,nch),rptrans(nch,nch)
       double precision rmatp(chanmax,chanmax),rptrans(chanmax,chanmax)
 
@@ -3117,7 +3119,7 @@ C * if iswitch = 1 you get T(trans) A T
       integer nch,i,j,k,l,iswitch
 CARR
       integer chanmax
-      parameter(chanmax=165)
+      parameter(chanmax=500)
 c$$$      double precision t(nch,nch),a(nch,nch)
       double precision t(nch,nch),a(chanmax,chanmax)
 
@@ -3168,7 +3170,7 @@ C * leaves the integration routines unscathed.
       integer i,npw,nch
 CARR
       integer chanmax
-      parameter(chanmax=165)
+      parameter(chanmax=500)
 c$$$      integer chin(nch,2)
       integer chin(chanmax,2)
 
@@ -3204,7 +3206,7 @@ C *         when READ IN
       integer nch,nlamdain,nlams,npw
 CARR 
       integer chanmax,vibmax,pwavemax,lammax
-      parameter(chanmax=165,vibmax=15,pwavemax=11,lammax=21)
+      parameter(chanmax=500,vibmax=25,pwavemax=20,lammax=21)
 c$$$      integer chin(nch,2)
 c$$$      double precision alpha0(vibdim,vibdim),alpha2(vibdim,vibdim)
 c$$$      double precision q(vibdim,vibdim),fmat(npw,npw,nlamdain)
@@ -3257,8 +3259,8 @@ C * if there is vibrational excitation
       integer nlamdain,nvibin,nch,nptspot,npts,ipts,npw
 CARR
       integer chanmax,potptsmax,ptsmax,pwavemax,lammax,vibmax
-      parameter(chanmax=165,potptsmax=330,ptsmax=331,pwavemax=11,lammax
-     $     =21,vibmax=15)
+      parameter(chanmax=500,potptsmax=330,ptsmax=331,pwavemax=20,lammax
+     $     =21,vibmax=25)
 c$$$      double precision vll(nch,nch,npts),fmat(npw,npw,nlamdain)
 c$$$      double precision vlam(nlamdain,nvibin,nvibin,npts)
 c$$$      integer chin(nch,2)
@@ -3314,7 +3316,7 @@ C * excitation as well as the Rigid Rotator problem.
       double precision rgs(npts),rmax
 CARR
       integer chanmax,ptsmax
-      parameter(chanmax=165,ptsmax=331)
+      parameter(chanmax=500,ptsmax=331)
 c$$$      double precision g1(nch,npts),g2(nch,npts),b(nch,npts)
 c$$$      integer chin(nch,2)
       double precision g1(chanmax,ptsmax)
@@ -3392,7 +3394,7 @@ C      double precision viben(vibmax)
       double precision viben(nvib)
 CARR
       integer chanmax
-      parameter(chanmax=165)
+      parameter(chanmax=500)
 c$$$      integer chin(nch,2)
       integer chin(chanmax,2)
 
@@ -3459,7 +3461,7 @@ C * WLAM program.
       integer nlamdain,nvibin,nofr,nptspot
 CARR
       integer lammax,vibmax,potptsmax
-      parameter(lammax=21,vibmax=15,potptsmax=330)
+      parameter(lammax=21,vibmax=25,potptsmax=330)
 c$$$      double precision vlamvib(nlamdain,nvibin,nvibin,nptspot)
       double precision vlamvib(lammax,vibmax,vibmax,potptsmax)
 
@@ -3539,7 +3541,7 @@ C * NCH: the total number pw channels in the problem BEFORE truncation
       integer nvtrunc,nltrunc,nch,nchtrunc
 CARR
       integer chanmax
-      parameter(chanmax=165)
+      parameter(chanmax=500)
 c$$$      double precision asympsi(nch,nch),dummy(nchtrunc,nchtrunc)
 c$$$      integer chin(nch,2)
       double precision asympsi(chanmax,chanmax),dummy(chanmax,chanmax)

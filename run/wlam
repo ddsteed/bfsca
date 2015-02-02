@@ -16,7 +16,7 @@
 #
 # ---
 #  Usage:
-#    wlam -t N2 -p DSG -basis ACCQ -ref HF -cp mpmom -R 2.000 2.020 -sym pg
+#    wlam -t N2 -p DSG -basis ACCQ -vwf Morse -nv 15 -ref HF -cp mpmom -R 2.000 2.020 -sym pg
 #
 #--------------------------------------------------------------------------------
 #--- options
@@ -29,19 +29,26 @@ function handle_opt {
 	    -cp)    shift; cp=$1       ;;
 	    -ref)   shift; ref=$1      ;;
 	    -sym)   shift; sym=$1      ;;
+            -vwf)   shift; vwf=$1      ;;
+            -nv)    shift; nv=$1       ;;
 	    -R)     shift; lir=($*)    ;;
 	    *)                         ;;
 	esac
 	shift
     done
 
+#- default values
     if [ "$tgt" == ""    ]; then tgt=H2;     fi
     if [ "$pot" == ""    ]; then pot=DSG;    fi
     if [ "$basis" == ""  ]; then basis=CCD;  fi
-    if [ "$cp" == ""     ]; then cp=mpmom; fi
+    if [ "$cp" == ""     ]; then cp=mpmom;   fi
     if [ "$ref" == ""    ]; then ref=HF;     fi
     if [ "$sym" == ""    ]; then sym=pg;     fi
-    if [ "$lir" == ""    ]; then lir=(0.500 1.400 2.600); fi
+    if [ "$vwf" == ""    ]; then vwf=Morse;  fi
+    if [ "$lir" == ""    ]; then lir=(0.500 1.400 2.600);  fi
+
+    if [[ "$nv" == ""   && $tgt == N2 ]]; then nv=15;      fi
+    if [[ "$nv" == ""   && $tgt == H2 ]]; then nv=4;       fi
 
 #- handle lir
     num=${#lir[@]}
@@ -53,12 +60,12 @@ function handle_opt {
     unset lir
     lir=(${ir[@]})
 
-# - echo OPTIONS
+#- echo OPTIONS
     echo " The command is: "
     if [[ $cp == exk ]]; then
-	echo "     $0 -t $tgt -p $pot -basis $basis -ref $ref -cp $cp -R ${lir[@]} -sym $sym"
+	echo "     $0 -t $tgt -p $pot -basis $basis -vwf $vwf -nv $nv -ref $ref -cp $cp -R ${lir[@]} -sym $sym"
     else
-	echo "     $0 -t $tgt -p $pot -basis $basis -ref $ref -cp $cp -R ${lir[@]}"
+	echo "     $0 -t $tgt -p $pot -basis $basis -vwf $vwf -nv $nv -ref $ref -cp $cp -R ${lir[@]}"
     fi
     echo
 }
@@ -97,7 +104,7 @@ function make_gen_para {
     local inf=$1
 
 #---vib. wavefunctions
-    cp $datavw/Morse    vibfun
+    cp $datavw/$vwf    vibfun
 
 #---
 #  lvib = m, the unit number for storing vib. matrix elements is m.
@@ -161,13 +168,13 @@ function make_gen_para {
     case $tgt in
 	H2)
 	    bmass=0.10078250e+01; cmass=0.10078250e+01; We=0.20053400e-01;   Re=0.14011000e+01
-	    minvib=1;             maxvib=4;             nhermt=12;           ihoex=0
+	    minvib=1;             maxvib=$nv;           nhermt=12;           ihoex=0
 	    ralfa=0.90;           rx=1.13;              noscil=12
 	    WeXe=0.55282000e-03;  Be=0.27727000e-03;    Alfe=0.13950000e-04; De=0.21460000e-06
 	    ;;
 	N2)
 	    bmass=0.14003074D+02; cmass=0.14003074D+02; We=0.10746436D-01;   Re=0.20200000D+01 
-	    minvib=1;             maxvib=15;            nhermt=30;           ihoex=0
+	    minvib=1;             maxvib=$nv;           nhermt=30;           ihoex=0
 	    ralfa=1.00;           rx=1.00;              noscil=10
 	    WeXe=0.65264950D-04;  Be=0.91046518D-05;    Alfe=0.78906618D-07; De=0.26244493D-10
 	    ;;

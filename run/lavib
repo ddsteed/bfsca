@@ -8,7 +8,7 @@
 #
 # ---
 #  Usage:
-#    lavib -t N2 -p DSG -basis ACCQ -ref HF -sym pg -method vib
+#    lavib -t N2 -p DSG -basis ACCQ -nv 15 -ref HF -sym pg -method vib
 #
 #--------------------------------------------------------------------------------
 #--- options
@@ -21,12 +21,14 @@ function handle_opt {
 	    -basis) shift; basis=$1    ;;
 	    -ref)   shift; ref=$1      ;;
 	    -sym)   shift; sym=$1      ;;
+            -nv)    shift; nv=$1       ;;
 	    -method)shift; method=$1   ;;
 	    *)                         ;;
 	esac
 	shift
     done
 
+#- default values
     if [ "$tgt" == ""    ]; then tgt=H2;     fi
     if [ "$pot" == ""    ]; then pot=DSG;    fi
     if [ "$basis" == ""  ]; then basis=CCD;  fi
@@ -37,10 +39,13 @@ function handle_opt {
     if [[ "$CRD" == ""  && $tgt == H2 ]]; then CRD=1.400;  fi
     if [[ "$CRD" == ""  && $tgt == N2 ]]; then CRD=2.020;  fi
 
-# - echo OPTIONS
+    if [[ "$nv" == ""   && $tgt == N2 ]]; then nv=15;      fi
+    if [[ "$nv" == ""   && $tgt == H2 ]]; then nv=4;       fi
+
+#- echo OPTIONS
     echo " The command is: "
     if [[ $method == vib ]]; then
-	echo "     $0 -t $tgt -p $pot -basis $basis -ref $ref -sym $sym -method $method"
+	echo "     $0 -t $tgt -p $pot -basis $basis -ref $ref -sym $sym -method $method -nv $nv"
     else
 	echo "     $0 -t $tgt -p $pot -basis $basis -ref $ref -sym $sym -method $method -R $CRD"
     fi
@@ -147,7 +152,7 @@ function make_inp {
 
     if [[ $tgt == H2 ]]; then
 	rmatstep=0.1;    rasym=200;   nlams=6
-	nvibin=4;        nvibxin=4;   nvibx=4;  nofr=1
+	nvibin=$nv;      nvibxin=$nv; nvibx=$nv;  nofr=1
 	nvtrunc=$nvibin; nltrunc=3
 	numiter=6
 	nbound=1
@@ -155,7 +160,7 @@ function make_inp {
 	swit=1;          we=4395.2;  wexe=117.9
     elif [[ $tgt == N2 ]]; then
 	rmatstep=0.1;    rasym=85;    nlams=2
-	nvibin=15;       nvibxin=15;  nvibx=15; nofr=1
+	nvibin=$nv;      nvibxin=$nv; nvibx=$nv;  nofr=1
 	nvtrunc=$nvibin; nltrunc=11
 	numiter=10
 	nbound=6

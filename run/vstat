@@ -25,13 +25,14 @@ function handle_opt {
 	shift
     done
 
+#- default values
     if [ "$tgt" == ""    ]; then tgt=H2;     fi
     if [ "$pot" == ""    ]; then pot=DSG;    fi
     if [ "$basis" == ""  ]; then basis=CCD;  fi
     if [ "$CRD" == ""    ]; then CRD=1.400;  fi
     if [ "$ref" == ""    ]; then ref=HF;     fi
 
-# - echo OPTIONS
+#- echo OPTIONS
     echo " The command is: "
     echo "     $0 -t $tgt -p $pot -basis $basis -R $CRD -ref $ref"
     echo

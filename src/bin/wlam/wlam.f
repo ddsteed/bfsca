@@ -868,7 +868,7 @@ C * maxqd is max quadrature, maxho=max harmonic osc.
      $     ,points)
       double precision finone(pwav,pwav,points)
       dimension chis(nquad,ivm),fnum(1),rquad(1),vquad(1),wquad(1)
-     $     ,nmunit(16),rss(18)
+     $     ,nmunit(20),rss(18)
       dimension ho(maxqd,maxho),hox(maxho)
       common/need/rx,alpha,re
  
@@ -971,7 +971,7 @@ c  ***
       dimension finone(nlexi,nlexi,npts)
       dimension fout(nlexo*ivm,nlexo*ivm,npts)
       dimension chis(nquad,ivm),fnum(1),rquad(1),vquad(1),wquad(1)
-     $     ,nmunit(16),rss(18)
+     $     ,nmunit(20),rss(18)
       character*8 iflnm(20)
 
       logical outvib
@@ -3959,7 +3959,7 @@ C * maxqd is max quadrature   maxho=max harmonic osc.
       logical outvib
 
       dimension chis(nquad,ivm), fnum(1), rquad(1),fmat(ivm,ivm),
-     $     vquad(1), wquad(1), nmunit(16), rss(18)
+     $     vquad(1), wquad(1), nmunit(20), rss(18)
       dimension ho(maxqd,maxho), hox(maxho)
       common /splin/ bpar(11), csplin(5000)
 

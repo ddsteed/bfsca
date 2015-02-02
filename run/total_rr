@@ -26,6 +26,7 @@ while test "x$1" != "x"; do
     shift
 done
 
+#- default values
 if [ "$tgt" == ""    ]; then tgt=H2;     fi
 if [ "$pot" == ""    ]; then pot=DSG;    fi
 if [ "$ref" == ""    ]; then ref=HF;     fi

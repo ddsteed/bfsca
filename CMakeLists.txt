@@ -12,8 +12,10 @@ project(BFSCA
         CXX Fortran C)
 
 # handle mem > 2 GB by using Intel compiler
-if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
-   set(CMAKE_Fortran_FLAGS "-mcmodel medium -shared-intel")
+if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+   if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
+      set(CMAKE_Fortran_FLAGS "-shared-intel -mcmodel medium")
+   endif()
 endif()
 
 # Source code subdirectory

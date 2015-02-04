@@ -67,8 +67,11 @@ echo
 echo " --------------------------------------------------------"
 echo
 
-cmake ..    \
-    -DINSTA_BIN=${dest_bin}     \
+cmake ..                            \
+    -DCMAKE_Fortran_COMPILER=${F77} \
+    -DCMAKE_C_COMPILER=${CC}        \
+    -DCMAKE_CXX_COMPILER=${CXX}     \
+    -DINSTA_BIN=${dest_bin}         \
     -DINSTA_LIB=${dest_lib}
 
 # (Options

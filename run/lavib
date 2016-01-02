@@ -43,11 +43,10 @@ function handle_opt {
     if [[ "$nv" == ""   && $tgt == H2 ]]; then nv=4;       fi
 
 #- echo OPTIONS
-    echo " The command is: "
     if [[ $method == vib ]]; then
-	echo "     $0 -t $tgt -p $pot -basis $basis -ref $ref -sym $sym -method $method -nv $nv"
+	echo "$0 -t $tgt -p $pot -basis $basis -ref $ref -sym $sym -method $method -nv $nv"
     else
-	echo "     $0 -t $tgt -p $pot -basis $basis -ref $ref -sym $sym -method $method -R $CRD"
+	echo "$0 -t $tgt -p $pot -basis $basis -ref $ref -sym $sym -method $method -R $CRD"
     fi
     echo
 }

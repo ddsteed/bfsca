@@ -42,8 +42,7 @@ function handle_opt {
     if [ "$vf" == ""     ]; then vf=0;       fi
 
 #- echo OPTIONS
-    echo " The command is: "
-    echo "     $0 -t $tgt -p $pot -basis $basis -ref $ref -kform $kform -E $ener -v0 $v0 -vf $vf"
+    echo "$0 -t $tgt -p $pot -basis $basis -ref $ref -kform $kform -E $ener -v0 $v0 -vf $vf"
     echo
 }
 

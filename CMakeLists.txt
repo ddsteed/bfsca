@@ -18,6 +18,13 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
    endif()
 endif()
 
+if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "GNU")
+   set(CMAKE_Fortran_FLAGS "-mcmodel=medium")
+endif()
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+endif()
+
 # Source code subdirectory
 add_subdirectory(src)
 

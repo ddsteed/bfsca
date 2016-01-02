@@ -35,8 +35,7 @@ function handle_opt {
     if [ "$method" == "" ]; then method=vxz; fi
 
 #- echo OPTIONS
-    echo " The command is: "
-    echo "     $0 -t $tgt -p $pot -basis $basis -R $CRD -ref $ref -method $method"
+    echo "$0 -t $tgt -p $pot -basis $basis -R $CRD -ref $ref -method $method"
     echo
 }
 

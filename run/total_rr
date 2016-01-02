@@ -57,7 +57,7 @@ for basis in ${BS[@]}; do
     ./enmv   -t $tgt -basis $basis -R $CRD 
     ./alam   -t $tgt -basis $basis -R $CRD -p $pot
     ./vstat  -t $tgt -basis $basis -R $CRD -p $pot
-    ./vpola  -t $tgt -basis $basis -R $CRD -p $pot -method vxz
+#   ./vpola  -t $tgt -basis $basis -R $CRD -p $pot -method vxz
 
     ./fitpol -t $tgt -basis $basis -R $CRD -p $pot
     ./vstpol -t $tgt -basis $basis -R $CRD -p $pot
@@ -69,7 +69,7 @@ done
 #
 for basis in ${BS[@]}; do
     for sym in ${SYMM[@]}; do
-#	./exker  -t $tgt -basis $basis -R $CRD -p $pot -sym $sym
+	./exker  -t $tgt -basis $basis -R $CRD -p $pot -sym $sym
     done
 done
 
@@ -78,6 +78,6 @@ done
 #
 for basis in ${BS[@]}; do
     for sym in ${SYMM[@]}; do
-#       ./lavib  -t $tgt -basis $basis -R $CRD -p $pot -sym $sym -method rr
+        ./lavib  -t $tgt -basis $basis -R $CRD -p $pot -sym $sym -method rr
     done	    
 done

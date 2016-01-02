@@ -26,7 +26,7 @@ C * argument declarations
       integer nch,l0,vibdim,npw,nlamda
 CARR
       integer chanmax,vibmax,pwavemax,lammax
-      parameter(chanmax=165,vibmax=15,pwavemax=11,lammax=21)
+      parameter(chanmax=220,vibmax=20,pwavemax=11,lammax=21)
 C      double precision kmatrix(nch,nch),k(nch),r
 C      double precision alpha0(vibdim,vibdim),alpha2(vibdim,vibdim)
 C      double precision q(vibdim,vibdim)
@@ -199,7 +199,7 @@ C * internal variables
       DATA first /.true./
 
       integer maxel
-      parameter (maxel=36)
+      parameter (maxel=96)
       integer it,l0,l1,l2,num,ii
       double precision gamma(maxel+3)
       double precision kpow,pi,ratk,gam0,gam1,gam2,a,b,c

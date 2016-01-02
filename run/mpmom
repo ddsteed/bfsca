@@ -37,8 +37,7 @@ function handle_opt {
     if [ "$ref" == ""    ]; then ref=HF;     fi
 
 #- echo OPTIONS
-    echo " The command is: "
-    echo "     $0 -t $tgt -p $pot -basis $basis -R $CRD -ref $ref"
+    echo "$0 -t $tgt -p $pot -basis $basis -R $CRD -ref $ref"
     echo
 }
 

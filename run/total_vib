@@ -8,7 +8,7 @@
 #
 # ---
 # Usage:
-#    total_vib -t N2 -p DSG -basis M2H -nv 15 -ref HF -sym pg 
+#    total_vib -t N2 -p DSG -basis M2H -vwf Morse -nv 15 -ref HF -sym pg 
 #
 #--------------------------------------------------------------------------------
 #--- options
@@ -20,6 +20,7 @@ while test "x$1" != "x"; do
 	-basis) shift; basis=$1    ;;
 	-ref)   shift; ref=$1      ;;
 	-sym)   shift; sym=$1      ;;
+        -vwf)   shift; vwf=$1      ;;
         -nv)    shift; nv=$1       ;;
 	*)                         ;;
     esac
@@ -30,6 +31,7 @@ done
 if [ "$tgt" == ""    ]; then tgt=H2;     fi
 if [ "$pot" == ""    ]; then pot=DSG;    fi
 if [ "$ref" == ""    ]; then ref=HF;     fi
+if [ "$vwf" == ""    ]; then vwf=Morse;  fi
 
 if [[ "$nv" == ""   && $tgt == N2 ]]; then nv=15;      fi
 if [[ "$nv" == ""   && $tgt == H2 ]]; then nv=4;       fi
@@ -81,8 +83,8 @@ for basis in ${BS[@]}; do
     # 	./spfd   -t $tgt -basis $basis -R $R -p $pot
     # done
 
-    ./wlam  -t $tgt -basis $basis -R ${RE[@]} -p $pot -nv $nv -cp mpmom 
-    ./wlam  -t $tgt -basis $basis -R ${RE[@]} -p $pot -nv $nv -cp pot 
+    ./wlam  -t $tgt -basis $basis -vwf $vwf -R ${RE[@]} -p $pot -nv $nv -cp mpmom 
+    ./wlam  -t $tgt -basis $basis -vwf $vwf -R ${RE[@]} -p $pot -nv $nv -cp pot 
 done
 
 #---
@@ -94,7 +96,7 @@ for basis in ${BS[@]}; do
 	    ./exker  -t $tgt -basis $basis -R $R -p $pot -sym $sym
 	done
 	#---
-	./wlam  -t $tgt -basis $basis -R ${RE[@]} -p $pot -sym $sym -nv $nv -cp exk
+	./wlam  -t $tgt -basis $basis -vwf $vwf -R ${RE[@]} -p $pot -sym $sym -nv $nv -cp exk
 	#---
 	./lavib -t $tgt -basis $basis -R ${RE[@]} -p $pot -sym $sym -nv $nv
     done

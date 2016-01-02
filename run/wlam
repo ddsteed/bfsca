@@ -61,11 +61,10 @@ function handle_opt {
     lir=(${ir[@]})
 
 #- echo OPTIONS
-    echo " The command is: "
     if [[ $cp == exk ]]; then
-	echo "     $0 -t $tgt -p $pot -basis $basis -vwf $vwf -nv $nv -ref $ref -cp $cp -R ${lir[@]} -sym $sym"
+	echo "$0 -t $tgt -p $pot -basis $basis -vwf $vwf -nv $nv -ref $ref -cp $cp -R ${lir[@]} -sym $sym"
     else
-	echo "     $0 -t $tgt -p $pot -basis $basis -vwf $vwf -nv $nv -ref $ref -cp $cp -R ${lir[@]}"
+	echo "$0 -t $tgt -p $pot -basis $basis -vwf $vwf -nv $nv -ref $ref -cp $cp -R ${lir[@]}"
     fi
     echo
 }

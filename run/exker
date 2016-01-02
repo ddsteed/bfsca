@@ -35,8 +35,7 @@ function handle_opt {
     if [ "$sym" == ""    ]; then sym=sg;     fi
 
 #- echo OPTIONS
-    echo " The command is: "
-    echo "     $0 -t $tgt -p $pot -basis $basis -R $CRD -ref $ref -sym $sym"
+    echo "$0 -t $tgt -p $pot -basis $basis -R $CRD -ref $ref -sym $sym"
     echo
 }
 

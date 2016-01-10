@@ -98,6 +98,6 @@ for basis in ${BS[@]}; do
 	#---
 	./wlam  -t $tgt -basis $basis -vwf $vwf -R ${RE[@]} -p $pot -sym $sym -nv $nv -cp exk
 	#---
-	./lavib -t $tgt -basis $basis -R ${RE[@]} -p $pot -sym $sym -nv $nv
+	./lavib -t $tgt -basis $basis -R ${RE[@]} -p $pot -sym $sym -nv $nv -vwf $vwf
     done
 done

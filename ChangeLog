@@ -1,3 +1,6 @@
+2016-01-10 Hao Feng (RDS) <fenghao@mail.xhu.edu.cn>
+	* update lavib to handle different vibrational wavefunctions and energies
+	
 2015-02-02 Hao Feng (RDS) <fenghao@mail.xhu.edu.cn>
 	* modify lavib.f to augment more vibrational levles
 

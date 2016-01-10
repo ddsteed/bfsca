@@ -8,7 +8,7 @@
 #
 # ---
 #  Usage:
-#    lavib -t N2 -p DSG -basis ACCQ -nv 15 -ref HF -sym pg -method vib
+#    lavib -t N2 -p DSG -basis ACCQ -nv 15 -vwf Morse -ref HF -sym pg -method vib
 #
 #--------------------------------------------------------------------------------
 #--- options
@@ -21,6 +21,7 @@ function handle_opt {
 	    -basis) shift; basis=$1    ;;
 	    -ref)   shift; ref=$1      ;;
 	    -sym)   shift; sym=$1      ;;
+            -vwf)   shift; vwf=$1      ;;
             -nv)    shift; nv=$1       ;;
 	    -method)shift; method=$1   ;;
 	    *)                         ;;
@@ -34,6 +35,7 @@ function handle_opt {
     if [ "$basis" == ""  ]; then basis=CCD;  fi
     if [ "$ref" == ""    ]; then ref=HF;     fi
     if [ "$sym" == ""    ]; then sym=sg;     fi
+    if [ "$vwf" == ""    ]; then vwf=Morse;  fi
     if [ "$method" == "" ]; then method=vib; fi
 
     if [[ "$CRD" == ""  && $tgt == H2 ]]; then CRD=1.400;  fi
@@ -44,7 +46,7 @@ function handle_opt {
 
 #- echo OPTIONS
     if [[ $method == vib ]]; then
-	echo "$0 -t $tgt -p $pot -basis $basis -ref $ref -sym $sym -method $method -nv $nv"
+	echo "$0 -t $tgt -p $pot -basis $basis -ref $ref -sym $sym -method $method -nv $nv -vwf $vwf"
     else
 	echo "$0 -t $tgt -p $pot -basis $basis -ref $ref -sym $sym -method $method -R $CRD"
     fi
@@ -164,7 +166,8 @@ function make_inp {
 	numiter=10
 	nbound=6
 	npwavxin=11;     npwavx=11
-	swit=0;          we=1.07367848E-02;  wexe=6.43295472E-05
+        if [[ "$vwf" == "Morse" ]];  then  swit=0; we=1.07367848E-02;  wexe=6.43295472E-05; fi
+        if [[ "$vwf" == "CCSD_T" ]]; then  swit=0; we=0.0107342;       wexe=0.0000641024;   fi
     fi
 
 #---

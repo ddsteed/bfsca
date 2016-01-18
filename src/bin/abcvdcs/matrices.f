@@ -6,7 +6,7 @@ c
        subroutine tmatrix(kmat,tmati,tmatr,temp,nch)
          implicit none
          integer chanmax
-         parameter (chanmax=200) 
+         parameter (chanmax=500) 
          integer nch
 C numerical recipes inverse routines
          integer indx(chanmax)

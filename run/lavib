@@ -166,8 +166,11 @@ function make_inp {
 	numiter=10
 	nbound=6
 	npwavxin=11;     npwavx=11
-        if [[ "$vwf" == "Morse" ]];  then  swit=0; we=1.07367848E-02;  wexe=6.43295472E-05; fi
-        if [[ "$vwf" == "CCSD_T" ]]; then  swit=0; we=0.0107342;       wexe=0.0000641024;   fi
+        if [[ "$vwf" == "Morse"  ]]; then  swit=0; we=0.0107368;   wexe=0.0000643295;   fi
+        if [[ "$vwf" == "CCSD_T" ]]; then  swit=0; we=0.010902;    wexe=0.0000713143;   fi
+        if [[ "$vwf" == "MRCI"   ]]; then  swit=0; we=0.0108641;   wexe=0.0000695461;   fi 
+        if [[ "$vwf" == "FCI"    ]]; then  swit=0; we=0.0107392;   wexe=0.0000741205;   fi
+        if [[ "$vwf" == "HF"     ]]; then  swit=0; we=0.0127123;   wexe=0.0000597783;   fi
     fi
 
 #---
@@ -427,7 +430,8 @@ handle_opt $@
 set_location
 cd_work
 
-ENER=(1.50 2.40 5.00)
+#ENER=(1.50 2.40 5.00)
+ENER=(5.00)
 for ener in ${ENER[@]}; do
     echo "Now handle energy = $ener ..."
 

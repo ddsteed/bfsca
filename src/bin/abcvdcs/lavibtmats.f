@@ -23,9 +23,8 @@ c
       integer v0,v,numv,numsym,maxsym,maxv,i,j,jj,maxchan
       integer lam,l0,lm,nch,nv,lend
       parameter (maxsym=100)
-      parameter (maxv=20)
-C     parameter (maxchan=50)
-      parameter (maxchan=200)
+      parameter (maxv=25)
+      parameter (maxchan=500)
       integer mflen,kflen(maxsym)
       character*512 momfile,kmatfile(maxsym)
       integer iread

@@ -431,7 +431,7 @@ set_location
 cd_work
 
 #ENER=(1.50 2.40 5.00)
-ENER=(5.00)
+ENER=(0.55 0.80 1.50 1.90 1.98 2.40 2.46 2.47 2.60 4.00 5.00 10.00 15.00 20.00)
 for ener in ${ENER[@]}; do
     echo "Now handle energy = $ener ..."
 

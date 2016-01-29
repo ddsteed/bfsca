@@ -34,8 +34,7 @@ function handle_opt {
     kdir=(${dir[@]})
 
 # - echo OPTIONS
-    echo " The command is: "
-    echo "     $0 -keep ${kdir[@]} "
+    echo "$0 -keep ${kdir[@]} "
     echo
 }
 

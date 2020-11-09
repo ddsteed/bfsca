@@ -59,11 +59,6 @@ C * MLPROJ: the Ml for that orbital
 C * L0PROJ: the L0 for the orbital
       integer nlproj(boundmax),mlproj(boundmax),l0proj(boundmax)
 
-C     double precision clebx1(boundmax,chanmax,lammax,chanmax)
-C     double precision clebx2(boundmax,chanmax,lammax,chanmax)
-C     double precision clebx3(boundmax,chanmax,lammax,chanmax)
-C     double precision clebx4(boundmax,chanmax,lammax,chanmax)
-C     double precision clebx5(boundmax,chanmax,lammax,chanmax)
       double precision clebx1(boundmax,chanmax,lammax,nlmomax)
       double precision clebx2(boundmax,chanmax,lammax,nlmomax)
       double precision clebx3(boundmax,chanmax,lammax,nlmomax)

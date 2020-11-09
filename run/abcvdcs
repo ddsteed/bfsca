@@ -49,8 +49,8 @@ function handle_opt {
 #--------------------------------------------------------------------------------
 #--- locations
 function set_location {
-    work="/Users/fenghao/home1/feng/scatt/bfsca/work"
-    storeT="/Users/fenghao/home1/feng/scatt/bfsca/store"
+    work="/Users/fenghao/Research/Scatt/bfsca/work"
+    storeT="/Users/fenghao/Research/Scatt/bfsca/store"
     store="$storeT/vdcs/$tgt/$ref/$pot/$basis"
     kmatin="$storeT/$kform/$tgt/$ref/$pot/$basis"
     momin="$storeT/wlam/$tgt/$ref/$pot/$basis"

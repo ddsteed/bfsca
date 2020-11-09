@@ -56,8 +56,8 @@ function handle_opt {
 #--------------------------------------------------------------------------------
 #--- locations
 function set_location {
-    work="/Users/fenghao/home1/feng/scatt/bfsca/work"
-    storeT="/Users/fenghao/home1/feng/scatt/bfsca/store"
+    work="/Users/fenghao/Research/Scatt/bfsca/work"
+    storeT="/Users/fenghao/Research/Scatt/bfsca/store"
     store="$storeT/lavib/$tgt/$ref/$pot/$basis"
     datain="$storeT/wlam/$tgt/$ref/$pot/$basis"
     datast="$storeT/vstpol/$tgt/$ref/$pot/$basis"
@@ -430,7 +430,7 @@ handle_opt $@
 set_location
 cd_work
 
-#ENER=(1.50 2.40 5.00)
+# for every incident energy (eV)
 ENER=(0.55 0.80 1.50 1.90 1.98 2.40 2.46 2.47 2.60 4.00 5.00 10.00 15.00 20.00)
 for ener in ${ENER[@]}; do
     echo "Now handle energy = $ener ..."

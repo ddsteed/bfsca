@@ -56,8 +56,8 @@ function handle_opt {
 #--------------------------------------------------------------------------------
 #--- locations
 function set_location {
-    work="/Users/fenghao/Research/Scatt/bfsca/work"
-    storeT="/Users/fenghao/Research/Scatt/bfsca/store"
+    work="/Users/fengh/Research/Scatt/bfsca/work"
+    storeT="/Users/fengh/Research/Scatt/bfsca/store"
     store="$storeT/lavib/$tgt/$ref/$pot/$basis"
     datain="$storeT/wlam/$tgt/$ref/$pot/$basis"
     datast="$storeT/vstpol/$tgt/$ref/$pot/$basis"

@@ -1,13 +1,13 @@
               INSTALLATION
               RDS      JAN 02, 2015
 
-1. Prerequisite
-* fortran compiler
-* cmake
-* modified GAMESS package (quantum chemistry)
+# Prerequisite
+- fortran compiler
+- cmake
+- modified GAMESS package (quantum chemistry)
 
-2. Steps
-1) modify the path of GAMESS in run/enmv and run/vpola
-2) ./setup
+# Steps
+- modify the path of GAMESS in run/enmv and run/vpola
+- ./setup
    choose working directory and store directory. If you want to set them in the current path, only press RETURN.
 

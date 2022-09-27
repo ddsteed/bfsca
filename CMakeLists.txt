@@ -37,7 +37,7 @@ set(CPACK_PACKAGE_VERSION_MAJOR 0)
 set(CPACK_PACKAGE_VERSION_MINOR 1) 
 set(CPACK_PACKAGE_VERSION_PATCH 0)
 
-# ’call’ CPack
+# 'call' CPack
 include(CPack)
 
 # ============================================================
